@@ -1,0 +1,72 @@
+{
+  "name": "jaml-ui",
+  "version": "0.1.0",
+  "description": "Balatro rendering components, sprite metadata, and optional Motely helpers for React apps.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js"
+    },
+    "./motely": {
+      "types": "./dist/motely.d.ts",
+      "import": "./dist/motely.js"
+    },
+    "./assets/*": "./assets/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "assets",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --pretty false",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit --pretty false",
+    "prepack": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "balatro",
+    "jaml",
+    "motely",
+    "seed",
+    "card",
+    "sprite",
+    "ui"
+  ],
+  "author": "pifreak",
+  "license": "MIT",
+  "peerDependencies": {
+    "motely-wasm": ">=5.7.0",
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "motely-wasm": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "motely-wasm": "^5.8.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.9.3"
+  }
+}
