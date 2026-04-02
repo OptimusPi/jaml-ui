@@ -33,6 +33,7 @@ export interface JamlGameCardProps {
     };
     type: "joker" | "consumable" | "playing";
     className?: string;
+    hoverTilt?: boolean;
 }
 
 export type AnalyzerShopItem = {
@@ -266,7 +267,7 @@ export function resolveAnalyzerShopItem(item: AnalyzerShopItem, scale = 1): Anal
     return packedResolved ?? { kind: "unknown", label: displayName };
 }
 
-export function JamlGameCard({ card, type, className = "" }: JamlGameCardProps) {
+export function JamlGameCard({ card, type, className = "", hoverTilt = false }: JamlGameCardProps) {
     const { name, edition, isEternal, isPerishable, isRental, rank, suit, enhancements, seal, scale = 1 } = card;
     const layers: Layer[] = [];
 
@@ -386,7 +387,7 @@ export function JamlGameCard({ card, type, className = "" }: JamlGameCardProps) 
 
     return (
         <div style={wrapperStyle} className={className}>
-            <JamlCardRenderer invert={edition === "Negative"} layers={layers} />
+            <JamlCardRenderer invert={edition === "Negative"} layers={layers} hoverTilt={hoverTilt} />
         </div>
     );
 }
@@ -395,9 +396,10 @@ export interface VoucherProps {
     voucherName: string;
     scale?: number;
     className?: string;
+    hoverTilt?: boolean;
 }
 
-export function JamlVoucher({ voucherName, scale = 1, className = "" }: VoucherProps) {
+export function JamlVoucher({ voucherName, scale = 1, className = "", hoverTilt = false }: VoucherProps) {
     const voucherData = VOUCHERS.find((v) => v.name === voucherName);
     if (!voucherData) return null;
 
@@ -415,7 +417,7 @@ export function JamlVoucher({ voucherName, scale = 1, className = "" }: VoucherP
 
     return (
         <div style={wrapperStyle} className={className}>
-            <JamlCardRenderer layers={layers} />
+            <JamlCardRenderer layers={layers} hoverTilt={hoverTilt} />
         </div>
     );
 }
@@ -424,9 +426,10 @@ export interface TagProps {
     tagName: string;
     scale?: number;
     className?: string;
+    hoverTilt?: boolean;
 }
 
-export function JamlTag({ tagName, scale = 1, className = "" }: TagProps) {
+export function JamlTag({ tagName, scale = 1, className = "", hoverTilt = false }: TagProps) {
     const tagData = TAGS.find((t) => t.name === tagName);
     if (!tagData) return null;
 
@@ -444,7 +447,7 @@ export function JamlTag({ tagName, scale = 1, className = "" }: TagProps) {
 
     return (
         <div style={wrapperStyle} className={className}>
-            <JamlCardRenderer layers={layers} />
+            <JamlCardRenderer layers={layers} hoverTilt={hoverTilt} />
         </div>
     );
 }
@@ -453,9 +456,10 @@ export interface BossProps {
     bossName: string;
     scale?: number;
     className?: string;
+    hoverTilt?: boolean;
 }
 
-export function JamlBoss({ bossName, scale = 1, className = "" }: BossProps) {
+export function JamlBoss({ bossName, scale = 1, className = "", hoverTilt = false }: BossProps) {
     const bossData = BOSSES.find((b) => b.name === bossName);
     if (!bossData) return null;
 
@@ -473,7 +477,7 @@ export function JamlBoss({ bossName, scale = 1, className = "" }: BossProps) {
 
     return (
         <div style={wrapperStyle} className={className}>
-            <JamlCardRenderer layers={layers} />
+            <JamlCardRenderer layers={layers} hoverTilt={hoverTilt} />
         </div>
     );
 }

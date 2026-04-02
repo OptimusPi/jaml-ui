@@ -60,15 +60,18 @@ export interface JamlCardRendererProps {
     layers: Layer[];
     invert?: boolean;
     className?: string;
+    hoverTilt?: boolean;
 }
 
-export function JamlCardRenderer({ layers, invert = false, className = "" }: JamlCardRendererProps) {
+export function JamlCardRenderer({ layers, invert = false, className = "", hoverTilt = false }: JamlCardRendererProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
     const [ratio, setRatio] = useState(3 / 4);
     const [, forceUpdate] = useState(0);
     const animationFrameRef = useRef<number | null>(null);
     const [elapsed, setElapsed] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
+    const [transform, setTransform] = useState("none");
 
     const hasAnimatedLayer = layers?.some((layer) => layer.animated);
 
@@ -160,20 +163,52 @@ export function JamlCardRenderer({ layers, invert = false, className = "" }: Jam
         return () => { cancelled = true; };
     }, [layers, elapsed, invert, hasAnimatedLayer]);
 
+    const handlePointerEnter = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!hoverTilt || event.pointerType === "touch") return;
+        setIsHovered(true);
+    };
+
+    const handlePointerLeave = () => {
+        if (!hoverTilt) return;
+        setIsHovered(false);
+        setTransform("none");
+    };
+
+    const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!hoverTilt || event.pointerType === "touch") return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const rotateY = (x / rect.width) * 12 - 6;
+        const rotateX = (y / rect.height) * -16 + 8;
+        setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`);
+    };
+
     const containerStyle: React.CSSProperties = {
         aspectRatio: String(ratio),
         width: "100%",
         display: "flex",
+        transition: hoverTilt && !isHovered ? "transform 0.4s ease" : undefined,
+        transform: hoverTilt ? (isHovered ? transform : "none") : undefined,
+        transformStyle: hoverTilt ? "preserve-3d" : undefined,
+        transformOrigin: hoverTilt ? "center center" : undefined,
     };
 
     const canvasStyle: React.CSSProperties = {
         borderRadius: "6px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+        boxShadow: hoverTilt && isHovered ? "0 2px 12px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.2)",
         imageRendering: "pixelated",
+        transition: hoverTilt && !isHovered ? "box-shadow 0.4s ease-out" : undefined,
     };
 
     return (
-        <div className={className} style={containerStyle}>
+        <div
+            className={className}
+            style={containerStyle}
+            onPointerEnter={hoverTilt ? handlePointerEnter : undefined}
+            onPointerLeave={hoverTilt ? handlePointerLeave : undefined}
+            onPointerMove={hoverTilt ? handlePointerMove : undefined}
+        >
             <canvas ref={canvasRef} style={canvasStyle} />
         </div>
     );
