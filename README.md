@@ -2,6 +2,8 @@
 
 Balatro rendering components, sprite metadata, and optional Motely helpers for React apps.
 
+`jaml-ui` is the shared UI layer for Balatro/JAML surfaces: low-level renderers, asset helpers, visual JAML previews, and a lightweight browser-first JAML IDE shell.
+
 ## Package shape
 
 - `jaml-ui`
@@ -40,6 +42,39 @@ export function Example() {
         isEternal: true,
         scale: 1.5,
       }}
+    />
+  );
+}
+```
+
+## JAML preview
+
+```tsx
+"use client";
+
+import { JamlMapPreview } from "jaml-ui";
+
+export function PreviewExample({ jaml }: { jaml: string }) {
+  return <JamlMapPreview jaml={jaml} title="JAML Intent Preview" />;
+}
+```
+
+## Lightweight JAML IDE shell
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { JamlIde } from "jaml-ui";
+
+export function IdeExample() {
+  const [jaml, setJaml] = useState("must:\n  joker: Blueprint");
+
+  return (
+    <JamlIde
+      jaml={jaml}
+      onChange={setJaml}
+      results={[]}
     />
   );
 }
@@ -108,3 +143,5 @@ export default nextConfig;
 ## Browser-first runtime direction
 
 `jaml-ui` is designed for browser/React consumers. The optional `jaml-ui/motely` entry targets plain `motely-wasm` and does not assume threaded WASM, SAB, or COEP setup.
+
+The built-in `JamlIde` intentionally stays lightweight. Rich editor integrations like Monaco, custom language servers, or extension-host-specific tooling should live in app-level packages on top of `jaml-ui`, not in the base renderer package.

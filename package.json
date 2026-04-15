@@ -1,6 +1,6 @@
 {
   "name": "jaml-ui",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Balatro rendering components, sprite metadata, and optional Motely helpers for React apps.",
   "type": "module",
   "main": "./dist/index.js",
@@ -40,6 +40,14 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OptimusPi/jaml-ui"
+  },
+  "homepage": "https://github.com/OptimusPi/jaml-ui#readme",
+  "bugs": {
+    "url": "https://github.com/OptimusPi/jaml-ui/issues"
+  },
   "keywords": [
     "balatro",
     "jaml",
@@ -52,7 +60,7 @@
   "author": "pifreak",
   "license": "MIT",
   "peerDependencies": {
-    "motely-wasm": ">=5.7.0",
+    "motely-wasm": "^10.2.0",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
@@ -64,7 +72,7 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "motely-wasm": "^9.0.0",
+    "motely-wasm": "^10.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "typescript": "^5.9.3"
