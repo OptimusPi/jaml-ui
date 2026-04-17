@@ -15,8 +15,8 @@ importers:
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
       motely-wasm:
-        specifier: ^11.2.0
-        version: 11.2.0
+        specifier: ^11.3.2
+        version: 11.3.2
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -40,8 +40,8 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
-  motely-wasm@11.2.0:
-    resolution: {integrity: sha512-Ru1lq91wJCLRJeI9ehWRzjbGnCFKhEyANP07RalVk64w+jldK6E8nnDh5X4GzJaJrS4TNS1DUYZhu3i5N1nfEg==}
+  motely-wasm@11.3.2:
+    resolution: {integrity: sha512-DJMRHS3gTIiyopaHI2rJeVZA3QCwwWcKjUcSrdcTbo/9ZanELeQXti7FpVPkyr/jILIOESiqhU5vDfGvr++lUA==}
 
   react-dom@19.2.4:
     resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
@@ -72,7 +72,7 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  motely-wasm@11.2.0: {}
+  motely-wasm@11.3.2: {}
 
   react-dom@19.2.4(react@19.2.4):
     dependencies:

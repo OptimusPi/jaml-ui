@@ -1,8 +1,6 @@
 # jaml-ui
 
-Balatro rendering components, sprite metadata, and optional Motely helpers for React apps.
-
-`jaml-ui` is the shared UI layer for Balatro/JAML surfaces: low-level renderers, asset helpers, visual JAML previews, and a lightweight browser-first JAML IDE shell.
+React components and utilities for Balatro/JAML. Pair with **`motely-wasm`** when you need the engine (peer). Update both in consumers with normal **`pnpm update`** / semver like any other deps.
 
 ## Package shape
 
