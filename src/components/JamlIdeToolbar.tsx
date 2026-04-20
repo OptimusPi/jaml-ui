@@ -9,6 +9,8 @@ export interface JamlIdeToolbarProps {
   onModeChange: (mode: JamlIdeMode) => void;
   resultCount?: number;
   className?: string;
+  onSearch?: () => void;
+  isSearching?: boolean;
 }
 
 const TABS: Array<{ id: JamlIdeMode; label: string }> = [
@@ -17,7 +19,7 @@ const TABS: Array<{ id: JamlIdeMode; label: string }> = [
   { id: "results", label: "Results" },
 ];
 
-export function JamlIdeToolbar({ mode, onModeChange, resultCount = 0, className = "" }: JamlIdeToolbarProps) {
+export function JamlIdeToolbar({ mode, onModeChange, resultCount = 0, className = "", onSearch, isSearching = false }: JamlIdeToolbarProps) {
   return (
     <div
       className={className}
@@ -68,6 +70,25 @@ export function JamlIdeToolbar({ mode, onModeChange, resultCount = 0, className 
           );
         })}
       </div>
+      {onSearch ? (
+        <button
+          type="button"
+          onClick={onSearch}
+          disabled={isSearching}
+          style={{
+            cursor: isSearching ? "not-allowed" : "pointer",
+            borderRadius: 8,
+            border: "1px solid rgba(74,222,128,0.4)",
+            background: isSearching ? "rgba(239,68,68,0.2)" : "rgba(74,222,128,0.15)",
+            color: isSearching ? "#ef4444" : "#4ade80",
+            padding: "6px 14px",
+            fontSize: 11,
+            fontWeight: 700,
+          }}
+        >
+          {isSearching ? "Stop" : "Search"}
+        </button>
+      ) : null}
     </div>
   );
 }

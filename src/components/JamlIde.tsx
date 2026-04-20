@@ -18,6 +18,8 @@ export interface JamlIdeProps {
   title?: string;
   actions?: React.ReactNode;
   codePlaceholder?: string;
+  onSearch?: () => void;
+  isSearching?: boolean;
 }
 
 function ResultsView({ results }: { results: JamlIdeSearchResult[] }) {
@@ -71,6 +73,8 @@ export function JamlIde({
   title = "JAML IDE",
   actions,
   codePlaceholder = "Enter JAML...",
+  onSearch,
+  isSearching = false,
 }: JamlIdeProps) {
   const [mode, setMode] = useState<JamlIdeMode>(defaultMode);
   const results = useMemo(() => searchResults, [searchResults]);
@@ -107,7 +111,7 @@ export function JamlIde({
         {actions ? <div style={{ display: "flex", alignItems: "center", gap: 8 }}>{actions}</div> : null}
       </div>
 
-      <JamlIdeToolbar mode={mode} onModeChange={setMode} resultCount={results.length} />
+      <JamlIdeToolbar mode={mode} onModeChange={setMode} resultCount={results.length} onSearch={onSearch} isSearching={isSearching} />
 
       <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
         {mode === "code" ? (

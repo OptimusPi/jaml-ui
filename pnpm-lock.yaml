@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      jaml-ui:
+        specifier: 0.4.0
+        version: 0.4.0(motely-wasm@11.3.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -40,6 +44,17 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
+  jaml-ui@0.4.0:
+    resolution: {integrity: sha512-dxluxj//XwimPpYEz2brS2ai1ygnqZR+YVlSsInwNkKd/mkcPBcJBBxhVnjnXhjObH5T7tGJMIK/yy3znd4BVA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      motely-wasm: ^10.2.0 || ^11.0.0
+      react: ^18.2.0 || ^19.0.0
+      react-dom: ^18.2.0 || ^19.0.0
+    peerDependenciesMeta:
+      motely-wasm:
+        optional: true
+
   motely-wasm@11.3.2:
     resolution: {integrity: sha512-DJMRHS3gTIiyopaHI2rJeVZA3QCwwWcKjUcSrdcTbo/9ZanELeQXti7FpVPkyr/jILIOESiqhU5vDfGvr++lUA==}
 
@@ -71,6 +86,13 @@ snapshots:
       csstype: 3.2.3
 
   csstype@3.2.3: {}
+
+  jaml-ui@0.4.0(motely-wasm@11.3.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+    optionalDependencies:
+      motely-wasm: 11.3.2
 
   motely-wasm@11.3.2: {}
 
