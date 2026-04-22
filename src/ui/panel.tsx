@@ -1,19 +1,18 @@
 'use client'
 
 import React, { useState, useEffect, useRef, memo } from 'react'
-import { JimboColorOption, JIMBO_ANIMATIONS, type ButtonVariant } from './tokens.js'
+import { JimboColorOption, JIMBO_ANIMATIONS } from './tokens.js'
 
 // ─── Panel ───────────────────────────────────────────────────────────────────
 
 export interface JimboPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   sway?: boolean
   onBack?: () => void
-  backLabel?: string
   hideBack?: boolean
 }
 
 export const JimboPanel = memo(({
-  children, className = '', sway = false, onBack, backLabel = 'Back', hideBack = false, style, ...props
+  children, className = '', sway = false, onBack, hideBack = false, style, ...props
 }: JimboPanelProps) => {
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -46,7 +45,7 @@ export const JimboPanel = memo(({
       <div className="flex-1 overflow-auto">{children}</div>
       {onBack && !hideBack && (
         <div className="mt-4 pt-2 shrink-0">
-          <JimboBackButton onClick={onBack} label={backLabel} />
+          <JimboBackButton onClick={onBack} />
         </div>
       )}
     </div>
@@ -67,65 +66,70 @@ export const JimboInnerPanel = memo(({ children, className = '', style, ...props
 ))
 JimboInnerPanel.displayName = 'JimboInnerPanel'
 
-// ─── Button ──────────────────────────────────────────────────────────────────
+// ─── JimboButton ──────────────────────────────────────────────────────────────
+// Canonical flat 2D Balatro-style button.
+// Two-layer: separate shadow div (3px south + 1px east) that disappears on press.
+// Press translates the face onto the shadow. No gradients, no hover color change.
 
-const VARIANT_COLORS: Record<ButtonVariant, { bg: string; hover: string; text: string }> = {
-  primary:   { bg: JimboColorOption.RED,    hover: JimboColorOption.DARK_RED,    text: '#fff' },
-  secondary: { bg: JimboColorOption.BLUE,   hover: JimboColorOption.DARK_BLUE,   text: '#fff' },
-  danger:    { bg: JimboColorOption.RED,    hover: JimboColorOption.DARK_RED,    text: '#fff' },
-  back:      { bg: JimboColorOption.ORANGE, hover: JimboColorOption.DARK_ORANGE, text: '#fff' },
-  ghost:     { bg: 'transparent', hover: 'rgba(255,255,255,0.1)', text: '#fff' },
+const JIMBO_TONE_PAIRS: Record<string, [string, string]> = {
+  orange: [JimboColorOption.ORANGE, JimboColorOption.DARK_ORANGE],
+  red:    [JimboColorOption.RED,    JimboColorOption.DARK_RED],
+  blue:   [JimboColorOption.BLUE,   JimboColorOption.DARK_BLUE],
+  green:  [JimboColorOption.GREEN,  JimboColorOption.DARK_GREEN],
+  gold:   [JimboColorOption.GOLD,   '#8a6a1e'],
+  grey:   [JimboColorOption.DARK_GREY, JimboColorOption.DARKEST],
 }
 
-export interface JimboButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant
+export type JimboTone = 'orange' | 'red' | 'blue' | 'green' | 'gold' | 'grey'
+
+export interface JimboButtonProps {
+  tone?: JimboTone
   size?: 'xs' | 'sm' | 'md' | 'lg'
   fullWidth?: boolean
+  disabled?: boolean
+  onClick?: () => void
+  style?: React.CSSProperties
+  children?: React.ReactNode
 }
 
 export function JimboButton({
-  children, variant = 'primary', size = 'md', fullWidth = false, className = '', style, disabled, ...props
+  tone = 'orange', size = 'md', fullWidth = false, disabled = false, onClick, style, children,
 }: JimboButtonProps) {
-  const [hovered, setHovered] = useState(false)
   const [pressed, setPressed] = useState(false)
-  const c = VARIANT_COLORS[variant]
-  const pad = { xs: '0.2rem 0.5rem', sm: '0.25rem 0.75rem', md: '0.375rem 1rem', lg: '0.5rem 1.5rem' }[size]
+  const [fg, sh] = JIMBO_TONE_PAIRS[tone] ?? JIMBO_TONE_PAIRS.orange
+  const pad = size === 'xs' ? '2px 8px' : size === 'sm' ? '4px 10px' : size === 'lg' ? '14px 18px' : '9px 14px'
+  const fs  = size === 'xs' ? 10 : size === 'sm' ? 12 : size === 'lg' ? 18 : 14
 
   return (
-    <button
-      disabled={disabled}
-      onMouseEnter={() => { if (!disabled) setHovered(true) }}
-      onMouseLeave={() => { setHovered(false); setPressed(false) }}
+    <div
       onMouseDown={() => { if (!disabled) setPressed(true) }}
       onMouseUp={() => setPressed(false)}
-      className={className}
-      style={{
-        fontFamily: 'm6x11plus, monospace',
-        backgroundColor: hovered ? c.hover : c.bg,
-        color: c.text,
-        padding: pad,
-        borderRadius: '0.5rem',
-        border: 'none',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        width: fullWidth ? '100%' : undefined,
-        opacity: disabled ? 0.5 : 1,
-        transform: pressed ? 'translateY(3px)' : 'none',
-        boxShadow: pressed ? 'none' : '0 3px 0 0 rgba(0,0,0,0.5)',
-        textShadow: '1px 1px 0 rgba(0,0,0,0.8)',
-        userSelect: 'none',
-        ...style,
-      }}
-      {...props}
+      onMouseLeave={() => setPressed(false)}
+      onTouchStart={() => { if (!disabled) setPressed(true) }}
+      onTouchEnd={() => setPressed(false)}
+      onClick={() => { if (!disabled) onClick?.() }}
+      style={{ display: 'inline-block', width: fullWidth ? '100%' : undefined, position: 'relative', cursor: disabled ? 'not-allowed' : 'pointer', userSelect: 'none', opacity: disabled ? 0.55 : 1, ...style }}
     >
-      {children}
-    </button>
+      <div style={{ position: 'absolute', left: 1, top: 3, right: -1, bottom: -3, background: sh, borderRadius: 6, opacity: pressed ? 0 : 1 }} />
+      <div style={{
+        position: 'relative', background: fg, borderRadius: 6, padding: pad,
+        transform: pressed ? 'translate(1px, 3px)' : 'translate(0,0)',
+        transition: 'transform 55ms linear',
+        textAlign: 'center',
+        fontFamily: 'm6x11plus, monospace', fontSize: fs, letterSpacing: 2,
+        color: '#fff', textShadow: '1px 1px 0 rgba(0,0,0,0.8)',
+        textTransform: 'uppercase', lineHeight: 1.1,
+      }}>{children}</div>
+    </div>
   )
 }
 
-export function JimboBackButton({
-  label = 'Back', ...props
-}: Omit<JimboButtonProps, 'variant' | 'children'> & { label?: string }) {
-  return <JimboButton variant="back" size="sm" fullWidth {...props}>{label}</JimboButton>
+export function JimboBackButton({ onClick }: { onClick?: () => void }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100%', padding: '8px 10px 10px' }}>
+      <JimboButton tone="orange" size="md" onClick={onClick} style={{ width: '66.666%' }}>Back</JimboButton>
+    </div>
+  )
 }
 
 // ─── Modal ───────────────────────────────────────────────────────────────────
@@ -163,7 +167,6 @@ export function JimboModal({ children, open, onClose, title, className }: JimboM
       <JimboPanel
         sway
         onBack={onClose}
-        backLabel="Close"
         className={'w-full flex flex-col max-h-[90vh] ' + (className ?? 'max-w-lg')}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >

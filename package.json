@@ -1,6 +1,6 @@
 {
   "name": "jaml-ui",
-  "version": "0.5.2",
+  "version": "0.7.0",
   "description": "Balatro rendering components, sprite metadata, and optional Motely helpers for React apps.",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,13 +26,11 @@
       "types": "./dist/r3f.d.ts",
       "import": "./dist/r3f.js"
     },
-    "./assets/*": "./assets/*",
     "./package.json": "./package.json"
   },
   "sideEffects": false,
   "files": [
     "dist",
-    "assets",
     "README.md",
     "LICENSE"
   ],

@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { JamlMapPreview } from "./JamlMapPreview.js";
 import { JamlIdeToolbar, type JamlIdeMode } from "./JamlIdeToolbar.js";
+import { JamlIdeVisual, type JamlVisualFilter } from "./JamlIdeVisual.js";
 import { JimboColorOption } from "../ui/tokens.js";
 
 export interface JamlIdeSearchResult {
@@ -23,7 +24,12 @@ export interface JamlIdeProps {
   codePlaceholder?: string;
   onSearch?: () => void;
   isSearching?: boolean;
+  visualFilter?: JamlVisualFilter;
+  onVisualFilterChange?: (filter: JamlVisualFilter) => void;
 }
+
+export type { JamlVisualFilter } from "./JamlIdeVisual.js";
+export type { JamlVisualClause, JamlZone } from "./JamlIdeVisual.js";
 
 function TallyBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.min(1, value / max) : 0;
@@ -198,6 +204,8 @@ export function JamlIde({
   codePlaceholder = "Enter JAML...",
   onSearch,
   isSearching = false,
+  visualFilter,
+  onVisualFilterChange,
 }: JamlIdeProps) {
   const [mode, setMode] = useState<JamlIdeMode>(defaultMode);
   const results = useMemo(() => searchResults, [searchResults]);
@@ -238,6 +246,14 @@ export function JamlIde({
       <JamlIdeToolbar mode={mode} onModeChange={setMode} resultCount={results.length} onSearch={onSearch} isSearching={isSearching} />
 
       <div style={{ flex: 1, minHeight: 0, overflow: "auto", background: JimboColorOption.DARKEST }}>
+        {mode === "visual" && visualFilter && onVisualFilterChange ? (
+          <JamlIdeVisual filter={visualFilter} onChange={onVisualFilterChange} />
+        ) : mode === "visual" ? (
+          <div style={{ padding: 16, color: JimboColorOption.GREY, fontSize: 12, textAlign: "center" }}>
+            Pass <code>visualFilter</code> and <code>onVisualFilterChange</code> props to enable the visual editor.
+          </div>
+        ) : null}
+
         {mode === "code" ? (
           <textarea
             title="JAML IDE Editor"

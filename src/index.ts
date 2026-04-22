@@ -39,7 +39,14 @@ export {
     JamlIde,
     type JamlIdeProps,
     type JamlIdeSearchResult,
+    type JamlVisualFilter,
+    type JamlVisualClause,
+    type JamlZone,
 } from "./components/JamlIde.js";
+export {
+    JamlIdeVisual,
+    type JamlIdeVisualProps,
+} from "./components/JamlIdeVisual.js";
 export {
     JamlIdeToolbar,
     type JamlIdeMode,

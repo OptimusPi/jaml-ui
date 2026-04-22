@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
+import { JimboButton } from "../ui/panel.js";
 import { JimboColorOption } from "../ui/tokens.js";
 
-export type JamlIdeMode = "code" | "map" | "results";
+export type JamlIdeMode = "visual" | "code" | "map" | "results";
 
 export interface JamlIdeToolbarProps {
   mode: JamlIdeMode;
@@ -15,6 +16,7 @@ export interface JamlIdeToolbarProps {
 }
 
 const TABS: Array<{ id: JamlIdeMode; label: string }> = [
+  { id: "visual", label: "Visual" },
   { id: "code", label: "Code" },
   { id: "map", label: "Map" },
   { id: "results", label: "Results" },
@@ -35,68 +37,27 @@ export function JamlIdeToolbar({ mode, onModeChange, resultCount = 0, className 
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        {TABS.map((tab) => {
-          const selected = mode === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => onModeChange(tab.id)}
-              style={{
-                cursor: "pointer",
-                borderRadius: 6,
-                border: selected ? `1px solid ${JimboColorOption.GOLD}` : "1px solid transparent",
-                background: selected ? `${JimboColorOption.GOLD}22` : "transparent",
-                color: selected ? JimboColorOption.GOLD_TEXT : JimboColorOption.GREY,
-                padding: "5px 10px",
-                fontSize: 11,
-                fontWeight: 700,
-                fontFamily: "m6x11plus, monospace",
-                transition: "background 120ms, color 120ms",
-              }}
-            >
-              {tab.label}
-              {tab.id === "results" && resultCount > 0 ? (
-                <span
-                  style={{
-                    marginLeft: 6,
-                    borderRadius: 999,
-                    background: `${JimboColorOption.GOLD}33`,
-                    color: JimboColorOption.GOLD_TEXT,
-                    padding: "1px 6px",
-                    fontSize: 10,
-                  }}
-                >
-                  {resultCount}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
+        {TABS.map((tab) => (
+          <JimboButton
+            key={tab.id}
+            tone={mode === tab.id ? "gold" : "grey"}
+            size="xs"
+            onClick={() => onModeChange(tab.id)}
+          >
+            {tab.label}
+            {tab.id === "results" && resultCount > 0 ? (
+              <span style={{ marginLeft: 6, borderRadius: 999, background: "rgba(228,182,67,0.2)", color: JimboColorOption.GOLD_TEXT, padding: "1px 6px", fontSize: 10 }}>
+                {resultCount}
+              </span>
+            ) : null}
+          </JimboButton>
+        ))}
       </div>
 
       {onSearch ? (
-        <button
-          type="button"
-          onClick={onSearch}
-          style={{
-            cursor: "pointer",
-            borderRadius: 6,
-            border: isSearching
-              ? `1px solid ${JimboColorOption.DARK_RED}`
-              : `1px solid ${JimboColorOption.GREEN}`,
-            background: isSearching
-              ? `${JimboColorOption.RED}22`
-              : `${JimboColorOption.GREEN}22`,
-            color: isSearching ? JimboColorOption.RED : JimboColorOption.GREEN_TEXT,
-            padding: "5px 14px",
-            fontSize: 11,
-            fontWeight: 700,
-            fontFamily: "m6x11plus, monospace",
-          }}
-        >
+        <JimboButton tone={isSearching ? "red" : "blue"} size="xs" onClick={onSearch}>
           {isSearching ? "Stop" : "Search"}
-        </button>
+        </JimboButton>
       ) : null}
     </div>
   );

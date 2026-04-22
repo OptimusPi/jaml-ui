@@ -1,15 +1,6 @@
 # jaml-ui
 
-React components and utilities for Balatro/JAML. Pair with **`motely-wasm`** when you need the engine (peer). Update both in consumers with normal **`pnpm update`** / semver like any other deps.
-
-## Package shape
-
-- `jaml-ui`
-  - React/client entry for rendered components and hooks
-- `jaml-ui/core`
-  - Pure asset helpers, sprite metadata, and decode utilities that do not depend on `motely-wasm`
-- `jaml-ui/motely`
-  - Optional plain `motely-wasm` helpers for decoding Motely item enums
+React components, UI tokens, sprites, and utilities for Balatro/JAML apps.
 
 ## Install
 
@@ -17,129 +8,128 @@ React components and utilities for Balatro/JAML. Pair with **`motely-wasm`** whe
 npm install jaml-ui react react-dom
 ```
 
-If you want the Motely-specific helpers too:
+## Package exports
 
-```bash
-npm install jaml-ui motely-wasm react react-dom
-```
+| Entry | Contents |
+|-------|----------|
+| `jaml-ui` | Game card components, JAML IDE, Analyzer Explorer, hooks |
+| `jaml-ui/ui` | Jimbo design system — JimboPanel, JimboButton, JimboModal, tokens |
+| `jaml-ui/core` | Pure asset helpers, sprite metadata, decode utilities (no React) |
+| `jaml-ui/motely` | motely-wasm decode helpers (requires `motely-wasm` peer) |
+| `jaml-ui/r3f` | 3D card component via React Three Fiber (requires r3f peers) |
 
 ## Quick start
 
 ```tsx
-"use client";
+import { JamlGameCard, AnalyzerExplorer, JamlIde } from "jaml-ui";
+import { JimboPanel, JimboButton } from "jaml-ui/ui";
+```
 
+### Game card
+
+```tsx
 import { JamlGameCard } from "jaml-ui";
 
-export function Example() {
-  return (
-    <JamlGameCard
-      type="joker"
-      card={{
-        name: "Blueprint",
-        edition: "Foil",
-        isEternal: true,
-        scale: 1.5,
-      }}
-    />
-  );
-}
+<JamlGameCard
+  type="joker"
+  card={{ name: "Blueprint", edition: "Foil", isEternal: true, scale: 1.5 }}
+/>
 ```
 
-## JAML preview
+### Jimbo UI (Balatro design system)
 
 ```tsx
-"use client";
+import { JimboPanel, JimboButton, JimboModal } from "jaml-ui/ui";
+import { JimboColorOption } from "jaml-ui/ui";
 
-import { JamlMapPreview } from "jaml-ui";
-
-export function PreviewExample({ jaml }: { jaml: string }) {
-  return <JamlMapPreview jaml={jaml} title="JAML Intent Preview" />;
-}
+<JimboPanel sway onBack={() => setOpen(false)}>
+  <JimboButton variant="primary" onClick={handleSearch}>Search</JimboButton>
+</JimboPanel>
 ```
 
-## Lightweight JAML IDE shell
+Available variants: `primary`, `secondary`, `danger`, `back`, `ghost`
+
+### JAML IDE
 
 ```tsx
-"use client";
-
-import { useState } from "react";
 import { JamlIde } from "jaml-ui";
 
-export function IdeExample() {
-  const [jaml, setJaml] = useState("must:\n  joker: Blueprint");
+<JamlIde
+  jaml={jaml}
+  onChange={setJaml}
+  searchResults={results}
+  onSearch={handleSearch}
+  isSearching={isSearching}
+/>
+```
 
-  return (
-    <JamlIde
-      jaml={jaml}
-      onChange={setJaml}
-      results={[]}
-    />
-  );
-}
+### Analyzer Explorer
+
+```tsx
+import { AnalyzerExplorer } from "jaml-ui";
+
+// antes: AnalyzerAnteView[] — stream from motely-wasm createSearchContext
+<AnalyzerExplorer antes={antes} totalAntes={8} highlights={highlights} />
+```
+
+### JAML Map Preview
+
+```tsx
+import { JamlMapPreview } from "jaml-ui";
+
+<JamlMapPreview jaml={jaml} />
 ```
 
 ## Asset handling
 
-By default, `jaml-ui` resolves its packaged sprite assets from the package `assets/` directory using `import.meta.url`.
+By default sprites resolve from the package `assets/` directory via `import.meta.url`.
 
-If you want to host the assets yourself, set a custom base URL once during app startup:
-
-```tsx
-"use client";
-
-import { setJamlAssetBaseUrl } from "jaml-ui";
-
-setJamlAssetBaseUrl("/vendor/jaml-ui/");
-```
-
-Reset back to packaged assets with:
+Override at app startup:
 
 ```ts
-import { clearJamlAssetBaseUrl } from "jaml-ui";
+import { setJamlAssetBaseUrl, clearJamlAssetBaseUrl } from "jaml-ui";
 
-clearJamlAssetBaseUrl();
+setJamlAssetBaseUrl("/vendor/jaml-ui/");  // custom CDN
+clearJamlAssetBaseUrl();                   // back to default
 ```
 
 ## Core utilities
 
 ```ts
 import { SPRITE_SHEETS, getSpriteData, resolveJamlAssetUrl } from "jaml-ui/core";
-
-const jokerSheetUrl = SPRITE_SHEETS.jokers.src;
-const blueprintSprite = getSpriteData("Blueprint");
-const vouchersUrl = resolveJamlAssetUrl("vouchers");
 ```
 
-## Motely helpers
+## Motely decode helpers
 
 ```ts
-"use client";
-
 import { decodeMotelyItemName, motelyItemTypeName } from "jaml-ui/motely";
-
-const itemName = decodeMotelyItemName(0x5001);
-const enumKey = motelyItemTypeName(0x5001);
 ```
 
-## Next.js notes
+## 3D card (optional)
 
-- The root `jaml-ui` entry is client-oriented and preserves the `"use client"` boundary for component consumers.
-- Import pure helpers from `jaml-ui/core` when you want server-safe metadata and asset utilities.
-- If you are consuming `jaml-ui` from a local workspace package in a Next.js app, you may need:
+```bash
+npm install three @react-three/fiber @react-three/drei @react-spring/three
+```
+
+```tsx
+import { Card3D } from "jaml-ui/r3f";
+
+<Card3D itemName="Blueprint" />
+```
+
+## Next.js
+
+Import pure helpers from `jaml-ui/core` for server components. For local workspace installs add:
 
 ```ts
 // next.config.ts
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  transpilePackages: ["jaml-ui"],
-};
-
-export default nextConfig;
+const nextConfig = { transpilePackages: ["jaml-ui"] };
 ```
 
-## Browser-first runtime direction
+## Peer dependencies
 
-`jaml-ui` is designed for browser/React consumers. The optional `jaml-ui/motely` entry targets plain `motely-wasm` and does not assume threaded WASM, SAB, or COEP setup.
-
-The built-in `JamlIde` intentionally stays lightweight. Rich editor integrations like Monaco, custom language servers, or extension-host-specific tooling should live in app-level packages on top of `jaml-ui`, not in the base renderer package.
+| Peer | Required for |
+|------|-------------|
+| `react`, `react-dom` | All components |
+| `motely-wasm ^10 \|\| ^11 \|\| ^12` | `jaml-ui/motely`, `AnalyzerExplorer` data |
+| `three`, `@react-three/fiber`, `@react-three/drei`, `@react-spring/three` | `jaml-ui/r3f` only |
