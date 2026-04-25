@@ -14,13 +14,7 @@ interface MotelyLabelLookup<K extends string> {
 }
 
 const BOSS_ENTRIES = [
-  { key: "AmberAcorn", label: "Amber Acorn" },
-  { key: "CeruleanBell", label: "Cerulean Bell" },
-  { key: "CrimsonHeart", label: "Crimson Heart" },
-  { key: "VerdantLeaf", label: "Verdant Leaf" },
-  { key: "VioletVessel", label: "Violet Vessel" },
   { key: "TheArm", label: "The Arm" },
-  { key: "TheClub", label: "The Club" },
   { key: "TheEye", label: "The Eye" },
   { key: "TheFish", label: "The Fish" },
   { key: "TheFlint", label: "The Flint" },
