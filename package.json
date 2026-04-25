@@ -43,6 +43,8 @@
     "build": "tsc --pretty false",
     "dev": "tsc --watch",
     "demo": "vite --config demo/vite.config.ts",
+    "demo:build": "vite build --config demo/vite.config.ts",
+    "demo:preview": "vite preview --config demo/vite.config.ts",
     "typecheck": "tsc --noEmit --pretty false",
     "prepack": "npm run build"
   },
