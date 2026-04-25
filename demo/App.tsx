@@ -67,7 +67,7 @@ export function App() {
       <header style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
         <h1 style={{ fontSize: 20, margin: 0, color: JimboColorOption.GOLD_TEXT }}>jaml-ui demo</h1>
         <span style={{ fontSize: 11, color: JimboColorOption.GREY }}>
-          motely-wasm @ {envOrThrow("VITE_MOTELY_WASM_VERSION")}
+          motely-wasm @ {MOTELY_WASM_VERSION}
         </span>
         {bootStatus && <span style={{ fontSize: 11, color: JimboColorOption.GOLD_TEXT }}>{bootStatus}</span>}
         {search.status === "error" && (
