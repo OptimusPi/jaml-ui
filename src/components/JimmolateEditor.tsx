@@ -1,11 +1,5 @@
 "use client";
 
-// TODO(jimbo-primitives): the CodeMirror host + status/test chrome use a few
-// inline styles (editor min-height, status colors) that pre-date the
-// no-inline-style / no-token-in-jsx-style rules. They read from --j-* tokens,
-// not raw hex. Refactor to Jimbo primitives alongside JamlCodeEditor.
-/* eslint-disable jaml-design/no-inline-style, jaml-design/no-token-in-jsx-style */
-
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection, placeholder as cmPlaceholder } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
@@ -16,6 +10,8 @@ import { tags } from "@lezer/highlight";
 import { JimboColorOption } from "../ui/tokens.js";
 import { JimboPanel, JimboInnerPanel, JimboButton } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
+import { JimboRow } from "../ui/jimboLayout.js";
+import { JimboTextInput } from "../ui/JimboTextInput.js";
 
 /**
  * A Jimmolate predicate: per-seed JavaScript that runs INSIDE the Motely search
@@ -228,21 +224,12 @@ export function JimmolateEditor({
     }
   }, [compiled, seed]);
 
-  const statusColor = compiled.error ? "var(--j-red)" : "var(--j-green-text)";
   const statusText = compiled.error ? `Error: ${compiled.error}` : "Compiles ✓";
 
   return (
     <JimboPanel className={`j-jimmolate ${className}`.trim()}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "var(--j-space-md)",
-          marginBottom: "var(--j-space-md)",
-        }}
-      >
-        <JimboText size="md" className="j-text--gold">Jimmolate</JimboText>
+      <JimboRow justify="between" align="center" gap="md" className="j-jimmolate__header">
+        <JimboText size="md" tone="gold">Jimmolate</JimboText>
         <JimboButton
           tone={enabled ? "green" : "grey"}
           size="sm"
@@ -250,54 +237,35 @@ export function JimmolateEditor({
         >
           {enabled ? "Enabled" : "Disabled"}
         </JimboButton>
-      </div>
+      </JimboRow>
 
       <JimboInnerPanel>
-        <div ref={containerRef} style={{ width: "100%", minHeight }} />
+        <div
+          ref={containerRef}
+          className="j-w-full j-jimmolate__editor"
+          style={{ "--j-jimmolate-editor-min-h": `${minHeight}px` } as React.CSSProperties}
+        />
       </JimboInnerPanel>
 
-      <div style={{ marginTop: "var(--j-space-sm)", minHeight: "1.4em" }}>
-        <JimboText size="xs" style={{ color: statusColor }}>{statusText}</JimboText>
+      <div className="j-jimmolate__status">
+        <JimboText size="xs" tone={compiled.error ? "red" : "green"}>{statusText}</JimboText>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--j-space-md)",
-          marginTop: "var(--j-space-md)",
-          flexWrap: "wrap",
-        }}
-      >
-        <JimboText size="xs" className="j-text--grey">Test seed</JimboText>
-        <input
+      <JimboRow align="center" gap="md" wrap className="j-jimmolate__testrow">
+        <JimboText size="xs" tone="grey">Test seed</JimboText>
+        <JimboTextInput
           className="j-jimmolate__seed"
           value={seed}
           onChange={(e) => setSeed(e.target.value.toUpperCase())}
           spellCheck={false}
-          style={{
-            fontFamily: "var(--j-font-code, monospace)",
-            fontSize: "14px",
-            background: "var(--j-surface-inset)",
-            color: "var(--j-white)",
-            border: "2px solid var(--j-inner-border)",
-            borderRadius: "var(--j-radius-sm)",
-            padding: "var(--j-space-xs) var(--j-space-sm)",
-            width: "12ch",
-          }}
         />
         <JimboButton tone="blue" size="sm" onClick={runTest} disabled={!compiled.predicate}>
           Test
         </JimboButton>
-        <JimmolateOutcomeBadge outcome={outcome} />
-      </div>
+        {outcome.kind === "pass" && <JimboText size="xs" tone="green">Kept (true)</JimboText>}
+        {outcome.kind === "fail" && <JimboText size="xs" tone="grey">Rejected (false)</JimboText>}
+        {outcome.kind === "error" && <JimboText size="xs" tone="red">{outcome.message}</JimboText>}
+      </JimboRow>
     </JimboPanel>
   );
-}
-
-function JimmolateOutcomeBadge({ outcome }: { outcome: TestOutcome }) {
-  if (outcome.kind === "idle") return null;
-  if (outcome.kind === "pass") return <JimboText size="xs" className="j-text--green">Kept (true)</JimboText>;
-  if (outcome.kind === "fail") return <JimboText size="xs" className="j-text--grey">Rejected (false)</JimboText>;
-  return <JimboText size="xs" style={{ color: "var(--j-red)" }}>{outcome.message}</JimboText>;
 }

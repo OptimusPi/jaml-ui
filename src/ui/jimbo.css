@@ -874,6 +874,10 @@
 
 .j-text-center { text-align: center; }
 
+/* JamlCodeEditor host — dynamic min-height via custom prop (keeps the inline
+   style custom-prop-only, satisfying no-inline-style). */
+.j-code-editor-host { min-height: var(--j-code-editor-min-h, 320px); }
+
 
 /* ── Flank Nav ────────────────────────────────────────────────────────── */
 
@@ -1223,6 +1227,11 @@
 .j-jimmolate { gap: var(--j-space-sm); }
 .j-jimmolate__sig { opacity: 0.6; }
 .j-jimmolate__input { width: 100%; font-family: var(--j-font-code); font-size: 11px; }
+.j-jimmolate__header { margin-bottom: var(--j-space-md); }
+.j-jimmolate__editor { min-height: var(--j-jimmolate-editor-min-h, 200px); }
+.j-jimmolate__status { margin-top: var(--j-space-sm); min-height: 1.4em; }
+.j-jimmolate__testrow { margin-top: var(--j-space-md); }
+.j-jimmolate__seed { width: 12ch; font-family: var(--j-font-code); text-align: center; }
 
 /* Inline-edit: borderless transparent input that reads as text. */
 .j-inline-edit {
@@ -3152,22 +3161,11 @@
   pointer-events: none;
 }
 
-/* ── Layout helpers ───────────────────────────────────────────────────── */
-.j-stack--xs { gap: 2px; }
-.j-stack--sm { gap: 4px; }
-.j-stack--md { gap: 8px; }
-.j-stack--lg { gap: 12px; }
-.j-stack--xl { gap: 16px; }
-
-.j-row { display: flex; flex-direction: row; align-items: center; }
-.j-row--xs { gap: 2px; }
-.j-row--sm { gap: 4px; }
-.j-row--md { gap: 8px; }
-.j-row--lg { gap: 12px; }
-.j-row--xl { gap: 16px; }
-.j-row--center { justify-content: center; }
-.j-row--end { justify-content: flex-end; }
-.j-row--between { justify-content: space-between; }
+/* Layout helpers removed: a duplicate `.j-row { display: flex }` block lived
+   here and silently overrode the grid `.j-row`/`.j-stack` primitives above
+   (CSS source order). Its `--xs/--md/--center/--between` gap+justify aliases
+   used non-canonical names that JimboRow/JimboStack never emit, so nothing
+   depended on them. Grid composition is the law on the fixed 320×568 canvas. */
 
 .j-divider {
   border: none;
