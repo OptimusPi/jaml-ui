@@ -1397,6 +1397,30 @@
   text-align: left;
 }
 
+/* ── Card Slot — art is identity, tap/hover/focus for info ─────────────── */
+/* The Balatro card: recognize by sprite, lift on hover, read on tap. No label
+   wrapped underneath. Uses the eyedropped --j-card-shadow (flat, hard drop —
+   not a soft 3D bevel). */
+.j-card-slot {
+  display: inline-grid;
+  cursor: pointer;
+  border-radius: var(--j-radius-md);
+  filter: drop-shadow(var(--j-card-shadow));
+  transition: transform var(--j-press-speed) ease, filter var(--j-press-speed) ease;
+  outline: none;
+}
+.j-card-slot:hover {
+  transform: translateY(-3px);
+  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.45)) brightness(1.05);
+  z-index: 2;
+}
+.j-card-slot:focus-visible {
+  outline: 2px solid var(--j-gold);
+  outline-offset: 2px;
+  border-radius: var(--j-radius-sm);
+}
+.j-card-slot:active { transform: translateY(-1px); }
+
 /* Inline-edit: borderless transparent input that reads as text. */
 .j-inline-edit {
   width: 100%;
