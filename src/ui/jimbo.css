@@ -1233,6 +1233,113 @@
 .j-jimmolate__testrow { margin-top: var(--j-space-md); }
 .j-jimmolate__seed { width: 12ch; font-family: var(--j-font-code); text-align: center; }
 
+/* ── Clause Map (JimboZone + JimboSpritePill) ─────────────────────────── */
+/* Visualizes must/should/mustNot JAML clauses. Grid-composed (no flex) on the
+   fixed canvas. Zone color + pill glow are driven by --j-zone-color /
+   --j-pill-glow custom props so the same classes serve every section. */
+
+.j-map-preview {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 10px;
+  padding: 10px;
+  background: var(--j-darkest);
+  color: var(--j-white);
+  width: 100%;
+  box-sizing: border-box;
+}
+.j-map-preview[data-compact="true"] { gap: 6px; padding: 8px; }
+
+.j-map-preview__empty {
+  background: var(--j-darkest);
+  border: 2px solid var(--j-panel-edge);
+  border-radius: 6px;
+  padding: 16px;
+  color: var(--j-grey);
+  font-size: 11px;
+  font-style: italic;
+  text-align: center;
+}
+.j-map-preview__empty[data-compact="true"] { padding: 8px; }
+
+.j-zone-rail {
+  border: 2px dashed color-mix(in srgb, var(--j-zone-color, var(--j-grey)) 33%, transparent);
+  border-radius: 6px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.j-zone-rail[data-compact="true"] { padding: 6px; }
+
+.j-zone-rail__header {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.j-zone-rail__tag {
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  background: var(--j-zone-color, var(--j-grey));
+  color: var(--j-white);
+  border-radius: 3px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+.j-zone-rail[data-compact="true"] .j-zone-rail__tag { font-size: 8px; }
+.j-zone-rail__rule {
+  height: 1px;
+  background: color-mix(in srgb, var(--j-zone-color, var(--j-grey)) 27%, transparent);
+}
+.j-zone-rail__count { font-size: 8px; color: var(--j-grey); }
+
+.j-zone-rail__items {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fill, max-content);
+  gap: 6px;
+}
+.j-zone-rail__empty { padding: 10px; font-style: italic; }
+
+.j-clause-pill {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 6px;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-panel-edge);
+  border-radius: 4px;
+  padding: 3px 8px;
+  position: relative;
+  opacity: 0.6;
+}
+.j-clause-pill[data-hit="true"] {
+  background: color-mix(in srgb, var(--j-pill-glow, var(--j-gold)) 20%, transparent);
+  border-color: var(--j-pill-glow, var(--j-gold));
+  opacity: 1;
+  animation: j-glow-pulse 1.6s ease-in-out infinite;
+}
+.j-clause-pill__label {
+  font-size: 10px;
+  color: var(--j-white);
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+.j-clause-pill__badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--j-green);
+  color: var(--j-white);
+  font-size: 7px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  border: 1px solid var(--j-black);
+  box-shadow: 0 1px 0 var(--j-black);
+}
+
 /* Inline-edit: borderless transparent input that reads as text. */
 .j-inline-edit {
   width: 100%;
