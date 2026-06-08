@@ -38,13 +38,6 @@ export function clearJimmolateProbe(): void {
     currentProbe = () => true;
 }
 
-// Must match the path the host serves motely-wasm's bin/ at.
-// Used by main-thread hooks, workers, and Storybook staticDir alike.
-// The Storybook staticDir in .storybook/main.ts serves it here.
-// Next.js consumers must serve it at this path too (e.g. via a catch-all route).
-// A bare "/bin" would 404 in every deployment context.
-export const MOTELY_BIN_PATH = "/motely-wasm/bin";
-
 // File System extension (optional peer `@rewaffle/bootsharp-file-system`).
 //
 // fs.init() binds the IFileMounter [Import], which — like the Jimmolate probe
@@ -92,13 +85,12 @@ export async function ensureMotelyReady(): Promise<void> {
         } catch (error) {
             fileSystemError = error;
         }
-        // motely-wasm v20 is a SIDELOADED build: dist/generated/resources.g.mjs has
-        // `embedded = undefined` and a manifest of `motely-wasm.wasm` (9.4 MB), so
-        // boot() MUST be handed the resource root or it never finds the wasm and the
-        // runtime sits on Standby forever (the "renders but nothing searches" bug).
-        // boot(root) fetches `${root}/motely-wasm.wasm`; the host must serve the
-        // engine's dist/bin/ at MOTELY_BIN_PATH (Storybook staticDirs, Next public/).
-        await bootsharp.boot(MOTELY_BIN_PATH);
+        // motely-wasm v20.0.2 is an EMBEDDED build: the WASM is base64-inlined in
+        // dist/generated/resources.g.mjs (~12.6 MB), so boot() takes no args and
+        // needs no served binary — nothing to 404, nothing to sideload. (Was a
+        // sideloaded build through 20.0.0, which required boot(root) + the host
+        // serving dist/bin/motely-wasm.wasm; that whole class of failure is gone.)
+        await bootsharp.boot();
     })();
     return bootPromise;
 }

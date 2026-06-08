@@ -2,15 +2,11 @@
 // and compares the engine's REAL scored result against the `sum(matches[].score)`
 // my Jamlyzer port invented. Two-clause filter so `sum` and `max` modes diverge.
 // Delete after use.
-import { readFileSync } from "node:fs";
 import bootsharp from "motely-wasm";
 import { Program as Motely } from "motely-wasm/motely/wasm";
 
-const buf = readFileSync("node_modules/motely-wasm/dist/bin/motely-wasm.wasm");
-const wasm = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-
-console.log("booting (sideloaded, bytes)…");
-await bootsharp.boot({ wasm });
+console.log("booting (embedded, no args)…");
+await bootsharp.boot();
 console.log("booted. status =", bootsharp.getStatus());
 
 // Two should clauses with different scores + multiple antes, so count-based `max`

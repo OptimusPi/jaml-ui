@@ -50,6 +50,5 @@ export {
 } from "./hooks/useJamlLibrary.js";
 export {
   ensureMotelyReady,
-  MOTELY_BIN_PATH,
   type MotelyRuntimeStatus,
 } from "./lib/motely/runtime.js";
