@@ -25,6 +25,7 @@ const preview: Preview = {
       test: 'todo'
     }
   },
+  decorators: [
     // The hard-locked 320×568 JimboApp is THE container. Centered in the canvas
     // with no flex via the position:fixed + inset:0 + margin:auto trick (see
     // .sb-stage); the .j-app (540) and footer (28) stack by normal block flow.
