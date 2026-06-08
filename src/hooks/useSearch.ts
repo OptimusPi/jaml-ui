@@ -112,7 +112,7 @@ export function useSearch() {
                 if (opts.predicate) {
                     const pred = opts.predicate;
                     setJimmolateProbe((seed, deck, stake) => pred(seed, deck, stake));
-                    Motely.enableJimmolate();
+                    Motely.jimmolateEnabled = true;
                 }
                 const search = configure(jaml, mode, opts).start();
                 searchRef.current = search;

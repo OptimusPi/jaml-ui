@@ -94,9 +94,11 @@ self.onmessage = async (event: MessageEvent) => {
 
         if (data.predicateStr) {
             try {
-                const pred = new Function("seed", "deck", "stake", `return (${data.predicateStr})(seed, deck, stake);`) as (seed: string, deck: number, stake: number) => boolean;
+                // v20 no longer carries deck/stake across the boundary — they arrive
+                // undefined, so the predicate's extra params are optional.
+                const pred = new Function("seed", "deck", "stake", `return (${data.predicateStr})(seed, deck, stake);`) as (seed: string, deck?: number, stake?: number) => boolean;
                 setJimmolateProbe((seed, deck, stake) => pred(seed, deck, stake));
-                Motely.enableJimmolate();
+                Motely.jimmolateEnabled = true;
             } catch (err) {
                 console.error("Failed to compile worker Jimmolate predicate:", err);
             }

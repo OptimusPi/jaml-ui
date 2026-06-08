@@ -1,13 +1,13 @@
 import bootsharp from "motely-wasm";
 import { Program as Motely } from "motely-wasm/motely/wasm";
-import type { MotelySingleSearchContext } from "motely-wasm/motely";
+import type { MotelyScoredSeedResult } from "motely-wasm/motely";
 import { IFileMounter } from "motely-wasm/bootsharp/file-system";
 
 export type MotelyRuntimeStatus = "idle" | "booting" | "ready" | "error";
 
-// Jimmolate probe dispatcher.
+// Jimmolate predicate dispatcher.
 //
-// Bootsharp snapshots [Import] bindings at boot() — assigning `Motely.jimmolateProbe`
+// Bootsharp snapshots [Import] bindings at boot() — assigning `Motely.jimmolatePredicate`
 // AFTER boot is a silent no-op, so the C# side calls an unbound import and the
 // predicate never runs. The correct order (pre-boot bind, post-boot enable) is the
 // one exercised by Motely.Wasm/tests/jimmolate.test.mjs, and the rule is in the
@@ -15,15 +15,18 @@ export type MotelyRuntimeStatus = "idle" | "booting" | "ready" | "error";
 //
 // So we bind a STABLE dispatcher here at module load (this runs on import, always
 // before any ensureMotelyReady()/boot() call) and swap the inner predicate per
-// search via setJimmolateProbe(). enableJimmolate() is a C# [Export], so calling it
-// after boot is fine — only this [Import] must be pre-bound.
-// motely-wasm 19.4.0 changed the probe to receive a search context instead of
-// (seed, deck, stake). We keep the inner predicate contract identical for all
-// callers and bridge to the new ctx shape in this one place.
-type JimmolateProbe = (seed: string, deck: number, stake: number) => boolean;
+// search via setJimmolateProbe(). `Motely.jimmolateEnabled = true` is a C# [Export]
+// prop, so setting it after boot is fine — only this [Import] must be pre-bound.
+//
+// motely-wasm v20 renamed `jimmolateProbe` → `jimmolatePredicate` and changed its
+// argument: it now receives a `MotelyScoredSeedResult` ({ seed, score, tallies }),
+// NOT a search context — deck/stake are no longer carried across the boundary. The
+// public probe contract keeps them optional, so callers that read them now get
+// `undefined`; only the seed survives the v20 engine semantics.
+type JimmolateProbe = (seed: string, deck?: number, stake?: number) => boolean;
 let currentProbe: JimmolateProbe = () => true;
-Motely.jimmolateProbe = (ctx: MotelySingleSearchContext) =>
-    currentProbe(ctx.getSeed(), ctx.deck, ctx.stake);
+Motely.jimmolatePredicate = (result: MotelyScoredSeedResult) =>
+    currentProbe(result.seed);
 
 /** Swap the active Jimmolate predicate. Safe before or after boot. */
 export function setJimmolateProbe(pred: JimmolateProbe): void {
@@ -89,11 +92,13 @@ export async function ensureMotelyReady(): Promise<void> {
         } catch (error) {
             fileSystemError = error;
         }
-        // motely-wasm is an EMBEDDED build (the runtime is inlined into the JS as
-        // base64 — see dist/generated/resources.g.mjs), so boot() takes no args and
-        // needs no served binaries. The old boot("/motely-wasm/bin") was leftover
-        // sideloaded config and 404'd in every context.
-        await bootsharp.boot();
+        // motely-wasm v20 is a SIDELOADED build: dist/generated/resources.g.mjs has
+        // `embedded = undefined` and a manifest of `motely-wasm.wasm` (9.4 MB), so
+        // boot() MUST be handed the resource root or it never finds the wasm and the
+        // runtime sits on Standby forever (the "renders but nothing searches" bug).
+        // boot(root) fetches `${root}/motely-wasm.wasm`; the host must serve the
+        // engine's dist/bin/ at MOTELY_BIN_PATH (Storybook staticDirs, Next public/).
+        await bootsharp.boot(MOTELY_BIN_PATH);
     })();
     return bootPromise;
 }

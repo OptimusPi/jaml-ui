@@ -2,9 +2,10 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Program as Motely } from "motely-wasm/motely/wasm";
-import type { MotelyJamlyzerResult, MotelyJamlyzerSeedResult } from "motely-wasm/motely/analysis";
+import type { JamlyzerSnapshot } from "motely-wasm/motely/analysis";
 import { MotelyBossBlind, MotelyVoucher, MotelyTag, MotelyBoosterPack } from "motely-wasm/motely/enums";
 import { ensureMotelyReady } from "../lib/motely/runtime.js";
+import { snapshotScore } from "../hooks/useAnalyzer.js";
 import { JimboInnerPanel, JimboPanel } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
 import { JamlSeedSpinner } from "./JamlSeedSpinner.js";
@@ -27,13 +28,20 @@ export interface JamlyzerProps {
   style?: React.CSSProperties;
 }
 
+/** One analyzed seed: the engine's per-seed snapshot plus its derived scoop score. */
+interface SeedRow {
+  seed: string;
+  snapshot: JamlyzerSnapshot;
+  score: number;
+}
+
 type JamlyzerLoadState =
   | { status: "loading" }
-  | { status: "ready"; result: MotelyJamlyzerResult; elapsedMs: number }
+  | { status: "ready"; rows: SeedRow[]; elapsedMs: number }
   | { status: "error"; message: string };
 
-function seedMatches(row: MotelyJamlyzerSeedResult): boolean {
-  return (row.score ?? 0) >= 1;
+function rowMatches(row: SeedRow): boolean {
+  return row.score >= 1;
 }
 
 function getBossDisplayName(bossVal: MotelyBossBlind): string {
@@ -106,19 +114,18 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
         if (!trimmed) {
           throw new Error("Write a JAML filter first.");
         }
-        let validation = "valid";
-        try { Motely.parseJaml(trimmed); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
-        if (validation !== "valid") {
-          throw new Error(String(validation ?? "Invalid JAML"));
-        }
+        // parseJaml throws on invalid JAML (the engine owns validation).
+        const config = Motely.parseJaml(trimmed);
         const t0 = performance.now();
-        const result = Motely.jamlyzer(Motely.parseJaml(trimmed));
+        // v20 jamlyzer is single-seed: (seed, lens) → JamlyzerSnapshot. Loop the
+        // config's own `seeds:` list to rebuild the multi-seed view.
+        const rows: SeedRow[] = config.seeds.map((seed) => {
+          const snapshot = Motely.jamlyzer(seed, config);
+          return { seed, snapshot, score: snapshotScore(snapshot) };
+        });
         const elapsedMs = performance.now() - t0;
         if (cancelled) return;
-        if (result.error) {
-          throw new Error(result.error);
-        }
-        setLoad({ status: "ready", result, elapsedMs });
+        setLoad({ status: "ready", rows, elapsedMs });
       } catch (error) {
         if (cancelled) return;
         setLoad({
@@ -134,7 +141,7 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
   }, [jaml]);
 
   const rows = useMemo(
-    () => (load.status === "ready" ? load.result.seeds : []),
+    () => (load.status === "ready" ? load.rows : []),
     [load],
   );
   const seedList = useMemo(() => rows.map((row) => row.seed), [rows]);
@@ -173,15 +180,11 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
     );
   }
 
-  const { elapsedMs, result } = load;
-  const matchCount = rows.filter(seedMatches).length;
-  const isMatch = current ? seedMatches(current) : false;
-  const tallyLine =
-    result.tallyLabels && result.tallyLabels.length > 0 && current
-      ? result.tallyLabels.map((label, i) => `${label}: ${current.tallies[i] ?? 0}`).join(" · ")
-      : null;
-
-  const hasAnalysis = !!current?.analysis;
+  const { elapsedMs } = load;
+  const matchCount = rows.filter(rowMatches).length;
+  const isMatch = current ? rowMatches(current) : false;
+  const antes = current?.snapshot.antes ?? [];
+  const hasAnalysis = antes.length > 0;
 
   return (
     <div className={rootClass} style={style}>
@@ -215,15 +218,7 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
             </JimboText>
           </JimboPanel>
 
-          {tallyLine ? (
-            <JimboInnerPanel className="j-jamlyzer__tallies">
-              <JimboText size="xs" tone="white" className="j-text-center">
-                {tallyLine}
-              </JimboText>
-            </JimboInnerPanel>
-          ) : null}
-
-          {hasAnalysis && current.analysis?.antes && (
+          {hasAnalysis && (
             <JimboInnerPanel className="j-jamlyzer__details">
               <JimboSpinner
                 value={`Ante ${selectedAnte}`}
@@ -234,7 +229,7 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
               />
 
               {(() => {
-                const anteData = current.analysis?.antes.find(a => a.ante === selectedAnte);
+                const anteData = antes.find(a => a.ante === selectedAnte);
                 if (!anteData) {
                   return (
                     <JimboText size="xs" tone="grey" className="j-text-center">
@@ -304,7 +299,7 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
                         <div className="j-jamlyzer__cards-grid">
                           {anteData.shopQueue.map((item, idx) => {
                             const resolved = getResolvedItem(item.item.value, 0.45);
-                            const isMatched = item.matched;
+                            const isMatched = item.isHighlighted;
                             return (
                               <div
                                 key={idx}
@@ -347,7 +342,7 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
                               <div className="j-jamlyzer__cards-grid">
                                 {pack.items.map((item, itemIdx) => {
                                   const resolved = getResolvedItem(item.item.value, 0.45);
-                                  const isMatched = item.matched;
+                                  const isMatched = item.isHighlighted;
                                   return (
                                     <div
                                       key={itemIdx}
@@ -393,4 +388,3 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
     </div>
   );
 }
-

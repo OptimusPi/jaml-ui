@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { type Program as MotelyNamespace } from "motely-wasm/motely/wasm";
-import type { MotelyJamlyzerSeedResult } from "motely-wasm/motely/analysis";
+import type { JamlyzerSnapshot } from "motely-wasm/motely/analysis";
 
 type MotelyApi = typeof MotelyNamespace;
 
 export function useSeedAnalyzer(motely: MotelyApi | null, seed: string | null, jaml?: string) {
-    const [data, setData] = useState<MotelyJamlyzerSeedResult | null>(null);
+    const [data, setData] = useState<JamlyzerSnapshot | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -25,21 +25,16 @@ export function useSeedAnalyzer(motely: MotelyApi | null, seed: string | null, j
             setError(null);
             try {
                 const config = jaml ?? `version: 1\nconfig:\n  deck: Erratic\n  stake: White\n`;
-                let validation = "valid";
-                try { motely.parseJaml(config); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML."; }
+                // parseJaml throws on invalid JAML (the engine owns validation).
+                const lens = motely.parseJaml(config);
                 if (abortController.signal.aborted) return;
-                if (validation !== "valid") {
-                    throw new Error(validation || "Invalid JAML.");
-                }
 
-                const analyzeConfig = motely.parseJaml(config);
-                analyzeConfig.seeds = [seed];
-                const result = motely.jamlyzer(analyzeConfig);
+                const result = motely.jamlyzer(seed, lens);
                 if (abortController.signal.aborted) return;
                 if (result.error) {
                     throw new Error(result.error);
                 }
-                setData(result.seeds[0] ?? null);
+                setData(result);
             } catch (err) {
                 if (abortController.signal.aborted) return;
                 console.error("[useSeedAnalyzer] Analysis error:", err);

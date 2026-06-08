@@ -25,21 +25,31 @@ const preview: Preview = {
       test: 'todo'
     }
   },
-  decorators: [
-    // One shell, always. The hard-locked 320×568 JimboApp is THE container —
-    // no opt-out, no harness toggle. Centered in the canvas with no flex via
-    // the position:fixed + inset:0 + margin:auto trick (see .sb-stage); the
-    // .j-app (540) and footer (28) stack by normal block flow inside it.
-    (Story) => (
-      <>
-        <JimboBackground />
-        <div className="sb-stage">
-          <JimboApp>
-            <Story />
-          </JimboApp>
-        </div>
-      </>
-    ),
+    // The hard-locked 320×568 JimboApp is THE container. Centered in the canvas
+    // with no flex via the position:fixed + inset:0 + margin:auto trick (see
+    // .sb-stage); the .j-app (540) and footer (28) stack by normal block flow.
+    //
+    // Opt-out: a story that renders its OWN JimboApp (e.g. SeedFinderApp — a
+    // full app, not a primitive) sets `parameters.jimboHarness: false`. Wrapping
+    // it again nests two 320×540 shells (busted size, escaping buttons), so we
+    // render it bare in the stage and let it bring its own shell.
+    (Story, context) => {
+      const ownsShell = context.parameters?.jimboHarness === false;
+      return (
+        <>
+          <JimboBackground />
+          <div className="sb-stage">
+            {ownsShell ? (
+              <Story />
+            ) : (
+              <JimboApp>
+                <Story />
+              </JimboApp>
+            )}
+          </div>
+        </>
+      );
+    },
   ],
 };
 
