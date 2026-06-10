@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jimbo Design System — Reference</title>
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   Tokens — mirrored from jaml-ui/src/ui/jimbo.css so this page can stand
+   alone as a spec. If you change values here, mirror them back into the
+   library, not the other way round.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'm6x11plus';
+  src: url('../fonts/m6x11plus.otf') format('opentype');
+  font-display: swap;
+}
+
+:root {
+  /* Hue ramp — bright face / dark "underside" pairs for chunky press buttons */
+  --j-red:        #fe5148;  --j-dark-red:    #a02721;
+  --j-blue:       #0093ff;  --j-dark-blue:   #0057a1;
+  --j-green:      #429f79;  --j-dark-green:  #215f46;
+  --j-orange:     #ff9800;  --j-dark-orange: #a05b00;
+  --j-gold:       #e4b643;
+  --j-purple:     #9e74ce;  --j-dark-purple: #5e437e;
+  --j-tarot:      #9e74ce;  --j-tarot-dark:    #5e437e;
+  --j-planet:     #00a7ca;  --j-planet-dark:   #00657c;
+  --j-spectral:   #2e76fd;  --j-spectral-dark: #14449e;
+
+  /* Surfaces */
+  --j-darkest:        #1e2b2d;   /* deepest inner */
+  --j-dark-grey:      #3a5055;   /* outer panel fill */
+  --j-teal-grey:      #404c4e;   /* tile fill */
+  --j-grey:           #708386;   /* disabled / muted */
+  --j-panel-edge:     #1e2e32;   /* inner-panel border */
+  --j-inner-border:   #334461;   /* alt inner panel */
+  --j-border-silver:  #b9c2d2;   /* outer panel border */
+  --j-border-south:   #777e89;   /* under-edge of panel */
+
+  /* Text */
+  --j-white:        #ffffff;
+  --j-gold-text:    #e4b643;
+  --j-green-text:   #35bd86;
+  --j-orange-text:  #ff8f00;
+
+  /* Type */
+  --j-font: 'm6x11plus', ui-monospace, Menlo, Consolas, monospace;
+  --j-text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+
+  /* Spacing */
+  --j-space-xs: 2px;
+  --j-space-sm: 4px;
+  --j-space-md: 8px;
+  --j-space-lg: 12px;
+  --j-space-xl: 16px;
+
+  /* Radii — never go higher than 10. Balatro-leaning UIs are chunky, not bubbly. */
+  --j-radius-sm: 4px;
+  --j-radius-md: 6px;
+  --j-radius-lg: 8px;
+  --j-radius-pill: 10px;
+
+  /* Motion */
+  --j-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --j-press-y: 3px;
+  --j-press-speed: 55ms;
+  --j-panel-border-width: 3px;
+  --j-surface-shadow-depth: 4px;
+
+  /* Page chrome */
+  --bg: #20302f;
+  --bg-grad-1: #243634;
+  --bg-grad-2: #1a2625;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--j-font);
+  color: var(--j-white);
+  background:
+    radial-gradient(ellipse at 20% -10%, rgba(255,255,255,0.04), transparent 60%),
+    radial-gradient(ellipse at 90% 110%, rgba(0,0,0,0.4), transparent 60%),
+    linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
+  min-height: 100vh;
+  letter-spacing: 0.02em;
+  text-shadow: var(--j-text-shadow);
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+/* Hide scrollbars per house rules */
+* { scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { display: none; }
+
+/* ── Layout ───────────────────────────────────────────────────────────── */
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 48px 28px 96px;
+}
+.masthead {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 36px;
+  padding-bottom: 20px;
+  border-bottom: 2px dashed rgba(185,194,210,0.18);
+}
+.masthead h1 {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+.masthead p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--j-border-silver);
+  max-width: 56ch;
+  line-height: 1.4;
+}
+.masthead .stamp {
+  font-size: 11px;
+  color: var(--j-gold-text);
+  letter-spacing: 0.12em;
+  border: 2px solid var(--j-gold-text);
+  padding: 6px 10px 4px;
+  border-radius: var(--j-radius-md);
+}
+
+.section {
+  margin-top: 56px;
+}
+.section + .section { margin-top: 64px; }
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.section-head .num {
+  font-size: 36px;
+  color: var(--j-gold-text);
+  min-width: 1.6ch;
+}
+.section-head .title {
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+.section-head .blurb {
+  font-size: 12px;
+  color: var(--j-border-silver);
+  margin-left: auto;
+  text-align: right;
+  max-width: 44ch;
+  line-height: 1.35;
+}
+
+.grid { display: grid; gap: 14px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.grid-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+.grid-6 { grid-template-columns: repeat(6, minmax(0,1fr)); }
+.row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+
+/* ── Panels (the workhorse surface) ───────────────────────────────────── */
+.j-panel {
+  background-color: var(--j-dark-grey);
+  border: var(--j-panel-border-width) solid var(--j-border-silver);
+  border-radius: var(--j-radius-md);
+  box-shadow:
+    0 calc(var(--j-panel-border-width) / 2) 0 0 var(--j-border-south),
+    0 calc(var(--j-surface-shadow-depth) + var(--j-panel-border-width)/2) 0 0 rgba(0,0,0,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+  padding: var(--j-space-lg);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.j-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,0.10), transparent 38%),
+    linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.05) 30%, transparent 56%);
+  pointer-events: none;
+  z-index: 0;
+}
+.j-panel > * { position: relative; z-index: 1; }
+
+.j-inner-panel {
+  background-color: var(--j-darkest);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-lg);
+  position: relative;
+}
+
+.swatch-panel { padding: 18px; }
+.swatch-panel h3 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: var(--j-border-silver);
+}
+
+/* ── Type scale ───────────────────────────────────────────────────────── */
+.type-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: baseline;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(185,194,210,0.14);
+}
+.type-row:last-child { border-bottom: none; }
+.type-row .label { font-size: 11px; color: var(--j-gold-text); letter-spacing: 0.12em; }
+.type-row .meta { font-size: 10px; color: var(--j-grey); letter-spacing: 0.06em; }
+.t-display { font-size: 26px; letter-spacing: 0.04em; line-height: 1; }
+.t-xl      { font-size: 24px; letter-spacing: 0.04em; }
+.t-lg      { font-size: 18px; letter-spacing: 0.04em; }
+.t-heading { font-size: 14px; letter-spacing: 0.08em; }
+.t-md      { font-size: 14px; }
+.t-sm      { font-size: 12px; }
+.t-body    { font-size: 11px; letter-spacing: 0.05em; line-height: 1.3; }
+.t-label   { font-size: 9px;  letter-spacing: 0.10em; }
+.t-micro   { font-size: 8px;  letter-spacing: 0.08em; }
+
+.tone-red    { color: var(--j-red); }
+.tone-blue   { color: var(--j-blue); }
+.tone-gold   { color: var(--j-gold-text); }
+.tone-green  { color: var(--j-green-text); }
+.tone-orange { color: var(--j-orange-text); }
+.tone-purple { color: var(--j-purple); }
+.tone-grey   { color: var(--j-grey); }
+
+/* ── Color swatches ───────────────────────────────────────────────────── */
+.swatch-grid { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px; }
+.swatch {
+  border-radius: var(--j-radius-sm);
+  padding: 10px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 2px solid rgba(0,0,0,0.35);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.55);
+  min-height: 78px;
+}
+.swatch .name { font-size: 10px; letter-spacing: 0.08em; }
+.swatch .hex  { font-size: 10px; letter-spacing: 0.04em; opacity: 0.8; }
+.swatch .var  { font-size: 9px; opacity: 0.7; }
+
+.swatch.on-dark { color: var(--j-white); }
+.swatch.on-light { color: #111; text-shadow: none; }
+
+/* ── Spacing + radius rulers ──────────────────────────────────────────── */
+.ruler {
+  display: grid;
+  grid-template-columns: 110px 1fr 90px;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(185,194,210,0.14);
+}
+.ruler:last-child { border-bottom: none; }
+.bar {
+  height: 18px;
+  background: var(--j-orange);
+  border-radius: 2px;
+  box-shadow: 0 2px 0 0 var(--j-dark-orange);
+}
+.radius-square {
+  width: 64px; height: 64px;
+  background: var(--j-teal-grey);
+  border: 3px solid var(--j-border-silver);
+  box-shadow: 0 3px 0 0 var(--j-border-south);
+}
+
+/* ── Buttons (chunky press) ───────────────────────────────────────────── */
+.j-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: transparent;
+  font-family: var(--j-font);
+  color: var(--j-white);
+}
+.j-btn .face {
+  display: inline-block;
+  position: relative;
+  border-radius: var(--j-radius-md);
+  background: var(--btn-face, var(--j-orange));
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  box-shadow: 0 calc(var(--j-press-y) + 2px) 0 0 rgba(0,0,0,0.8);
+  transform: translate(0, 0);
+  transition:
+    transform var(--j-press-speed) linear,
+    box-shadow var(--j-press-speed) linear,
+    background-color var(--j-press-speed) linear;
+  padding: 6px 18px 9px;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+.j-btn:hover:not(.is-disabled) .face { background: var(--btn-shadow, var(--j-dark-orange)); }
+.j-btn[data-pressed="true"] .face,
+.j-btn:active:not(.is-disabled) .face {
+  background: var(--btn-shadow, var(--j-dark-orange));
+  transform: translateY(var(--j-press-y));
+  box-shadow: none;
+}
+.j-btn.is-disabled { opacity: 0.55; cursor: not-allowed; }
+
+.j-btn--xs .face { padding: 6px 8px 3px; font-size: 11px; }
+.j-btn--sm .face { padding: 6px 12px 5px; font-size: 13px; }
+.j-btn--md .face { padding: 6px 18px 9px; font-size: 16px; }
+.j-btn--lg .face { padding: 6px 18px 11px; font-size: 20px; }
+.j-btn--block { display: block; width: 100%; }
+.j-btn--block .face { display: block; width: 100%; }
+
+.j-btn--orange   { --btn-face: var(--j-orange);   --btn-shadow: var(--j-dark-orange); }
+.j-btn--red      { --btn-face: var(--j-red);      --btn-shadow: var(--j-dark-red); }
+.j-btn--blue     { --btn-face: var(--j-blue);     --btn-shadow: var(--j-dark-blue); }
+.j-btn--green    { --btn-face: var(--j-green);    --btn-shadow: var(--j-dark-green); }
+.j-btn--grey     { --btn-face: var(--j-grey);     --btn-shadow: var(--j-dark-grey); }
+.j-btn--tarot    { --btn-face: var(--j-tarot);    --btn-shadow: var(--j-tarot-dark); }
+.j-btn--planet   { --btn-face: var(--j-planet);   --btn-shadow: var(--j-planet-dark); }
+.j-btn--spectral { --btn-face: var(--j-spectral); --btn-shadow: var(--j-spectral-dark); }
+
+/* ── Stat tile ────────────────────────────────────────────────────────── */
+.stat-tile {
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-sm);
+  padding: 8px 10px 6px;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  min-width: 86px;
+}
+.stat-tile .lbl { display: block; font-size: 10px; letter-spacing: 0.1em; color: var(--j-border-silver); margin-bottom: 2px; }
+.stat-tile .val { display: block; font-size: 24px; line-height: 1; }
+.stat-tile .val .small { font-size: 12px; color: var(--j-border-silver); }
+
+/* ── Scoreboard (chip × mult) ─────────────────────────────────────────── */
+.scoreboard {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--j-radius-md);
+  overflow: hidden;
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.6);
+}
+.scoreboard .side {
+  padding: 10px 18px 8px;
+  font-size: 30px;
+  min-width: 80px;
+  text-align: center;
+}
+.scoreboard .chips { background: var(--j-blue); color: var(--j-white); }
+.scoreboard .x     {
+  background: var(--j-darkest);
+  color: var(--j-red);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; padding: 0 8px;
+}
+.scoreboard .mult  { background: var(--j-red); color: var(--j-white); }
+
+/* ── Pill badges ──────────────────────────────────────────────────────── */
+.j-badge {
+  display: inline-block;
+  border-radius: var(--j-radius-sm);
+  padding: 3px 7px 2px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  background: var(--j-teal-grey);
+  border: 1px solid rgba(0,0,0,0.4);
+}
+.j-badge--tarot    { background: var(--j-tarot); }
+.j-badge--planet   { background: var(--j-planet); }
+.j-badge--spectral { background: var(--j-spectral); }
+.j-badge--gold     { background: var(--j-gold); color: #2a1f00; text-shadow: none; }
+.j-badge--green    { background: var(--j-green); }
+.j-badge--red      { background: var(--j-red); }
+
+/* ── Card slots (generic placeholders, not game art) ──────────────────── */
+.card-slot {
+  position: relative;
+  width: 110px;
+  height: 154px;
+  border-radius: var(--j-radius-md);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 6px, transparent 6px 12px),
+    var(--slot-bg, var(--j-teal-grey));
+  border: 2px solid rgba(0,0,0,0.4);
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.7);
+}
+.card-slot .corner { font-size: 11px; }
+.card-slot .corner.br { align-self: flex-end; transform: rotate(180deg); }
+.card-slot .tag {
+  align-self: center;
+  background: rgba(0,0,0,0.5);
+  padding: 3px 6px 2px;
+  border-radius: var(--j-radius-sm);
+  font-size: 9px;
+}
+.card-slot--joker      { --slot-bg: #c93832; }
+.card-slot--tarot      { --slot-bg: #87724a; }
+.card-slot--planet     { --slot-bg: #163b53; }
+.card-slot--spectral   { --slot-bg: #1f3aa8; }
+.card-slot--blind      { --slot-bg: #1a2b3a; }
+.card-slot--pack       { --slot-bg: #4a3a78; }
+.card-slot--standard   { --slot-bg: #f3efe2; color: #3a3326; }
+.card-slot--standard .tag { background: rgba(0,0,0,0.15); color: inherit; }
+
+/* ── Blind column (the "Choose your next Blind" pattern) ──────────────── */
+.blind-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px 14px;
+  border-radius: var(--j-radius-md);
+  background: var(--j-darkest);
+  border: 2px solid var(--col-edge, var(--j-blue));
+  width: 168px;
+}
+.blind-col--up   { --col-edge: var(--j-blue); }
+.blind-col--next { --col-edge: var(--j-gold); }
+.blind-col--boss { --col-edge: var(--j-red); }
+.blind-col .ribbon {
+  padding: 4px 12px 2px;
+  border-radius: var(--j-radius-sm);
+  background: var(--col-edge);
+  color: var(--j-white);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.blind-col .blind-icon {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: var(--col-edge);
+  border: 3px solid rgba(0,0,0,0.4);
+  display: grid; place-items: center;
+  color: var(--j-white);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  line-height: 1.1;
+  box-shadow: inset 0 -4px 0 0 rgba(0,0,0,0.25);
+}
+.blind-col .target { font-size: 11px; color: var(--j-border-silver); }
+.blind-col .target .n { display: block; font-size: 22px; color: var(--j-red); margin-top: 2px; }
+.blind-col .reward { font-size: 11px; color: var(--j-gold-text); }
+.blind-col .ghosted { color: var(--j-grey); }
+
+/* ── Modal pattern ────────────────────────────────────────────────────── */
+.modal-demo {
+  position: relative;
+  padding: 18px;
+}
+.modal {
+  background: var(--j-dark-grey);
+  border: 3px solid var(--j-border-silver);
+  border-radius: var(--j-radius-md);
+  box-shadow: 0 6px 0 0 rgba(0,0,0,0.6);
+  padding: 16px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.modal-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.modal-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px 0; }
+.modal-row .label { font-size: 14px; letter-spacing: 0.06em; }
+
+.stepper {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.stepper .j-btn .face { padding: 4px 10px 3px; font-size: 14px; }
+.stepper .value {
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 4px 18px 3px;
+  color: var(--j-white);
+  font-size: 14px;
+  box-shadow: 0 3px 0 0 var(--j-dark-red);
+}
+
+.checkbox {
+  width: 22px; height: 22px;
+  border-radius: var(--j-radius-sm);
+  background: var(--j-red);
+  border: 2px solid rgba(0,0,0,0.5);
+  box-shadow: 0 2px 0 0 var(--j-dark-red);
+  display: inline-grid; place-items: center;
+  font-size: 14px;
+  color: var(--j-white);
+}
+.checkbox.off { background: var(--j-darkest); box-shadow: 0 2px 0 0 #000; }
+
+.slider {
+  position: relative;
+  height: 16px;
+  width: 220px;
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-pill);
+  overflow: hidden;
+}
+.slider .fill {
+  position: absolute; inset: 0 auto 0 0;
+  width: 70%;
+  background: var(--j-red);
+  box-shadow: inset 0 -3px 0 0 var(--j-dark-red);
+}
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-row .val {
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 2px 8px 1px;
+  font-size: 11px;
+  box-shadow: 0 2px 0 0 var(--j-dark-red);
+}
+
+/* ── Tooltip / inline label ──────────────────────────────────────────── */
+.j-tooltip {
+  display: inline-block;
+  background: var(--j-white);
+  color: #000;
+  text-shadow: none;
+  border-radius: var(--j-radius-sm);
+  padding: 6px 10px 4px;
+  font-size: 12px;
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.4);
+  border: 2px solid rgba(0,0,0,0.2);
+  line-height: 1.25;
+}
+
+/* ── Sidebar HUD demo ─────────────────────────────────────────────────── */
+.hud {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.hud .sidebar {
+  background: var(--j-darkest);
+  border: 2px solid #000;
+  border-radius: var(--j-radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.6);
+}
+.hud .sidebar h4 {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--j-white);
+}
+.hud .sidebar .header-tile {
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-sm);
+  padding: 6px 10px;
+  display: flex; justify-content: space-between; align-items: center;
+  border: 1px solid rgba(0,0,0,0.5);
+}
+.hud .sidebar .header-tile .lbl { font-size: 10px; color: var(--j-border-silver); letter-spacing: 0.08em; }
+.hud .sidebar .header-tile .v { font-size: 14px; }
+
+.hud .arena {
+  background:
+    repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0 14px, transparent 14px 28px),
+    linear-gradient(180deg, #2c4842, #213632);
+  border-radius: var(--j-radius-md);
+  border: 2px solid #000;
+  padding: 18px;
+  min-height: 280px;
+}
+
+/* ── Tabs / segmented controls ────────────────────────────────────────── */
+.j-tabs { display: inline-flex; gap: 6px; }
+.j-tabs .j-btn { flex: 0 0 auto; }
+
+.segmented {
+  display: inline-flex;
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-md);
+  padding: 3px;
+  gap: 3px;
+}
+.segmented .seg {
+  padding: 6px 12px 4px;
+  font-size: 12px;
+  border-radius: var(--j-radius-sm);
+  color: var(--j-border-silver);
+  cursor: pointer;
+}
+.segmented .seg.active { background: var(--j-orange); color: var(--j-white); box-shadow: inset 0 -3px 0 0 var(--j-dark-orange); }
+
+/* ── Pagination ───────────────────────────────────────────────────────── */
+.pagination { display: inline-flex; align-items: stretch; gap: 6px; }
+.pagination .page-tag {
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 6px 18px 5px;
+  box-shadow: 0 3px 0 0 var(--j-dark-red);
+  font-size: 13px;
+}
+
+/* ── Rules card ──────────────────────────────────────────────────────── */
+.rules {
+  background: var(--j-darkest);
+  border: 2px solid rgba(0,0,0,0.5);
+  border-radius: var(--j-radius-md);
+  padding: 16px;
+}
+.rules ul { margin: 0; padding-left: 18px; }
+.rules li { font-size: 13px; line-height: 1.6; color: var(--j-border-silver); }
+.rules li b { color: var(--j-white); font-weight: 400; letter-spacing: 0.04em; }
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+.foot {
+  margin-top: 72px;
+  padding-top: 18px;
+  border-top: 1px dashed rgba(185,194,210,0.18);
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--j-grey);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* ── Hover hint for buttons demo ─────────────────────────────────────── */
+.btn-demo .row { gap: 10px; }
+.note { font-size: 11px; color: var(--j-grey); letter-spacing: 0.06em; margin-top: 8px; }
+
+</style>
+</head>
+<body>
+<main class="page" data-screen-label="01 Reference">
+
+  <!-- ── Masthead ────────────────────────────────────────────────────── -->
+  <header class="masthead">
+    <div>
+      <h1>Jimbo Design System</h1>
+      <p>Visual reference distilled from the screenshots in <span class="tone-gold">examples/screenshots/</span>. The patterns below are the only shapes UI work in <span class="tone-gold">jaml-ui</span> should adhere to. Anything outside this vocabulary should be added here first, then to the library.</p>
+    </div>
+    <span class="stamp">v1 · spec</span>
+  </header>
+
+  <!-- ── 01 Type ─────────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">01</span>
+      <span class="title">Type</span>
+      <span class="blurb">One face — m6x11plus — at fixed-pixel sizes. No bold weight, no ALL CAPS. Letter-spacing replaces weight as emphasis.</span>
+    </div>
+    <div class="j-panel swatch-panel">
+      <div class="type-row"><span class="label">display / 26</span><span class="t-display">Choose your next Blind</span><span class="meta">spacing 0.04em · line 1.0</span></div>
+      <div class="type-row"><span class="label">xl / 24</span><span class="t-xl">Run Workbench</span><span class="meta">spacing 0.04em</span></div>
+      <div class="type-row"><span class="label">lg / 18</span><span class="t-lg">Score at least <span class="tone-red">300</span></span><span class="meta">spacing 0.04em</span></div>
+      <div class="type-row"><span class="label">heading / 14</span><span class="t-heading">Base Cards</span><span class="meta">spacing 0.08em</span></div>
+      <div class="type-row"><span class="label">md / 14</span><span class="t-md">Spectral cards may appear in the shop.</span><span class="meta">default body</span></div>
+      <div class="type-row"><span class="label">sm / 12</span><span class="t-sm">Reward: <span class="tone-gold">$$$+</span></span><span class="meta">tile copy</span></div>
+      <div class="type-row"><span class="label">body / 11</span><span class="t-body">Cards played previously this ante are debuffed. Hand size, hands, and discards reset between rounds.</span><span class="meta">spacing 0.05em · line 1.3</span></div>
+      <div class="type-row"><span class="label">label / 9</span><span class="t-label">CONSUMABLES</span><span class="meta">spacing 0.10em</span></div>
+      <div class="type-row"><span class="label">micro / 8</span><span class="t-micro">52 / 52</span><span class="meta">corner counts only</span></div>
+    </div>
+
+    <div class="section-head" style="margin-top:32px;">
+      <span class="num">·</span><span class="title">Tones</span>
+      <span class="blurb">Color carries meaning. Don't use accent tones for non-semantic decoration.</span>
+    </div>
+    <div class="j-panel swatch-panel">
+      <div class="row" style="gap:24px;">
+        <span class="t-lg tone-red">+30 Mult</span>
+        <span class="t-lg tone-blue">+50 Chips</span>
+        <span class="t-lg tone-gold">$14</span>
+        <span class="t-lg tone-green">1 in 5 chance</span>
+        <span class="t-lg tone-orange">Up the Ante</span>
+        <span class="t-lg tone-purple">Bonus Card</span>
+        <span class="t-lg tone-grey">Upcoming</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 Color ────────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">02</span><span class="title">Color</span>
+      <span class="blurb">Every saturated face has a matched "underside" shadow color — that's what gives buttons their chunky press. Never pick a face hex without picking its dark partner.</span>
+    </div>
+
+    <div class="j-panel swatch-panel">
+      <h3>Face / shadow pairs</h3>
+      <div class="swatch-grid">
+        <div class="swatch on-dark" style="background:var(--j-red);    box-shadow:0 4px 0 0 var(--j-dark-red);"><span class="name">red</span><span class="hex">#fe5148</span><span class="var">--j-red / --j-dark-red</span></div>
+        <div class="swatch on-dark" style="background:var(--j-blue);   box-shadow:0 4px 0 0 var(--j-dark-blue);"><span class="name">blue</span><span class="hex">#0093ff</span><span class="var">--j-blue / --j-dark-blue</span></div>
+        <div class="swatch on-dark" style="background:var(--j-green);  box-shadow:0 4px 0 0 var(--j-dark-green);"><span class="name">green</span><span class="hex">#429f79</span><span class="var">--j-green / --j-dark-green</span></div>
+        <div class="swatch on-dark" style="background:var(--j-orange); box-shadow:0 4px 0 0 var(--j-dark-orange);"><span class="name">orange</span><span class="hex">#ff9800</span><span class="var">--j-orange / --j-dark-orange</span></div>
+        <div class="swatch on-light" style="background:var(--j-gold);  box-shadow:0 4px 0 0 #a87f1e;"><span class="name">gold</span><span class="hex">#e4b643</span><span class="var">--j-gold</span></div>
+        <div class="swatch on-dark" style="background:var(--j-purple); box-shadow:0 4px 0 0 var(--j-dark-purple);"><span class="name">purple</span><span class="hex">#9e74ce</span><span class="var">--j-purple / --j-dark-purple</span></div>
+      </div>
+
+      <h3 style="margin-top:18px;">Consumable buttons</h3>
+      <div class="swatch-grid">
+        <div class="swatch on-dark" style="background:var(--j-tarot);    box-shadow:0 4px 0 0 var(--j-tarot-dark);"><span class="name">tarot</span><span class="hex">#9e74ce</span><span class="var">--j-tarot</span></div>
+        <div class="swatch on-dark" style="background:var(--j-planet);   box-shadow:0 4px 0 0 var(--j-planet-dark);"><span class="name">planet</span><span class="hex">#00a7ca</span><span class="var">--j-planet</span></div>
+        <div class="swatch on-dark" style="background:var(--j-spectral); box-shadow:0 4px 0 0 var(--j-spectral-dark);"><span class="name">spectral</span><span class="hex">#2e76fd</span><span class="var">--j-spectral</span></div>
+      </div>
+
+      <h3 style="margin-top:18px;">Surfaces &amp; chrome</h3>
+      <div class="swatch-grid">
+        <div class="swatch on-dark" style="background:var(--j-darkest);     border-color:#000;"><span class="name">darkest</span><span class="hex">#1e2b2d</span><span class="var">inner-panel fill</span></div>
+        <div class="swatch on-dark" style="background:var(--j-dark-grey);"><span class="name">dark-grey</span><span class="hex">#3a5055</span><span class="var">outer panel fill</span></div>
+        <div class="swatch on-dark" style="background:var(--j-teal-grey);"><span class="name">teal-grey</span><span class="hex">#404c4e</span><span class="var">tile fill</span></div>
+        <div class="swatch on-light" style="background:var(--j-border-silver);"><span class="name">silver</span><span class="hex">#b9c2d2</span><span class="var">panel border</span></div>
+        <div class="swatch on-light" style="background:var(--j-border-south);"><span class="name">south-edge</span><span class="hex">#777e89</span><span class="var">panel under-edge</span></div>
+        <div class="swatch on-dark" style="background:var(--j-grey);"><span class="name">grey</span><span class="hex">#708386</span><span class="var">muted / disabled text</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 Spacing & Radius ─────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">03</span><span class="title">Spacing &amp; Radius</span>
+      <span class="blurb">Tight scale. Most spacing is 4 / 8 / 12 / 16. Radii top out at 10px — Balatro is chunky, not bubbly.</span>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel swatch-panel">
+        <h3>Spacing</h3>
+        <div class="ruler"><span class="t-label">xs · 2px</span><div class="bar" style="width:2px;"></div><span class="t-micro tone-grey">--j-space-xs</span></div>
+        <div class="ruler"><span class="t-label">sm · 4px</span><div class="bar" style="width:4px;"></div><span class="t-micro tone-grey">--j-space-sm</span></div>
+        <div class="ruler"><span class="t-label">md · 8px</span><div class="bar" style="width:8px;"></div><span class="t-micro tone-grey">--j-space-md</span></div>
+        <div class="ruler"><span class="t-label">lg · 12px</span><div class="bar" style="width:12px;"></div><span class="t-micro tone-grey">--j-space-lg</span></div>
+        <div class="ruler"><span class="t-label">xl · 16px</span><div class="bar" style="width:16px;"></div><span class="t-micro tone-grey">--j-space-xl</span></div>
+      </div>
+      <div class="j-panel swatch-panel">
+        <h3>Radius</h3>
+        <div class="row" style="gap:18px; align-items:flex-end;">
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:4px;"></div><span class="t-label">sm · 4</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:6px;"></div><span class="t-label">md · 6</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:8px;"></div><span class="t-label">lg · 8</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:10px;"></div><span class="t-label">pill · 10</span></div>
+        </div>
+        <p class="note">Anything above 10px reads as web-app, not arcade. If a surface needs to feel softer, increase border + shadow instead of radius.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 Panels ───────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">04</span><span class="title">Panels</span>
+      <span class="blurb">Three nested surfaces only: <b>outer panel</b> (silver border + south-edge), <b>inner panel</b> (darkest fill, black border), <b>tile</b> (recessed, no border).</span>
+    </div>
+    <div class="grid grid-3">
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em;">Outer panel</h3>
+        <p class="t-body" style="margin:0 0 12px; color:var(--j-border-silver);">3px silver border, soft sheen overlay, south-edge shadow. Top-level surface only.</p>
+        <div class="j-inner-panel">
+          <span class="t-heading">Inner panel</span>
+          <p class="t-body" style="margin:6px 0 10px; color:var(--j-border-silver);">Darkest fill, near-black 3px border. Hosts tiles and content.</p>
+          <div class="row">
+            <div class="stat-tile"><span class="lbl">Hands</span><span class="val tone-blue">4</span></div>
+            <div class="stat-tile"><span class="lbl">Discards</span><span class="val tone-red">3</span></div>
+            <div class="stat-tile"><span class="lbl">Ante</span><span class="val tone-orange">1<span class="small"> / 8</span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em;">Section header</h3>
+        <div class="row" style="margin-bottom:10px;">
+          <div class="j-badge j-badge--gold">Round score</div>
+          <div class="j-badge">Ante 2 voucher</div>
+          <div class="j-badge j-badge--green">+30 chips</div>
+        </div>
+        <p class="t-body" style="margin:0; color:var(--j-border-silver);">Section headers are tile-sized rectangles holding one short label. Place at the top of the panel they describe.</p>
+        <div style="margin-top:14px;">
+          <div class="stat-tile" style="display:flex; justify-content:space-between; align-items:center; min-width:0;">
+            <span class="lbl" style="margin:0;">Round score</span>
+            <span class="val" style="font-size:18px;">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em;">Scoreboard</h3>
+        <p class="t-body" style="margin:0 0 12px; color:var(--j-border-silver);">The chip × mult pair. Always blue / red. Multiplication glyph is red over a dark gap.</p>
+        <div class="scoreboard">
+          <div class="side chips">0</div>
+          <div class="side x">×</div>
+          <div class="side mult">0</div>
+        </div>
+        <p class="note">Live state: while a hand resolves, scale the active side up by 1.05 with --j-ease-bounce. Never animate the gap.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 Buttons ──────────────────────────────────────────────────── -->
+  <section class="section btn-demo">
+    <div class="section-head">
+      <span class="num">05</span><span class="title">Buttons</span>
+      <span class="blurb">Every button has a black underside via <span class="tone-gold">box-shadow</span> and presses 3px down with a 55ms linear transition. The face flips to its <b>dark partner</b> on hover and press — never lighten.</span>
+    </div>
+    <div class="j-panel swatch-panel">
+      <h3>Tones</h3>
+      <div class="row" style="margin-bottom:18px;">
+        <button class="j-btn j-btn--md j-btn--orange"><span class="face">Select</span></button>
+        <button class="j-btn j-btn--md j-btn--red"><span class="face">Skip Blind</span></button>
+        <button class="j-btn j-btn--md j-btn--blue"><span class="face">Next Round</span></button>
+        <button class="j-btn j-btn--md j-btn--green"><span class="face">Reroll $4</span></button>
+        <button class="j-btn j-btn--md j-btn--tarot"><span class="face">Tarot</span></button>
+        <button class="j-btn j-btn--md j-btn--planet"><span class="face">Planet</span></button>
+        <button class="j-btn j-btn--md j-btn--spectral"><span class="face">Spectral</span></button>
+        <button class="j-btn j-btn--md j-btn--grey is-disabled"><span class="face">Disabled</span></button>
+      </div>
+
+      <h3>Sizes</h3>
+      <div class="row" style="margin-bottom:18px; align-items:flex-end;">
+        <button class="j-btn j-btn--xs j-btn--orange"><span class="face">xs · 11</span></button>
+        <button class="j-btn j-btn--sm j-btn--orange"><span class="face">sm · 13</span></button>
+        <button class="j-btn j-btn--md j-btn--orange"><span class="face">md · 16</span></button>
+        <button class="j-btn j-btn--lg j-btn--orange"><span class="face">lg · 20</span></button>
+      </div>
+
+      <h3>States</h3>
+      <div class="row">
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange"><span class="face">Rest</span></button>
+          <span class="t-micro tone-grey">rest</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange" data-pressed="true"><span class="face">Press</span></button>
+          <span class="t-micro tone-grey">pressed — face flips to --j-dark-orange, sinks 3px, shadow collapses</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange is-disabled"><span class="face">Disabled</span></button>
+          <span class="t-micro tone-grey">opacity 0.55, no hover</span>
+        </div>
+      </div>
+
+      <h3 style="margin-top:18px;">Stretch / split rows</h3>
+      <div class="grid grid-2" style="gap:10px;">
+        <button class="j-btn j-btn--md j-btn--orange j-btn--block"><span class="face">Back</span></button>
+        <div class="row" style="gap:6px; justify-content:flex-start;">
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">‹</span></button>
+          <div class="page-tag" style="background:var(--j-red); border-radius:var(--j-radius-md); padding:6px 18px 5px; box-shadow:0 3px 0 0 var(--j-dark-red);">Page 1 / 10</div>
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">›</span></button>
+        </div>
+      </div>
+      <p class="note">A long "Back" button anchored to the bottom of a modal is the standard dismissal pattern. Use orange even when the modal is destructive — destructive intent shows in the verb, not the color.</p>
+    </div>
+  </section>
+
+  <!-- ── 06 Controls ─────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">06</span><span class="title">Controls</span>
+      <span class="blurb">Steppers, sliders, checkboxes, tabs. All inherit the press metaphor.</span>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel swatch-panel">
+        <h3>Stepper</h3>
+        <div class="row" style="gap:18px;">
+          <div class="stack" style="align-items:center; gap:6px;">
+            <span class="t-sm tone-grey">Game Speed</span>
+            <div class="stepper">
+              <button class="j-btn j-btn--sm j-btn--red"><span class="face">‹</span></button>
+              <span class="value">4</span>
+              <button class="j-btn j-btn--sm j-btn--red"><span class="face">›</span></button>
+            </div>
+          </div>
+          <div class="stack" style="align-items:center; gap:6px;">
+            <span class="t-sm tone-grey">Shadows</span>
+            <div class="stepper">
+              <button class="j-btn j-btn--sm j-btn--red"><span class="face">‹</span></button>
+              <span class="value">On</span>
+              <button class="j-btn j-btn--sm j-btn--red"><span class="face">›</span></button>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:18px;">Slider</h3>
+        <div class="slider-row">
+          <span class="t-sm tone-grey" style="min-width:80px;">Screenshake</span>
+          <div class="slider"><div class="fill"></div></div>
+          <span class="val">70</span>
+        </div>
+        <div class="slider-row" style="margin-top:6px;">
+          <span class="t-sm tone-grey" style="min-width:80px;">CRT</span>
+          <div class="slider"><div class="fill" style="width:35%;"></div></div>
+          <span class="val">35</span>
+        </div>
+
+        <h3 style="margin-top:18px;">Checkbox</h3>
+        <div class="row">
+          <div class="row" style="gap:6px;"><span class="checkbox">✓</span><span class="t-sm">Vibration</span></div>
+          <div class="row" style="gap:6px;"><span class="checkbox">✓</span><span class="t-sm">High Contrast Cards</span></div>
+          <div class="row" style="gap:6px;"><span class="checkbox off"></span><span class="t-sm tone-grey">Reduced Motion</span></div>
+        </div>
+      </div>
+
+      <div class="j-panel swatch-panel">
+        <h3>Tabs</h3>
+        <div class="j-tabs">
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">Game</span></button>
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">Graphics</span></button>
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">Audio</span></button>
+        </div>
+        <p class="note">Pill-shaped buttons in a row. Active state is implicit — the tab whose panel is open. Don't add an additional underline or marker.</p>
+
+        <h3 style="margin-top:18px;">Segmented</h3>
+        <div class="segmented">
+          <span class="seg active">Filters</span>
+          <span class="seg">Seeds</span>
+          <span class="seg">Antes</span>
+        </div>
+        <p class="note">Use for content switching <i>within</i> a panel. Tabs are for navigation between panels.</p>
+
+        <h3 style="margin-top:18px;">Tooltip</h3>
+        <div class="row" style="align-items:flex-start;">
+          <div class="j-tooltip">+30 extra chips<br/><span style="background:var(--j-tarot); color:#fff; text-shadow:1px 1px 0 rgba(0,0,0,0.7); border-radius:4px; padding:1px 6px;">Bonus Card</span></div>
+          <div class="j-tooltip">1 in 5 chance<br/>for <span class="tone-red">+20 Mult</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 Card slots ──────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">07</span><span class="title">Card slots</span>
+      <span class="blurb">All cards share one frame: 110×154, rounded-md, black inner border, 3px south shadow. Type is signalled by background tone, not shape. Slot bodies stay blank in code — art is content, not chrome.</span>
+    </div>
+    <div class="j-panel swatch-panel">
+      <div class="row" style="gap:14px;">
+        <div class="stack" style="align-items:center; gap:6px;">
+          <div class="card-slot card-slot--joker"><span class="corner">J</span><span class="tag">Joker</span><span class="corner br">J</span></div>
+          <span class="t-label tone-grey">joker</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <div class="card-slot card-slot--tarot"><span class="corner">T</span><span class="tag">Tarot</span><span class="corner br">T</span></div>
+          <span class="t-label tone-grey">tarot</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <div class="card-slot card-slot--planet"><span class="corner">P</span><span class="tag">Planet</span><span class="corner br">P</span></div>
+          <span class="t-label tone-grey">planet</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <div class="card-slot card-slot--spectral"><span class="corner">S</span><span class="tag">Spectral</span><span class="corner br">S</span></div>
+          <span class="t-label tone-grey">spectral</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <div class="card-slot card-slot--blind"><span class="corner">·</span><span class="tag">Blind</span><span class="corner br">·</span></div>
+          <span class="t-label tone-grey">blind back</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <div class="card-slot card-slot--pack"><span class="corner">·</span><span class="tag">Pack</span><span class="corner br">·</span></div>
+          <span class="t-label tone-grey">booster pack</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <div class="card-slot card-slot--standard"><span class="corner">A</span><span class="tag">Standard</span><span class="corner br">A</span></div>
+          <span class="t-label tone-grey">standard</span>
+        </div>
+      </div>
+      <p class="note" style="margin-top:14px;">Hover lifts the card by 2px and tilts 6° max. Selection is shown with a 2px silver outset border, never a colored glow.</p>
+    </div>
+  </section>
+
+  <!-- ── 08 Blind column ────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">08</span><span class="title">Blind column</span>
+      <span class="blurb">Three-column "choose your next blind" layout. Active column gets a 2px <b>blue</b> outer border; queued columns get gold / red. Skip CTA lives outside the column.</span>
+    </div>
+    <div class="j-panel swatch-panel">
+      <div class="row" style="gap:18px; align-items:stretch;">
+        <div class="blind-col blind-col--up">
+          <div class="ribbon">Select</div>
+          <span class="t-sm">Small Blind</span>
+          <div class="blind-icon">Small<br/>Blind</div>
+          <div class="target">Score at least<span class="n">300</span></div>
+          <div class="reward">Reward: $$$+</div>
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">Skip Blind</span></button>
+        </div>
+        <div class="blind-col blind-col--next">
+          <div class="ribbon">Upcoming</div>
+          <span class="t-sm">Big Blind</span>
+          <div class="blind-icon" style="background:var(--j-gold); color:#2a1f00; text-shadow:none;">Big<br/>Blind</div>
+          <div class="target ghosted">Score at least<span class="n" style="color:var(--j-gold-text);">450</span></div>
+          <div class="reward">Reward: $$$$+</div>
+          <span class="t-micro tone-grey">queued</span>
+        </div>
+        <div class="blind-col blind-col--boss">
+          <div class="ribbon">Boss</div>
+          <span class="t-sm">The Pillar</span>
+          <div class="blind-icon" style="background:#7b6049;">⊟</div>
+          <div class="target">Score at least<span class="n">600</span></div>
+          <div class="reward">Reward: $$$$$+</div>
+          <span class="t-micro tone-grey">cards played previously this ante are debuffed</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 09 HUD layout ──────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">09</span><span class="title">HUD layout</span>
+      <span class="blurb">Left rail is run state, never gameplay. Right arena is whatever the player is acting on. Rail width is fixed; arena flexes.</span>
+    </div>
+    <div class="j-panel" style="padding:14px;">
+      <div class="hud">
+        <aside class="sidebar">
+          <div class="header-tile"><span class="lbl">Round score</span><span class="v">0</span></div>
+          <div class="scoreboard" style="align-self:center;">
+            <div class="side chips" style="font-size:20px; padding:8px 14px 6px; min-width:54px;">0</div>
+            <div class="side x" style="font-size:14px;">×</div>
+            <div class="side mult" style="font-size:20px; padding:8px 14px 6px; min-width:54px;">0</div>
+          </div>
+          <div class="row" style="gap:8px; justify-content:space-between;">
+            <button class="j-btn j-btn--sm j-btn--red"><span class="face">Run Info</span></button>
+            <div class="stat-tile" style="min-width:0; flex:1;"><span class="lbl">Hands</span><span class="val tone-blue" style="font-size:18px;">4</span></div>
+            <div class="stat-tile" style="min-width:0; flex:1;"><span class="lbl">Discards</span><span class="val tone-red" style="font-size:18px;">3</span></div>
+          </div>
+          <div class="header-tile"><span class="lbl">Wallet</span><span class="v tone-gold">$4</span></div>
+          <div class="row" style="gap:8px;">
+            <button class="j-btn j-btn--sm j-btn--orange"><span class="face">Options</span></button>
+            <div class="stat-tile" style="min-width:0; flex:1;"><span class="lbl">Ante</span><span class="val tone-orange" style="font-size:18px;">1<span class="small"> / 8</span></span></div>
+            <div class="stat-tile" style="min-width:0; flex:1;"><span class="lbl">Round</span><span class="val tone-orange" style="font-size:18px;">0</span></div>
+          </div>
+        </aside>
+        <div class="arena">
+          <div class="row" style="justify-content:space-between; margin-bottom:14px;">
+            <span class="t-display">Choose your next Blind</span>
+            <div class="row">
+              <div class="card-slot card-slot--joker" style="width:78px; height:108px;"><span class="corner">J</span><span class="tag" style="font-size:8px;">Joker</span><span class="corner br">J</span></div>
+              <div class="card-slot card-slot--blind" style="width:78px; height:108px;"><span class="corner">·</span><span class="tag" style="font-size:8px;">Deck</span><span class="corner br">·</span></div>
+            </div>
+          </div>
+          <div class="row" style="gap:14px; align-items:stretch;">
+            <div class="blind-col blind-col--up" style="width:148px;">
+              <div class="ribbon">Select</div>
+              <span class="t-sm">Small Blind</span>
+              <div class="blind-icon" style="width:64px;height:64px;">Small<br/>Blind</div>
+              <div class="target">Score at least<span class="n" style="font-size:18px;">300</span></div>
+              <div class="reward">Reward: $$$+</div>
+            </div>
+            <div class="blind-col blind-col--next" style="width:148px;">
+              <div class="ribbon">Upcoming</div>
+              <span class="t-sm">Big Blind</span>
+              <div class="blind-icon" style="width:64px;height:64px; background:var(--j-gold); color:#2a1f00; text-shadow:none;">Big<br/>Blind</div>
+              <div class="target ghosted">Score at least<span class="n" style="font-size:18px;color:var(--j-gold-text);">450</span></div>
+              <div class="reward">Reward: $$$$+</div>
+            </div>
+            <div class="blind-col blind-col--boss" style="width:148px;">
+              <div class="ribbon">Boss</div>
+              <span class="t-sm">Boss Blind</span>
+              <div class="blind-icon" style="width:64px;height:64px; background:#7b6049;">⊟</div>
+              <div class="target">Score at least<span class="n" style="font-size:18px;">600</span></div>
+              <div class="reward">Reward: $$$$$+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 10 Modal pattern ────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">10</span><span class="title">Modal</span>
+      <span class="blurb">Modal = outer panel + tabs at top + back button anchored at the bottom edge as a full-width orange bar. Body sits between.</span>
+    </div>
+    <div class="j-panel modal-demo">
+      <div class="modal">
+        <div class="modal-tabs">
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">Game</span></button>
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">Graphics</span></button>
+          <button class="j-btn j-btn--sm j-btn--red"><span class="face">Audio</span></button>
+        </div>
+        <div class="stack" style="gap:14px;">
+          <div class="stack" style="align-items:center; gap:6px;">
+            <span class="t-sm">Game Speed</span>
+            <div class="stepper">
+              <button class="j-btn j-btn--sm j-btn--red"><span class="face">‹</span></button>
+              <span class="value">4</span>
+              <button class="j-btn j-btn--sm j-btn--red"><span class="face">›</span></button>
+            </div>
+          </div>
+          <div class="modal-row"><span class="label">Vibration</span><span class="checkbox">✓</span></div>
+          <div class="stack" style="align-items:center; gap:6px;">
+            <span class="t-sm">Screenshake</span>
+            <div class="slider-row">
+              <div class="slider"><div class="fill"></div></div>
+              <span class="val">100</span>
+            </div>
+          </div>
+          <div class="modal-row"><span class="label">Display Stake Stickers during Run</span><span class="checkbox">✓</span></div>
+          <div class="modal-row"><span class="label">High Contrast Cards</span><span class="checkbox">✓</span></div>
+          <div class="modal-row"><span class="label tone-grey">Reduced Motion</span><span class="checkbox off"></span></div>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="j-btn j-btn--md j-btn--orange j-btn--block"><span class="face">Back</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 11 Categories grid ─────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">11</span><span class="title">Categories grid</span>
+      <span class="blurb">Two columns, red full-width tiles with category + n/total. Consumables get a vertical "CONSUMABLES" rail and their own purple/teal/blue tints.</span>
+    </div>
+    <div class="j-panel swatch-panel">
+      <div class="grid grid-2" style="gap:10px;">
+        <div class="stack" style="gap:8px;">
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Jokers · 150 / 150</span></button>
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Decks · 15 / 15</span></button>
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Vouchers · 32 / 32</span></button>
+          <div style="position:relative; padding-left:22px;">
+            <span style="position:absolute; left:0; top:0; bottom:0; width:18px; background:var(--j-darkest); border-radius:var(--j-radius-sm); display:flex; align-items:center; justify-content:center; font-size:8px; letter-spacing:0.2em; color:var(--j-border-silver); writing-mode:vertical-rl; transform:rotate(180deg);">CONSUMABLES</span>
+            <div class="stack" style="gap:8px;">
+              <button class="j-btn j-btn--md j-btn--tarot j-btn--block"><span class="face">Tarot · 22 / 22</span></button>
+              <button class="j-btn j-btn--md j-btn--planet j-btn--block"><span class="face">Planet · 12 / 12</span></button>
+              <button class="j-btn j-btn--md j-btn--spectral j-btn--block"><span class="face">Spectral · 18 / 18</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="stack" style="gap:8px;">
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Enhanced Cards</span></button>
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Seals</span></button>
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Editions · 5 / 5</span></button>
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Booster Packs · 32 / 32</span></button>
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Tags · 24 / 24</span></button>
+          <button class="j-btn j-btn--md j-btn--red j-btn--block"><span class="face">Blinds · 30 / 30</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 12 House rules ─────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">12</span><span class="title">House rules</span>
+      <span class="blurb">Lifted from <span class="tone-gold">CLAUDE.md / AGENTS.md</span>. These are non-negotiable for any UI work in jaml-ui.</span>
+    </div>
+    <div class="rules">
+      <ul>
+        <li><b>Never ALL CAPS.</b> Title-case headings, sentence-case body. Letter-spacing carries emphasis.</li>
+        <li><b>Never bold.</b> One weight only. Use color or size to differentiate.</li>
+        <li><b>Never grey-on-grey.</b> If text sits on a grey surface, it must be white or a tone color — never <span class="tone-grey">grey</span>.</li>
+        <li><b>Mobile-first at 375px.</b> All components must lay out cleanly at that width before scaling up.</li>
+        <li><b>Juice is CSS.</b> Press, sway, font-dance, scale 1.05 — all keyframes / transitions. No JS wrappers around them.</li>
+        <li><b>No visible scrollbars.</b> Use magnetic scroll snapping; let content imply more.</li>
+        <li><b>Chunky, not bubbly.</b> Radius ≤ 10px. Buttons must have a black underside and a 3px press.</li>
+        <li><b>Color carries meaning.</b> Red = mult / destructive / boss. Blue = chips / informational. Orange = primary action. Green = success / reroll. Gold = currency. Purple/teal/blue trio = tarot / planet / spectral consumables.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>jaml-ui · jimbo design system · single-source spec</span>
+    <span>m6x11plus · oklch off — fixed pixel ramp</span>
+  </footer>
+
+</main>
+</body>
+</html>

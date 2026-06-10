@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=320,initial-scale=1" />
+<title>JAML Browser</title>
+<link rel="stylesheet" href="src/ui/jimbo.css" />
+<link rel="stylesheet" href="src/ui/jimbo-addons.css" />
+<style>
+  @font-face {
+    font-family: 'm6x11plus';
+    src: url('public/fonts/m6x11plusplus.otf') format('opentype');
+    font-display: block;
+  }
+  html, body, #root {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background: #0b1416;
+    overflow: hidden;
+  }
+  body { font-family: 'm6x11plus', monospace; color: #fff; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  #root { display: flex; justify-content: center; align-items: center; }
+  .stage {
+    width: 320px; height: 568px;
+    padding: 2px;
+    display: flex; flex-direction: column;
+    flex: 0 0 auto;
+  }
+  /* Tighter panel padding inside the 320 stage */
+  .stage .j-panel { padding: 6px; flex: 1; min-height: 0; }
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    background: #1e2b2d;
+    border: 2px solid #334461;
+    border-radius: 6px;
+    padding: 6px;
+    cursor: pointer;
+    transition: background 80ms linear, border-color 80ms linear;
+    appearance: none;
+    color: inherit;
+    font-family: inherit;
+    min-height: 56px;
+  }
+  .filter-row:hover {
+    background: #3a5055;
+    border-color: #b9c2d2;
+  }
+  .filter-row__decks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .filter-row__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .filter-row__name {
+    font-family: 'm6x11plus', monospace;
+    font-size: 15px;
+    color: #fff;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .filter-row__desc {
+    font-size: 9px;
+    color: #708386;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .filter-row__deckpill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 34px;
+    border-radius: 4px;
+    border: 2px solid #1e2b2d;
+    font-family: 'm6x11plus', monospace;
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.7);
+    line-height: 1;
+  }
+  .filter-row__fan {
+    position: relative;
+    flex-shrink: 0;
+    width: 60px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .filter-row__fan-slot {
+    position: absolute;
+    top: 0;
+    transition: transform 120ms ease;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="src/tokens.js"></script>
+<script src="src/v2/mock-filters.js"></script>
+<script type="text/babel" src="src/v2/BalatroComponents.jsx"></script>
+<script type="text/babel" src="src/sprites.jsx"></script>
+
+<script type="text/babel">
+const {
+  JimboPanel, JimboButton, JimboBackButton, JimboBadge, JimboText,
+  JimboStack, JimboRow, JimboTabs, JimboToast,
+} = window;
+
+function FilterRow({ filter, onOpen }) {
+  const { StakeSprite, JokerMini, TarotMini, VoucherMini, TagChip } = window;
+  const targets = [...filter.must, ...filter.should].slice(0, 5);
+
+  // Deck pill — color-coded by deck name. (Sprite-based deck backs would
+  // come from a dedicated deck-back atlas, not 8BitDeck which is suits.)
+  const deckPalette = {
+    Red:    { bg: '#a02721' },
+    Blue:   { bg: '#0057a1' },
+    Yellow: { bg: '#a05b00' },
+    Green:  { bg: '#215f46' },
+    Black:  { bg: '#1e2b2d' },
+    Magic:  { bg: '#5e437e' },
+    Nebula: { bg: '#14449e' },
+    Ghost:  { bg: '#708386' },
+  }[filter.deck] || { bg: '#3a5055' };
+
+  // Resolve each target to the right sprite mini.
+  const renderTarget = (t, i) => {
+    const offset = i * 12;
+    const rot = (i - (targets.length - 1) / 2) * 8;
+    const style = {
+      left: offset,
+      transform: `rotate(${rot}deg)`,
+      zIndex: i,
+    };
+    let sprite = null;
+    if (t.type === 'joker' || t.type === 'souljoker') {
+      sprite = t.value === 'any'
+        ? <div style={{ width: 26, height: 35, background: '#3a5055', border: '1px solid #708386', borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#e4b643' }}>?</div>
+        : <JokerMini name={t.value} size={26} />;
+    } else if (t.type === 'tarot') {
+      sprite = <TarotMini name={t.value} size={26} />;
+    } else if (t.type === 'voucher') {
+      sprite = <VoucherMini name={t.value} size={26} />;
+    } else if (t.type === 'smallblindtag' || t.type === 'bigblindtag') {
+      sprite = <TagChip name={t.value} size={22} />;
+    }
+    return <div key={i} className="filter-row__fan-slot" style={style}>{sprite}</div>;
+  };
+
+  return (
+    <button className="filter-row" onClick={() => onOpen(filter)}>
+      <div className="filter-row__decks">
+        <div className="filter-row__deckpill" style={{ background: deckPalette.bg }}>
+          {filter.deck.charAt(0)}
+        </div>
+        <StakeSprite name={filter.stake} size={16} />
+      </div>
+      <div className="filter-row__body">
+        <span className="filter-row__name">{filter.name}</span>
+        <span className="filter-row__desc">{filter.description}</span>
+      </div>
+      <div className="filter-row__fan">
+        {targets.map(renderTarget)}
+      </div>
+    </button>
+  );
+}
+
+function Browser() {
+  const [filters, setFilters] = React.useState(window.FILTERS);
+  const [tab, setTab] = React.useState('files');
+  const [toast, setToast] = React.useState(null);
+  const fileInputRef = React.useRef(null);
+
+  // Load sprite atlases on mount
+  React.useEffect(() => {
+    window.loadSpriteMap?.('jokers',   'assets/jokers.json');
+    window.loadSpriteMap?.('tarots',   'assets/tarots.json');
+    window.loadSpriteMap?.('vouchers', 'assets/vouchers.json');
+    window.loadSpriteMap?.('tags',     'assets/tags.json');
+  }, []);
+
+  const openFinder = (filter) => {
+    window.location.href = `JAML Seed Finder.html?jaml=${encodeURIComponent(filter.id)}`;
+  };
+
+  const newFilter = () => {
+    // Stub: would open the JAML editor. For now, toast.
+    setToast({ message: 'new jaml editor not wired here', tone: 'orange' });
+  };
+
+  const loadFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onFileChosen = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setToast({ message: `loaded: ${f.name}`, tone: 'green' });
+  };
+
+  // Per-tab content
+  const tabFilters =
+    tab === 'files' ? filters :
+    tab === 'default' ? filters.filter((f) => f.author === 'pifreak') :
+    /* community */ filters.filter((f) => f.author !== 'pifreak');
+
+  return (
+    <div className="stage">
+      <JimboPanel onBack={() => history.back()}>
+        <JimboStack gap="md">
+          <JimboTabs
+            activeTab={tab}
+            onTabChange={setTab}
+            tabs={[
+              { id: 'files', label: 'files' },
+              { id: 'default', label: 'default' },
+              { id: 'community', label: 'community' },
+            ]}
+          />
+
+          {tab === 'files' && (
+            <JimboRow gap="sm" justify="between">
+              <JimboButton tone="green" size="sm" onClick={newFilter}>+ new</JimboButton>
+              <JimboButton tone="blue" size="sm" onClick={loadFile}>upload</JimboButton>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".jaml,.yaml,.yml,.json"
+                style={{ display: 'none' }}
+                onChange={onFileChosen}
+              />
+            </JimboRow>
+          )}
+
+          <JimboText size="sm">
+            {tabFilters.length} filter{tabFilters.length === 1 ? '' : 's'} • tap to run
+          </JimboText>
+
+          <JimboStack gap="sm">
+            {tabFilters.length === 0 && (
+              <JimboText size="xs" tone="grey">nothing here yet</JimboText>
+            )}
+            {tabFilters.map((f) => (
+              <FilterRow key={f.id} filter={f} onOpen={openFinder} />
+            ))}
+          </JimboStack>
+        </JimboStack>
+      </JimboPanel>
+
+      {toast && (
+        <JimboToast
+          message={toast.message}
+          tone={toast.tone}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Browser />);
+</script>
+</body>
+</html>

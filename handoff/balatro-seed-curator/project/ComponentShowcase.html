@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Balatro Component Showcase</title>
+<link rel="stylesheet" href="src/ui/jimbo.css" />
+<link rel="stylesheet" href="src/ui/jimbo-addons.css" />
+<style>
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #0b1416;
+    overflow: hidden;
+  }
+  body {
+    font-family: 'm6x11plus', monospace;
+    color: #fff;
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #root { display: flex; justify-content: center; align-items: center; }
+
+  .stage {
+    width: 320px;
+    height: 568px;
+    padding: 2px;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+  }
+  .stage .j-panel { padding: 6px; flex: 1; min-height: 0; }
+
+  .scroll {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: #708386;
+    text-transform: lowercase;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="src/tokens.js"></script>
+<script type="text/babel" src="src/v2/BalatroComponents.jsx"></script>
+
+<script type="text/babel">
+const {
+  JimboText, JimboButton, JimboBackButton, JimboPanel, JimboInnerPanel,
+  JimboBadge, JimboListItem, JimboTextInput, JimboInlineEdit, JimboLink,
+  JimboValueBadge, JimboSlider, JimboStepper, JimboDualChip, JimboTabs,
+  JimboInfoCard, JimboInfoCardBody, JimboInfoCardTitle, JimboInfoCardSub, JimboInfoCardAside,
+  JimboCopyButton, JimboSeedCopyChip, JimboCopyRow, JimboIconButton, JimboFlankNav,
+} = window;
+
+function Showcase() {
+  const [slider, setSlider] = React.useState(50);
+  const [page, setPage] = React.useState(0);
+  const [tab, setTab] = React.useState('jokers');
+  const [name, setName] = React.useState('my seed pack');
+  const [search, setSearch] = React.useState('');
+
+  return (
+    <div className="stage">
+      <JimboPanel onBack={() => console.log('back')}>
+        <div className="scroll">
+
+          <div className="section">
+            <span className="label">Buttons — Tones</span>
+            <div className="grid">
+              <JimboButton tone="orange" size="sm">Orange</JimboButton>
+              <JimboButton tone="red" size="sm">Red</JimboButton>
+              <JimboButton tone="blue" size="sm">Blue</JimboButton>
+              <JimboButton tone="green" size="sm">Green</JimboButton>
+              <JimboButton tone="tarot" size="sm">Tarot</JimboButton>
+              <JimboButton tone="planet" size="sm">Planet</JimboButton>
+              <JimboButton tone="spectral" size="sm">Spectral</JimboButton>
+              <JimboButton tone="grey" size="sm">Grey</JimboButton>
+            </div>
+          </div>
+
+          <div className="section">
+            <span className="label">Buttons — Sizes</span>
+            <div className="row">
+              <JimboButton size="xs">XS</JimboButton>
+              <JimboButton size="sm">SM</JimboButton>
+              <JimboButton size="md">MD</JimboButton>
+              <JimboButton size="lg">LG</JimboButton>
+            </div>
+            <JimboButton fullWidth size="md">Full Width</JimboButton>
+            <JimboButton disabled size="sm">Disabled</JimboButton>
+          </div>
+
+          <div className="section">
+            <span className="label">Text — Sizes &amp; Tones</span>
+            <JimboInnerPanel>
+              <JimboText size="display" tone="gold">Display</JimboText>
+              <br />
+              <JimboText size="lg">Large Text</JimboText>
+              <br />
+              <JimboText size="md" tone="blue">Chips Text</JimboText>
+              <br />
+              <JimboText size="md" tone="red">Mult Text</JimboText>
+              <br />
+              <JimboText size="sm" tone="grey">Small Grey</JimboText>
+              <br />
+              <JimboText size="xs" tone="green">XS Green</JimboText>
+              <br />
+              <JimboText size="md" dance>Dancing Letters</JimboText>
+            </JimboInnerPanel>
+          </div>
+
+          <div className="section">
+            <span className="label">Badges</span>
+            <div className="row">
+              <JimboBadge tone="dark">Dark</JimboBadge>
+              <JimboBadge tone="blue">Blue</JimboBadge>
+              <JimboBadge tone="red">Red</JimboBadge>
+              <JimboBadge tone="green">Green</JimboBadge>
+              <JimboBadge tone="grey">Grey</JimboBadge>
+              <JimboBadge tone="orange">Orange</JimboBadge>
+              <JimboBadge tone="purple">Purple</JimboBadge>
+            </div>
+          </div>
+
+          <div className="section">
+            <span className="label">Dual Chip (Hands × Discards)</span>
+            <JimboDualChip
+              left={{ value: 4, tone: 'blue' }}
+              right={{ value: 3, tone: 'red' }}
+            />
+          </div>
+
+          <div className="section">
+            <span className="label">Tabs</span>
+            <JimboTabs
+              activeTab={tab}
+              onTabChange={setTab}
+              tabs={[
+                { id: 'jokers', label: 'Jokers' },
+                { id: 'tarots', label: 'Tarots' },
+                { id: 'planets', label: 'Planets' },
+              ]}
+            />
+          </div>
+
+          <div className="section">
+            <span className="label">Slider</span>
+            <JimboSlider value={slider} onChange={setSlider} label="Ante Count" />
+          </div>
+
+          <div className="section">
+            <span className="label">Stepper (Page Dots)</span>
+            <JimboStepper count={5} index={page} onIndexChange={setPage} />
+          </div>
+
+          <div className="section">
+            <span className="label">Flank Nav</span>
+            <JimboFlankNav
+              onPrev={() => setPage((p) => Math.max(0, p - 1))}
+              onNext={() => setPage((p) => Math.min(4, p + 1))}
+              canPrev={page > 0}
+              canNext={page < 4}
+            >
+              <JimboText size="md">Page {page + 1}/5</JimboText>
+            </JimboFlankNav>
+          </div>
+
+          <div className="section">
+            <span className="label">Inputs</span>
+            <JimboTextInput
+              placeholder="Search Seeds..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <JimboInlineEdit
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              tone="gold"
+              size="md"
+            />
+          </div>
+
+          <div className="section">
+            <span className="label">Copy</span>
+            <JimboCopyRow label="Seed" value="ALEEEEEE" />
+            <JimboCopyButton value="copied this string" />
+          </div>
+
+          <div className="section">
+            <span className="label">Icon Buttons</span>
+            <div className="row">
+              <JimboIconButton title="add">+</JimboIconButton>
+              <JimboIconButton title="delete" tone="destructive">×</JimboIconButton>
+            </div>
+          </div>
+
+          <div className="section">
+            <span className="label">Info Card</span>
+            <JimboInfoCard tone="blue">
+              <JimboInfoCardBody>
+                <JimboInfoCardTitle>
+                  <JimboText size="md" tone="blue">Must — Joker</JimboText>
+                </JimboInfoCardTitle>
+                <JimboInfoCardSub>
+                  <JimboText size="sm" tone="grey">Show Me</JimboText>
+                </JimboInfoCardSub>
+              </JimboInfoCardBody>
+              <JimboInfoCardAside>
+                <JimboBadge tone="blue">3</JimboBadge>
+              </JimboInfoCardAside>
+            </JimboInfoCard>
+          </div>
+
+          <div className="section">
+            <span className="label">Value Badge (Click to Edit)</span>
+            <JimboValueBadge value={slider} onChange={setSlider} min={0} max={100} />
+          </div>
+
+        </div>
+      </JimboPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Showcase />);
+</script>
+</body>
+</html>
