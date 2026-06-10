@@ -2706,3 +2706,133 @@
   transform: translateY(-2px);
   z-index: 5;
 }
+/* ── Cook lever — slot-machine search trigger (JimboCookLever) ──────────
+   Fixed-size grid, NO FLEX. Knob drag transform is pointer-driven inline;
+   everything static lives here. --j-cook-travel mirrors TRAVEL in
+   JimboCookLever.tsx — keep them in sync. */
+.j-cook-lever {
+  --j-cook-travel: 56px;
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  grid-template-rows: auto auto;
+  gap: 4px 8px;
+  align-items: center;
+  width: 100%;
+  padding: 8px;
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-lg);
+  border-bottom: 4px solid var(--j-panel-edge);
+  user-select: none;
+  box-sizing: border-box;
+}
+
+/* Reel windows — joker-card aspect (52×70 ≈ 71:95), like JimboSprite. */
+.j-cook-lever__reels {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  gap: 6px;
+  justify-content: center;
+}
+.j-cook-lever__reel {
+  width: 52px;
+  height: 70px;
+  overflow: hidden;
+  border-radius: var(--j-radius-sm);
+  background: var(--j-teal-grey);
+  border-bottom: 3px solid var(--j-panel-edge);
+}
+.j-cook-lever__reel[data-spinning] .j-cook-lever__sprite {
+  filter: blur(1.5px);
+  animation: j-cook-reel-jitter 0.18s infinite steps(2, end);
+}
+.j-cook-lever__reel[data-locked] {
+  animation: j-cook-reel-lock 0.45s var(--j-ease-bounce);
+}
+@keyframes j-cook-reel-jitter {
+  from { transform: translateY(-2px); }
+  to   { transform: translateY(2px); }
+}
+@keyframes j-cook-reel-lock {
+  0%   { transform: scale(1.15); box-shadow: 0 0 0 2px var(--j-gold), 0 0 10px var(--j-gold); }
+  60%  { transform: scale(1);    box-shadow: 0 0 0 2px var(--j-gold), 0 0 10px var(--j-gold); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
+}
+
+.j-cook-lever__label {
+  grid-column: 1;
+  grid-row: 2;
+  text-align: center;
+  font-family: var(--j-font);
+  font-size: 14px;
+  color: var(--j-gold-text);
+  text-shadow: var(--j-text-shadow);
+}
+
+/* Track — full right edge, spans both rows. Height = knob 40 + travel 56
+   + 2×4 padding. */
+.j-cook-lever__track {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  width: 48px;
+  height: 104px;
+  margin: auto;
+  padding: 4px;
+  background: var(--j-teal-grey);
+  border-radius: var(--j-radius-pill);
+  border-bottom: 3px solid var(--j-panel-edge);
+  box-sizing: border-box;
+}
+
+/* Outer knob = drag target (transform + spring transition only); the
+   face child carries the visuals + idle bob so the bob animation never
+   fights the drag/spring transform. */
+.j-cook-lever__knob {
+  width: 40px;
+  height: 40px;
+  cursor: grab;
+  touch-action: none;
+  transform: translateY(0);
+  transition: transform 300ms var(--j-ease-bounce);
+}
+.j-cook-lever__knob-face {
+  width: 100%;
+  height: 100%;
+  background: var(--j-gold);
+  border-radius: var(--j-radius-pill);
+  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.45);
+  animation: j-cook-bob 1.6s infinite ease-in-out;
+}
+@keyframes j-cook-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(2px); }
+}
+.j-cook-lever__knob[data-dragging] {
+  transition: none;
+  cursor: grabbing;
+}
+.j-cook-lever__knob[data-dragging] .j-cook-lever__knob-face {
+  animation: none;
+}
+
+/* Slammed — knob sits on the track floor, face collapses onto its dark
+   base (the j-btn pressed treatment). */
+.j-cook-lever[data-cooking] .j-cook-lever__knob {
+  transform: translateY(var(--j-cook-travel));
+}
+.j-cook-lever[data-cooking] .j-cook-lever__knob-face {
+  animation: none;
+  background: var(--j-dark-orange);
+  box-shadow: 0 0 0 0 transparent;
+}
+
+.j-cook-lever[data-disabled] {
+  opacity: 0.55;
+}
+.j-cook-lever[data-disabled] .j-cook-lever__knob {
+  cursor: not-allowed;
+}
+.j-cook-lever[data-disabled] .j-cook-lever__knob-face {
+  animation: none;
+}

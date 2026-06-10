@@ -55,7 +55,7 @@ const ZONE_META: Record<JamlZone, { label: string; hint: string; color: string; 
     mustnot: { label: "Must Not", hint: "Rejected if any appear.", color: "#fe5148", accent: "#fe5148" },
 };
 
-function clauseSpriteSheet(type: string): SpriteSheetType | undefined {
+export function clauseSpriteSheet(type: string): SpriteSheetType | undefined {
     if (
         type === "joker" ||
         type === "jokers" ||

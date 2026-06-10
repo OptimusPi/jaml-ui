@@ -1,15 +1,18 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { MotelyDeck, MotelyStake } from "motely-wasm/motely/enums";
 import { JimboApp, JimboAppScroll } from "../ui/jimboApp.js";
 import { JimboButton } from "../ui/panel.js";
+import { JimboCookLever } from "../ui/JimboCookLever.js";
 import { JimboText } from "../ui/jimboText.js";
 import { JimboStack, JimboRow } from "../ui/jimboLayout.js";
 import { JimboBadge } from "../ui/JimboBadge.js";
 import { JamlIde } from "./JamlIde.js";
+import { clauseSpriteSheet } from "./JamlIdeVisual.js";
 import { RunConfigModal } from "./RunConfigModal.js";
 import { useSearch } from "../hooks/useSearch.js";
+import { jamlTextToVisualFilter } from "../utils/jamlVisualFilter.js";
 
 const DEFAULT_JAML = `must:
   - joker: Blueprint
@@ -40,6 +43,15 @@ export function SeedFinderApp({
     const jamlWithConfig = `deck: ${deck}\nstake: ${stake}\n${jaml}`;
     startAesthetic(jamlWithConfig, 0);
   }, [jaml, deck, stake, startAesthetic]);
+
+  // Reels stay spinning until the first hit, then slam onto the must clauses.
+  const hasHits = results.length > 0;
+  const matchSprites = useMemo(() => {
+    if (!hasHits) return undefined;
+    return jamlTextToVisualFilter(jaml)
+      .must.map((c) => ({ name: c.value, sheet: clauseSpriteSheet(c.type) }))
+      .filter((s) => s.sheet !== undefined);
+  }, [hasHits, jaml]);
 
   const statusTone: "dark" | "blue" | "green" | "red" =
     status === "running" ? "blue" : status === "completed" ? "green" : status === "error" ? "red" : "dark";
@@ -86,13 +98,12 @@ export function SeedFinderApp({
           </JimboStack>
         ) : null}
 
-        {isRunning ? (
-          <JimboButton tone="red" size="lg" fullWidth onClick={cancel}>Stop</JimboButton>
-        ) : (
-          <JimboButton tone="orange" size="lg" fullWidth onClick={handleStart}>
-            Let Jimbo COOK!
-          </JimboButton>
-        )}
+        <JimboCookLever
+          cooking={isRunning}
+          onCook={handleStart}
+          onStop={cancel}
+          matchSprites={matchSprites}
+        />
 
         <RunConfigModal
           open={modalOpen}
