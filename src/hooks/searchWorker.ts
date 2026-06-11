@@ -7,7 +7,7 @@
 import { Program as Motely } from "motely-wasm/motely/wasm";
 import type { IMotelySearch, MotelyProgress, MotelyScoredSeedResult } from "motely-wasm/motely";
 import type { JamlAesthetic } from "motely-wasm/motely/filters/jaml";
-import { ensureMotelyReady } from "../lib/motely/runtime.js";
+import { ensureMotelyReady, setJimmolateProbe, clearJimmolateProbe } from "../lib/motely/runtime.js";
 
 const self = globalThis as typeof globalThis & DedicatedWorkerGlobalScope;
 
@@ -94,8 +94,19 @@ self.onmessage = async (event: MessageEvent) => {
     try {
         await ensureMotelyReady();
 
-        // NOTE(motely-wasm 21): the jimmolate predicate API is gone from the
-        // engine; `predicateStr` is ignored. See git history to revive it.
+        // motely-wasm 21.1 jimmolate shape: predicate receives the scored
+        // result ({seed, score, tallies}), not (seed, deck, stake).
+        const useJimmolate = Boolean(data.predicateStr);
+        if (data.predicateStr) {
+            try {
+                const pred = new Function("result", `return (${data.predicateStr})(result);`) as (result: MotelyScoredSeedResult) => boolean;
+                setJimmolateProbe((result) => pred(result));
+                Motely.jimmolateEnabled = true;
+            } catch (err) {
+                console.error("Failed to compile worker Jimmolate predicate:", err);
+            }
+        }
+
         attachListeners();
 
         try {
@@ -108,6 +119,10 @@ self.onmessage = async (event: MessageEvent) => {
                 matched: Number(search.matchingSeeds),
             });
         } finally {
+            if (useJimmolate) {
+                Motely.jimmolateEnabled = false;
+                clearJimmolateProbe();
+            }
             detachListeners();
             currentSearch = null;
         }

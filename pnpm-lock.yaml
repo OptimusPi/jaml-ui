@@ -124,8 +124,8 @@ importers:
         specifier: ^17.6.0
         version: 17.6.0
       motely-wasm:
-        specifier: ^21.0.0
-        version: 21.0.0
+        specifier: ^21.1.0
+        version: 21.1.0
       playwright:
         specifier: ^1.60.0
         version: 1.60.0
@@ -2220,8 +2220,8 @@ packages:
   mlly@1.8.2:
     resolution: {integrity: sha512-d+ObxMQFmbt10sretNDytwt85VrbkhhUA/JBGm1MPaWJ65Cl4wOgLaB1NYvJSZ0Ef03MMEU/0xpPMXUIQ29UfA==}
 
-  motely-wasm@21.0.0:
-    resolution: {integrity: sha512-fSrFPY9lfYZYoufRGJyDV5VhEhxfsJUlbk+vGKTt7KQyaxhUG0df31ejY4bJzkq3F3b3HQRD1mCUNZ+tSJkhZg==}
+  motely-wasm@21.1.0:
+    resolution: {integrity: sha512-fIwHiHPq2LqI5D+BDxkloUTPOsrkGKHJlDIUY26s0gHR77rGRGFzAugXirtAh/+6qEQ5VVVuFi+iFqQxkjs49A==}
 
   mrmime@2.0.1:
     resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
@@ -4801,7 +4801,7 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.4
 
-  motely-wasm@21.0.0: {}
+  motely-wasm@21.1.0: {}
 
   mrmime@2.0.1: {}
 

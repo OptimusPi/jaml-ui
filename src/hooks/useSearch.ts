@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Program as Motely } from "motely-wasm/motely/wasm";
 import type { IMotelySearch, MotelyProgress, MotelyScoredSeedResult } from "motely-wasm/motely";
 import type { JamlAesthetic } from "motely-wasm/motely/filters/jaml";
-import { ensureMotelyReady } from "../lib/motely/runtime.js";
+import { ensureMotelyReady, setJimmolateProbe, clearJimmolateProbe, type JimmolateProbe } from "../lib/motely/runtime.js";
 
 export interface SearchResult {
     seed: string;
@@ -66,10 +66,10 @@ export function useSearch() {
 
     useEffect(() => () => teardown(), [teardown]);
 
-    // NOTE(motely-wasm 21): the per-search jimmolate `predicate` option is gone —
-    // the engine removed the probe API. See git history to revive it.
+    // The jimmolate `predicate` (motely-wasm >=21.1 shape) receives the scored
+    // result ({seed, score, tallies}) and decides whether it counts as a match.
     const startSearch = useCallback(
-        async (jaml: string, mode: SearchMode, opts: { aesthetic?: number; seeds?: string[]; count?: number } = {}) => {
+        async (jaml: string, mode: SearchMode, opts: { aesthetic?: number; seeds?: string[]; count?: number; predicate?: JimmolateProbe } = {}) => {
             try {
                 await ensureMotelyReady();
 
@@ -113,6 +113,11 @@ export function useSearch() {
                     Motely.onProgress.unsubscribe(onProgress);
                 };
 
+                if (opts.predicate) {
+                    setJimmolateProbe(opts.predicate);
+                    Motely.jimmolateEnabled = true;
+                }
+
                 // Yield one macrotask so React paints the "running" state before
                 // the synchronous engine run blocks the thread (motely-wasm 21).
                 await new Promise((resolve) => setTimeout(resolve, 0));
@@ -128,11 +133,17 @@ export function useSearch() {
                         seedsPerSecond: 0,
                     }));
                 } finally {
+                    if (opts.predicate) {
+                        Motely.jimmolateEnabled = false;
+                        clearJimmolateProbe();
+                    }
                     cleanupRef.current?.();
                     cleanupRef.current = null;
                     searchRef.current = null;
                 }
             } catch (error) {
+                Motely.jimmolateEnabled = false;
+                clearJimmolateProbe();
                 teardown();
                 const message = error instanceof Error ? error.message : String(error);
                 setState((s) => ({ ...s, status: "error", error: message, seedsPerSecond: 0 }));
@@ -142,17 +153,20 @@ export function useSearch() {
     );
 
     const startAesthetic = useCallback(
-        (jaml: string, aesthetic: number) => startSearch(jaml, "aesthetic", { aesthetic }),
+        (jaml: string, aesthetic: number, predicate?: JimmolateProbe) =>
+            startSearch(jaml, "aesthetic", { aesthetic, predicate }),
         [startSearch],
     );
 
     const startSeedList = useCallback(
-        (jaml: string, seeds: string[]) => startSearch(jaml, "seedlist", { seeds }),
+        (jaml: string, seeds: string[], predicate?: JimmolateProbe) =>
+            startSearch(jaml, "seedlist", { seeds, predicate }),
         [startSearch],
     );
 
     const startRandom = useCallback(
-        (jaml: string, count: number) => startSearch(jaml, "random", { count }),
+        (jaml: string, count: number, predicate?: JimmolateProbe) =>
+            startSearch(jaml, "random", { count, predicate }),
         [startSearch],
     );
 

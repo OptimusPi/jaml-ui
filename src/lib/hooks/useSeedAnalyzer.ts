@@ -2,12 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { type Program as MotelyNamespace } from "motely-wasm/motely/wasm";
-import type { MotelyJamlyzerSeedResult } from "motely-wasm/motely/analysis";
+import type { MotelyScoredSeedResult } from "motely-wasm/motely";
+import type { JamlyzerSnapshot } from "motely-wasm/motely/analysis";
 
 type MotelyApi = typeof MotelyNamespace;
 
+/** Per-seed result shape, reassembled from the split motely-wasm 21.1 API
+ *  (the old jamlyzer(config) bundled score + analysis per seed). */
+export interface SeedAnalyzerResult {
+    seed: string;
+    score: number;
+    tallies: number[];
+    analysis: JamlyzerSnapshot;
+}
+
 export function useSeedAnalyzer(motely: MotelyApi | null, seed: string | null, jaml?: string) {
-    const [data, setData] = useState<MotelyJamlyzerSeedResult | null>(null);
+    const [data, setData] = useState<SeedAnalyzerResult | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -25,21 +35,38 @@ export function useSeedAnalyzer(motely: MotelyApi | null, seed: string | null, j
             setError(null);
             try {
                 const config = jaml ?? `version: 1\nconfig:\n  deck: Erratic\n  stake: White\n`;
-                let validation = "valid";
-                try { motely.parseJaml(config); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML."; }
+                let parsed;
+                try {
+                    parsed = motely.fromJaml(config);
+                } catch (e) {
+                    throw new Error(e instanceof Error ? e.message : "Invalid JAML.");
+                }
                 if (abortController.signal.aborted) return;
-                if (validation !== "valid") {
-                    throw new Error(validation || "Invalid JAML.");
+
+                parsed.seeds = [seed];
+                let scored: MotelyScoredSeedResult | null = null;
+                const onScored = (r: MotelyScoredSeedResult) => {
+                    if (r.seed === seed) scored = r;
+                };
+                motely.onScoredResult.subscribe(onScored);
+                try {
+                    motely.runSeedListSearch(parsed);
+                } finally {
+                    motely.onScoredResult.unsubscribe(onScored);
                 }
 
-                const analyzeConfig = motely.parseJaml(config);
-                analyzeConfig.seeds = [seed];
-                const result = motely.jamlyzer(analyzeConfig);
+                const snapshot = motely.jamlyze(seed, parsed.deck, parsed.stake);
                 if (abortController.signal.aborted) return;
-                if (result.error) {
-                    throw new Error(result.error);
+                if (snapshot.error) {
+                    throw new Error(snapshot.error);
                 }
-                setData(result.seeds[0] ?? null);
+                const hit = scored as MotelyScoredSeedResult | null;
+                setData({
+                    seed,
+                    score: hit?.score ?? 0,
+                    tallies: hit ? Array.from(hit.tallies) : [],
+                    analysis: snapshot,
+                });
             } catch (err) {
                 if (abortController.signal.aborted) return;
                 console.error("[useSeedAnalyzer] Analysis error:", err);

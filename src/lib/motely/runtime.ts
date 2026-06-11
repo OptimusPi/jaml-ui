@@ -1,11 +1,33 @@
 import bootsharp from "motely-wasm";
+import { Program as Motely } from "motely-wasm/motely/wasm";
+import type { MotelyScoredSeedResult } from "motely-wasm/motely";
 import { IFileMounter } from "motely-wasm/bootsharp/file-system";
 
 export type MotelyRuntimeStatus = "idle" | "booting" | "ready" | "error";
 
-// NOTE(motely-wasm 21): the Jimmolate probe ([Import] `Motely.jimmolateProbe` +
-// `enableJimmolate()`) was removed from the engine, so the pre-boot dispatcher
-// that lived here is gone with it. See git history if the engine regains it.
+// Jimmolate probe dispatcher.
+//
+// Bootsharp snapshots [Import] bindings at boot() — assigning
+// `Motely.jimmolatePredicate` AFTER boot is a silent no-op, so we bind a STABLE
+// dispatcher here at module load (always before any ensureMotelyReady()/boot()
+// call) and swap the inner predicate per search via setJimmolateProbe().
+// `Motely.jimmolateEnabled` is a plain settable, fine to flip after boot.
+//
+// motely-wasm 21.1 reshaped the probe: it now receives the scored result
+// ({seed, score, tallies}) instead of a search context.
+export type JimmolateProbe = (result: MotelyScoredSeedResult) => boolean;
+let currentProbe: JimmolateProbe = () => true;
+Motely.jimmolatePredicate = (result: MotelyScoredSeedResult) => currentProbe(result);
+
+/** Swap the active Jimmolate predicate. Safe before or after boot. */
+export function setJimmolateProbe(pred: JimmolateProbe): void {
+    currentProbe = pred;
+}
+
+/** Reset the probe to pass-through (the engine's default: every survivor matches). */
+export function clearJimmolateProbe(): void {
+    currentProbe = () => true;
+}
 
 // Must match the path the host serves motely-wasm's bin/ at.
 // Used by main-thread hooks, workers, and Storybook staticDir alike.

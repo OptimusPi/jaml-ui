@@ -2,18 +2,23 @@
 
 import { useState, useCallback } from "react";
 import { Program as Motely } from "motely-wasm/motely/wasm";
-import type { MotelyJamlyzerResult, MotelySeedAnalysis } from "motely-wasm/motely/analysis";
+import type { MotelyScoredSeedResult } from "motely-wasm/motely";
+import type { JamlyzerSnapshot } from "motely-wasm/motely/analysis";
 import { ensureMotelyReady } from "../lib/motely/runtime.js";
 
 export type AnalyzerStatus = "idle" | "running" | "done" | "error";
 
-
+// motely-wasm 21.1 split the old jamlyzer(config) API in two:
+//  - score + tallies against a filter: runSeedListSearch(config with one seed)
+//    captured via onScoredResult (tally labels come from createPlan).
+//  - the deep per-seed snapshot (antes/shops/packs/rolls): jamlyze(seed, deck,
+//    stake) -> JamlyzerSnapshot, which is filter-agnostic.
 export function useAnalyzer() {
     const [score, setScore] = useState<number | null>(null);
     const [status, setStatus] = useState<AnalyzerStatus>("idle");
     const [error, setError] = useState<string | null>(null);
     const [tallyLabels, setTallyLabels] = useState<string[]>([]);
-    const [rawAnalysis, setRawAnalysis] = useState<MotelySeedAnalysis | null>(null);
+    const [rawAnalysis, setRawAnalysis] = useState<JamlyzerSnapshot | null>(null);
 
     const analyze = useCallback((seed: string, jaml: string) => {
         setScore(null);
@@ -25,23 +30,32 @@ export function useAnalyzer() {
         void (async () => {
             try {
                 await ensureMotelyReady();
-                let validation = "valid";
-                try { Motely.parseJaml(jaml); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
-                if (validation !== "valid") {
-                    throw new Error(validation || "Invalid JAML.");
+                let config;
+                try {
+                    config = Motely.fromJaml(jaml);
+                } catch (e) {
+                    throw new Error(e instanceof Error ? e.message : "Invalid JAML.");
                 }
-                const analyzeConfig = Motely.parseJaml(jaml);
-                analyzeConfig.seeds = [seed];
-                const result: MotelyJamlyzerResult = Motely.jamlyzer(analyzeConfig);
-                if (result.error) {
-                    throw new Error(result.error);
+                config.seeds = [seed];
+                setTallyLabels(Array.from(Motely.createPlan(config).tallyLabels));
+
+                let scored: MotelyScoredSeedResult | null = null;
+                const onScored = (r: MotelyScoredSeedResult) => {
+                    if (r.seed === seed) scored = r;
+                };
+                Motely.onScoredResult.subscribe(onScored);
+                try {
+                    Motely.runSeedListSearch(config);
+                } finally {
+                    Motely.onScoredResult.unsubscribe(onScored);
                 }
-                if (result.tallyLabels) setTallyLabels(result.tallyLabels);
-                const seedResult = result.seeds[0];
-                if (seedResult?.analysis) {
-                    setRawAnalysis(seedResult.analysis);
-                    setScore(seedResult.score);
+                if (scored) setScore((scored as MotelyScoredSeedResult).score);
+
+                const snapshot = Motely.jamlyze(seed, config.deck, config.stake);
+                if (snapshot.error) {
+                    throw new Error(snapshot.error);
                 }
+                setRawAnalysis(snapshot);
                 setStatus("done");
             } catch (e) {
                 setError(e instanceof Error ? e.message : String(e));

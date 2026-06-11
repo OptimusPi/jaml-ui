@@ -26,9 +26,7 @@ import {
 import { JamlIdeToolbar, type JamlIdeMode } from "./JamlIdeToolbar.js";
 import { JamlIdeVisual, type JamlVisualFilter, type JamlZone, type JamlVisualClause } from "./JamlIdeVisual.js";
 import { JamlCodeEditor } from "./JamlCodeEditor.js";
-// NOTE(motely-wasm 21): Jamlyzer is unavailable — the engine removed its
-// analyzer API (Program.jamlyzer / motely/analysis). Tab hidden below; see
-// git history to revive when the engine regains it.
+import { Jamlyzer } from "./Jamlyzer.js";
 import { normalizeJamlSeed } from "./jamlSeedUtils.js";
 import { JimboColorOption } from "../ui/tokens.js";
 import { JimboButton, JimboModal } from "../ui/panel.js";
@@ -475,7 +473,7 @@ export function JamlIde({
         onModeChange={setMode}
         resultCount={searchResults.length}
         showResultsTab={showResultsTab}
-        showJamlyzerTab={false}
+        showJamlyzerTab
         onSearch={onSearch}
         isSearching={isSearching}
         onLoadFile={showLoadFileButton ? handleLoadFile : undefined}
@@ -505,7 +503,7 @@ export function JamlIde({
 
         {mode === "jamlyzer" ? (
           <div className="j-ide__jamlyzer">
-            <JimboText>Analyzer unavailable: motely-wasm 21 removed the engine analyzer API.</JimboText>
+            <Jamlyzer jaml={text} />
           </div>
         ) : null}
       </div>
