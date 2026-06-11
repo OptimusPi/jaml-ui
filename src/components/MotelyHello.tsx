@@ -36,7 +36,7 @@ export function MotelyHello({ jaml = STARTER_JAML, searchCount = 5000 }: MotelyH
     setStatus("running");
 
     let validation = "valid";
-    try { Motely.parseJaml(jaml); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
+    try { Motely.fromJaml(jaml); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
     if (validation !== "valid") {
       setError(validation);
       setStatus("error");
@@ -55,10 +55,11 @@ export function MotelyHello({ jaml = STARTER_JAML, searchCount = 5000 }: MotelyH
     Motely.onProgress.subscribe(onProg);
 
     try {
-      const search = Motely.runRandomSearch(Motely.parseJaml(jaml), searchCount);
-      search.start();
+      // Yield one macrotask so React paints "running" before the synchronous
+      // engine run (motely-wasm 21: runRandomSearch blocks until complete).
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const search = Motely.runRandomSearch(Motely.fromJaml(jaml), searchCount);
       setSearchRef(search);
-      await search.waitForCompletionAsync(undefined);
       setStatus(search.isCompleted ? "done" : "idle");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

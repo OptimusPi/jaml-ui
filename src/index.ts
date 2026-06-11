@@ -87,10 +87,9 @@ export {
     type UseSearchPoolOptions,
     type UseSearchPoolState,
 } from "./hooks/useSearchPool.js";
-export {
-    useAnalyzer,
-    type AnalyzerStatus,
-} from "./hooks/useAnalyzer.js";
+// NOTE(motely-wasm 21): useAnalyzer is unexported — the engine removed its
+// analyzer API (Program.jamlyzer / motely/analysis). Source kept at
+// hooks/useAnalyzer.ts; see git history / re-export when the engine regains it.
 
 export {
     PaginatedFilterBrowser,
@@ -113,7 +112,8 @@ export {
     JamlSeedSpinner,
     type JamlSeedSpinnerProps,
 } from "./components/JamlSeedSpinner.js";
-export { Jamlyzer, type JamlyzerProps } from "./components/Jamlyzer.js";
+// NOTE(motely-wasm 21): Jamlyzer is unexported — engine analyzer API removed
+// (see the useAnalyzer note above). Source kept at components/Jamlyzer.tsx.
 export { RunConfigModal, type RunConfigModalProps } from "./components/RunConfigModal.js";
 
 export {

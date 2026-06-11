@@ -24,6 +24,12 @@
     "**/*.stories.tsx",
     "**/*.stories.ts",
     "**/*.test.tsx",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    // motely-wasm 21 removed the engine analyzer API these depend on
+    // (Program.jamlyzer / motely-wasm/motely/analysis). Unexported from the
+    // barrels; kept on disk for revival. See git history.
+    "src/components/Jamlyzer.tsx",
+    "src/hooks/useAnalyzer.ts",
+    "src/lib/hooks/useSeedAnalyzer.ts"
   ]
 }

@@ -299,7 +299,7 @@ export function useSearchPool(options: UseSearchPoolOptions = {}) {
             try {
                 await ensureMotelyReady();
                 let validation = "valid";
-                try { Motely.parseJaml(jaml); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
+                try { Motely.fromJaml(jaml); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
                 if (validation !== "valid") {
                     setState((s) => ({ ...s, status: "error", error: validation }));
                     return;

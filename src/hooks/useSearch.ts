@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Program as Motely } from "motely-wasm/motely/wasm";
 import type { IMotelySearch, MotelyProgress, MotelyScoredSeedResult } from "motely-wasm/motely";
 import type { JamlAesthetic } from "motely-wasm/motely/filters/jaml";
-import { ensureMotelyReady, setJimmolateProbe, clearJimmolateProbe } from "../lib/motely/runtime.js";
+import { ensureMotelyReady } from "../lib/motely/runtime.js";
 
 export interface SearchResult {
     seed: string;
@@ -36,10 +36,12 @@ const INITIAL_STATE: UseSearchState = {
 };
 
 
-// Jimmolate is enabled by the caller (setJimmolateProbe + Motely.enableJimmolate),
-// so this just selects the search mode against the parsed config.
-function configure(jaml: string, mode: SearchMode, opts: { aesthetic?: number; seeds?: string[]; count?: number }): IMotelySearch {
-    const config = Motely.parseJaml(jaml);
+// motely-wasm 21: Program.run*Search EXECUTES the search synchronously to
+// completion (WASM has no pthreads — the engine documents that every Run* call
+// blocks the calling thread) and returns the finished IMotelySearch. So this
+// both selects the mode AND runs it; events fire during the call.
+function runConfigured(jaml: string, mode: SearchMode, opts: { aesthetic?: number; seeds?: string[]; count?: number }): IMotelySearch {
+    const config = Motely.fromJaml(jaml);
     if (mode === "seedlist" && opts.seeds && opts.seeds.length > 0) {
         config.seeds = opts.seeds;
         return Motely.runSeedListSearch(config);
@@ -64,13 +66,15 @@ export function useSearch() {
 
     useEffect(() => () => teardown(), [teardown]);
 
+    // NOTE(motely-wasm 21): the per-search jimmolate `predicate` option is gone —
+    // the engine removed the probe API. See git history to revive it.
     const startSearch = useCallback(
-        async (jaml: string, mode: SearchMode, opts: { aesthetic?: number; seeds?: string[]; count?: number; predicate?: (seed: string, deck?: number, stake?: number) => boolean } = {}) => {
+        async (jaml: string, mode: SearchMode, opts: { aesthetic?: number; seeds?: string[]; count?: number } = {}) => {
             try {
                 await ensureMotelyReady();
 
                 let validation = "valid";
-                try { Motely.parseJaml(jaml); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
+                try { Motely.fromJaml(jaml); } catch (e) { validation = e instanceof Error ? e.message : "Invalid JAML"; }
                 if (validation !== "valid") {
                     setState((s) => ({ ...s, status: "error", error: validation }));
                     return;
@@ -109,16 +113,13 @@ export function useSearch() {
                     Motely.onProgress.unsubscribe(onProgress);
                 };
 
-                if (opts.predicate) {
-                    const pred = opts.predicate;
-                    setJimmolateProbe((seed, deck, stake) => pred(seed, deck, stake));
-                    Motely.enableJimmolate();
-                }
-                const search = configure(jaml, mode, opts).start();
-                searchRef.current = search;
+                // Yield one macrotask so React paints the "running" state before
+                // the synchronous engine run blocks the thread (motely-wasm 21).
+                await new Promise((resolve) => setTimeout(resolve, 0));
 
                 try {
-                    await search.waitForCompletionAsync();
+                    const search = runConfigured(jaml, mode, opts);
+                    searchRef.current = search;
                     setState((s) => ({
                         ...s,
                         status: search.isCompleted ? "completed" : "cancelled",
@@ -127,13 +128,11 @@ export function useSearch() {
                         seedsPerSecond: 0,
                     }));
                 } finally {
-                    if (opts.predicate) clearJimmolateProbe();
                     cleanupRef.current?.();
                     cleanupRef.current = null;
                     searchRef.current = null;
                 }
             } catch (error) {
-                clearJimmolateProbe();
                 teardown();
                 const message = error instanceof Error ? error.message : String(error);
                 setState((s) => ({ ...s, status: "error", error: message, seedsPerSecond: 0 }));
@@ -143,20 +142,17 @@ export function useSearch() {
     );
 
     const startAesthetic = useCallback(
-        (jaml: string, aesthetic: number, predicate?: (seed: string, deck?: number, stake?: number) => boolean) =>
-            startSearch(jaml, "aesthetic", { aesthetic, predicate }),
+        (jaml: string, aesthetic: number) => startSearch(jaml, "aesthetic", { aesthetic }),
         [startSearch],
     );
 
     const startSeedList = useCallback(
-        (jaml: string, seeds: string[], predicate?: (seed: string, deck?: number, stake?: number) => boolean) =>
-            startSearch(jaml, "seedlist", { seeds, predicate }),
+        (jaml: string, seeds: string[]) => startSearch(jaml, "seedlist", { seeds }),
         [startSearch],
     );
 
     const startRandom = useCallback(
-        (jaml: string, count: number, predicate?: (seed: string, deck?: number, stake?: number) => boolean) =>
-            startSearch(jaml, "random", { count, predicate }),
+        (jaml: string, count: number) => startSearch(jaml, "random", { count }),
         [startSearch],
     );
 

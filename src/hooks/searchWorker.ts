@@ -7,7 +7,7 @@
 import { Program as Motely } from "motely-wasm/motely/wasm";
 import type { IMotelySearch, MotelyProgress, MotelyScoredSeedResult } from "motely-wasm/motely";
 import type { JamlAesthetic } from "motely-wasm/motely/filters/jaml";
-import { ensureMotelyReady, setJimmolateProbe } from "../lib/motely/runtime.js";
+import { ensureMotelyReady } from "../lib/motely/runtime.js";
 
 const self = globalThis as typeof globalThis & DedicatedWorkerGlobalScope;
 
@@ -62,8 +62,10 @@ function attachListeners(): void {
     unsubscribers.push(() => Motely.onSeedMatch.unsubscribe(onSeedMatch));
 }
 
-function configureSettings(message: StartMessage): IMotelySearch {
-    const config = Motely.parseJaml(message.jaml);
+// motely-wasm 21: Program.run*Search executes synchronously to completion and
+// returns the finished IMotelySearch — this RUNS the search, not just configures.
+function runConfigured(message: StartMessage): IMotelySearch {
+    const config = Motely.fromJaml(message.jaml);
     if (message.mode === "aesthetic") {
         return Motely.runAestheticSearch(config, (message.aesthetic ?? 0) as JamlAesthetic);
     }
@@ -92,25 +94,13 @@ self.onmessage = async (event: MessageEvent) => {
     try {
         await ensureMotelyReady();
 
-        if (data.predicateStr) {
-            try {
-                const pred = new Function("seed", "deck", "stake", `return (${data.predicateStr})(seed, deck, stake);`) as (seed: string, deck: number, stake: number) => boolean;
-                setJimmolateProbe((seed, deck, stake) => pred(seed, deck, stake));
-                Motely.enableJimmolate();
-            } catch (err) {
-                console.error("Failed to compile worker Jimmolate predicate:", err);
-            }
-        }
-
+        // NOTE(motely-wasm 21): the jimmolate predicate API is gone from the
+        // engine; `predicateStr` is ignored. See git history to revive it.
         attachListeners();
 
-        currentSearch?.cancel();
-        const search = configureSettings(data);
-        search.start();
-        currentSearch = search;
-
         try {
-            await search.waitForCompletionAsync();
+            const search = runConfigured(data);
+            currentSearch = search;
             self.postMessage({
                 type: "complete",
                 status: search.isCompleted ? "Completed" : "Cancelled",
