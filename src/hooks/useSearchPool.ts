@@ -87,7 +87,11 @@ interface SequentialPartition {
 }
 
 function partitionSequential(batchCharacterCount: number, workerCount: number): SequentialPartition[] {
-    const total = 35n ** BigInt(batchCharacterCount);
+    // One batch spans 35^batchCharacterCount seeds, so the BATCH-INDEX space
+    // over the 8-char/35-alphabet seed pool is 35^(8 - batchCharacterCount).
+    // (Was 35^batchCharacterCount — only coincidentally correct at the
+    // default of 4; bcc=3 swept 1/1225th of the space and reported done.)
+    const total = 35n ** BigInt(8 - batchCharacterCount);
     const base = total / BigInt(workerCount);
     const remainder = total - base * BigInt(workerCount);
     const result: SequentialPartition[] = [];

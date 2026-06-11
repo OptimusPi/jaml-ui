@@ -84,6 +84,12 @@ export function useSearch() {
 
                 setState({ ...INITIAL_STATE, status: "running" });
 
+                // Yield one macrotask BEFORE subscribing, so React paints the
+                // "running" state and there is no await between subscribe and
+                // the synchronous run — a rapid double startSearch() can no
+                // longer cross-unsubscribe the other call's listeners mid-gap.
+                await new Promise((resolve) => setTimeout(resolve, 0));
+
                 const onResult = (result: MotelyScoredSeedResult) => {
                     setState((s) => ({
                         ...s,
@@ -117,10 +123,6 @@ export function useSearch() {
                     setJimmolateProbe(opts.predicate);
                     Motely.jimmolateEnabled = true;
                 }
-
-                // Yield one macrotask so React paints the "running" state before
-                // the synchronous engine run blocks the thread (motely-wasm 21).
-                await new Promise((resolve) => setTimeout(resolve, 0));
 
                 try {
                     const search = runConfigured(jaml, mode, opts);

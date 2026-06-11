@@ -35,6 +35,9 @@ export interface JamlyzerProps {
 // `--matched` card highlighting from the pre-21 analyzer is gone with it.
 interface JamlyzerRow {
   seed: string;
+  /** True when the seed PASSED the filter (the engine only emits onScoredResult
+   *  for hits) — `score >= 1` was wrong for must-only filters, which score 0. */
+  hit: boolean;
   score: number;
   tallies: number[];
   analysis: JamlyzerSnapshot;
@@ -46,7 +49,7 @@ type JamlyzerLoadState =
   | { status: "error"; message: string };
 
 function seedMatches(row: JamlyzerRow): boolean {
-  return (row.score ?? 0) >= 1;
+  return row.hit;
 }
 
 function getBossDisplayName(bossVal: MotelyBossBlind): string {
@@ -148,6 +151,7 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
           const scored = scoredBySeed.get(seed);
           return {
             seed,
+            hit: scoredBySeed.has(seed),
             score: scored?.score ?? 0,
             tallies: scored ? Array.from(scored.tallies) : [],
             analysis: Motely.jamlyze(seed, config.deck, config.stake),
