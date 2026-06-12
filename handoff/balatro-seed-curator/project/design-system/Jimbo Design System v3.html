@@ -1,0 +1,1610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jimbo Design System v3 — Playground</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   v3 — A LIVE design-system playground.
+   Every primitive on this page is wired up. Press the buttons. Drag the
+   slider. Click the swatches. Click the scoreboard. Toggle the juice.
+   Tokens & primitives mirror jaml-ui/src/ui/jimbo.css — additions are
+   marked "proposed" and noted in the review doc.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'm6x11plus';
+  src: url('../fonts/m6x11plus.otf') format('opentype');
+  font-display: swap;
+}
+
+:root {
+  --j-red:        #fe5148;  --j-dark-red:    #a02721;
+  --j-blue:       #0093ff;  --j-dark-blue:   #0057a1;
+  --j-green:      #429f79;  --j-dark-green:  #215f46;
+  --j-orange:     #ff9800;  --j-dark-orange: #a05b00;
+  --j-gold:       #e4b643;
+  --j-purple:     #9e74ce;  --j-dark-purple: #5e437e;
+  --j-tarot-btn:    #9e74ce;  --j-tarot-btn-dark:    #5e437e;
+  --j-planet-btn:   #00a7ca;  --j-planet-btn-dark:   #00657c;
+  --j-spectral-btn: #2e76fd;  --j-spectral-btn-dark: #14449e;
+
+  --j-darkest:        #1e2b2d;
+  --j-dark-grey:      #3a5055;
+  --j-teal-grey:      #404c4e;
+  --j-grey:           #708386;
+  --j-panel-edge:     #1e2e32;
+  --j-inner-border:   #334461;
+  --j-border-silver:  #b9c2d2;
+  --j-border-south:   #777e89;
+
+  --j-white:        #ffffff;
+  --j-black:        #000000;
+  --j-gold-text:    #e4b643;
+  --j-green-text:   #35bd86;
+  --j-orange-text:  #ff8f00;
+
+  --j-font: 'm6x11plus', ui-monospace, Menlo, Consolas, monospace;
+  --j-text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+
+  --j-space-xs: 2px;
+  --j-space-sm: 4px;
+  --j-space-md: 8px;
+  --j-space-lg: 12px;
+  --j-space-xl: 16px;
+
+  --j-radius-sm: 4px;
+  --j-radius-md: 6px;
+  --j-radius-lg: 8px;
+  --j-radius-pill: 10px;
+
+  --j-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --j-press-y: 3px;
+  --j-press-speed: 55ms;
+  --j-panel-border-width: 3px;
+  --j-surface-shadow-depth: 4px;
+  --j-idle-sheen-duration: 5600ms;
+  --j-idle-bob-duration: 3400ms;
+
+  --bg-grad-1: #243634;
+  --bg-grad-2: #1a2625;
+}
+
+/* JUICE switch — turning this off neutralizes every animation */
+html[data-juice="off"] * {
+  animation: none !important;
+  transition: none !important;
+}
+
+* { box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { display: none; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--j-font);
+  color: var(--j-white);
+  background:
+    radial-gradient(ellipse at 20% -10%, rgba(255,255,255,0.04), transparent 60%),
+    radial-gradient(ellipse at 90% 110%, rgba(0,0,0,0.4), transparent 60%),
+    linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
+  min-height: 100vh;
+  letter-spacing: 0.02em;
+  text-shadow: var(--j-text-shadow);
+  -webkit-font-smoothing: none;
+}
+
+/* ── Page chrome ──────────────────────────────────────────────────────── */
+.page { max-width: 1240px; margin: 0 auto; padding: 48px 28px 96px; }
+.masthead {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 40px;
+  padding-bottom: 22px;
+  border-bottom: 2px dashed rgba(185,194,210,0.18);
+}
+.masthead h1 { margin: 0; font-size: 48px; line-height: 1; letter-spacing: 0.04em; }
+.masthead h1 .accent { color: var(--j-gold-text); }
+.masthead p  { margin: 12px 0 0; font-size: 14px; color: var(--j-border-silver); max-width: 64ch; line-height: 1.45; }
+.masthead .stamp {
+  font-size: 12px; color: var(--j-gold-text); letter-spacing: 0.14em;
+  border: 2px solid var(--j-gold-text); padding: 8px 12px 6px; border-radius: var(--j-radius-md);
+  box-shadow: 0 3px 0 0 #6f5417;
+  transform-origin: center;
+  animation: stamp-wobble 7s ease-in-out infinite;
+}
+@keyframes stamp-wobble {
+  0%,100% { transform: rotate(-2deg) translateY(0); }
+  50%     { transform: rotate(2deg) translateY(-2px); }
+}
+
+.section { margin-top: 60px; }
+.section-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; }
+.section-head .num { font-size: 40px; color: var(--j-gold-text); min-width: 1.6ch; }
+.section-head .title { font-size: 24px; letter-spacing: 0.04em; }
+.section-head .blurb { font-size: 12px; color: var(--j-border-silver); margin-left: auto; text-align: right; max-width: 50ch; line-height: 1.4; }
+.section-head .ref   { font-size: 10px; color: var(--j-grey); letter-spacing: 0.08em; margin-top: 4px; }
+
+.grid { display: grid; gap: 14px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.row   { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.row-tight { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.note  { font-size: 11px; color: var(--j-grey); letter-spacing: 0.06em; }
+
+.tone-red    { color: var(--j-red); }
+.tone-blue   { color: var(--j-blue); }
+.tone-gold   { color: var(--j-gold-text); }
+.tone-green  { color: var(--j-green-text); }
+.tone-orange { color: var(--j-orange-text); }
+.tone-purple { color: var(--j-purple); }
+.tone-grey   { color: var(--j-grey); }
+.tone-white  { color: var(--j-white); }
+
+.real {
+  display: inline-block; font-size: 9px; letter-spacing: 0.12em;
+  color: var(--j-green-text); border: 1px solid var(--j-green-text);
+  border-radius: 3px; padding: 1px 5px 0; margin-left: 6px; text-shadow: none;
+  vertical-align: middle;
+}
+.proposed {
+  display: inline-block; font-size: 9px; letter-spacing: 0.12em;
+  color: var(--j-orange-text); border: 1px solid var(--j-orange-text);
+  border-radius: 3px; padding: 1px 5px 0; margin-left: 6px; text-shadow: none;
+  vertical-align: middle;
+}
+.live {
+  display: inline-block; font-size: 9px; letter-spacing: 0.12em;
+  color: var(--j-red); border: 1px solid var(--j-red);
+  border-radius: 3px; padding: 1px 5px 0; margin-left: 6px; text-shadow: none;
+  vertical-align: middle;
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.55; }
+}
+
+/* ── JUICE toggle (top-right sticky) ──────────────────────────────────── */
+.juice-toggle {
+  position: fixed; top: 16px; right: 16px; z-index: 1000;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px;
+  background: rgba(30,43,45,0.92);
+  border: 2px solid var(--j-border-silver);
+  border-radius: var(--j-radius-md);
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.55);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(4px);
+}
+.juice-toggle label { color: var(--j-border-silver); }
+.juice-toggle .switch {
+  width: 38px; height: 20px;
+  background: var(--j-dark-red);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background 120ms linear;
+  border: 1px solid rgba(0,0,0,0.5);
+}
+.juice-toggle .switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  background: var(--j-white);
+  border-radius: 50%;
+  transition: transform 140ms var(--j-ease-bounce);
+  box-shadow: 0 1px 0 0 rgba(0,0,0,0.4);
+}
+.juice-toggle[data-on="true"] .switch { background: var(--j-green); }
+.juice-toggle[data-on="true"] .switch::after { transform: translateX(18px); }
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/* Library primitives                                                       */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── .j-text ──────────────────────────────────────────────────────────── */
+.j-text { font-family: var(--j-font); font-weight: 400; line-height: 1.2; text-shadow: var(--j-text-shadow); color: var(--j-white); }
+.j-text--display { font-size: 26px; letter-spacing: 0.04em; line-height: 1; }
+.j-text--xl      { font-size: 24px; letter-spacing: 0.04em; }
+.j-text--lg      { font-size: 18px; letter-spacing: 0.04em; }
+.j-text--heading { font-size: 14px; letter-spacing: 0.08em; line-height: 1.2; }
+.j-text--md      { font-size: 14px; }
+.j-text--sm      { font-size: 12px; }
+.j-text--body    { font-size: 11px; letter-spacing: 0.05em; line-height: 1.3; }
+.j-text--xs      { font-size: 10px; }
+.j-text--label   { font-size: 9px;  letter-spacing: 0.10em; line-height: 1; }
+.j-text--micro   { font-size: 8px;  letter-spacing: 0.08em; line-height: 1; }
+.j-text--no-shadow { text-shadow: none; }
+
+/* font-dance — bounce each letter on hover for hover-able titles */
+.j-text--dance-container { display: inline-block; white-space: pre; }
+.j-text--dance-container:hover .j-font-dance-char {
+  animation: j-font-dance 0.7s steps(2, end) infinite;
+}
+.j-font-dance-char { display: inline-block; }
+@keyframes j-font-dance {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(1px,-1px); }
+  50% { transform: translate(0,-2px); }
+  75% { transform: translate(-1px,-1px); }
+}
+
+/* ── .j-panel + .j-inner-panel ────────────────────────────────────────── */
+.j-panel {
+  background-color: var(--j-dark-grey);
+  border: var(--j-panel-border-width) solid var(--j-border-silver);
+  border-radius: var(--j-radius-md);
+  box-shadow:
+    0 calc(var(--j-panel-border-width) / 2) 0 0 var(--j-border-south),
+    0 calc(var(--j-surface-shadow-depth) + var(--j-panel-border-width)/2) 0 0 rgba(0,0,0,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+  padding: var(--j-space-lg);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.j-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,0.10), transparent 38%),
+    linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.05) 30%, transparent 56%);
+  background-size: 160% 160%, 220% 220%;
+  background-position: 0% 0%, 12% 18%;
+  pointer-events: none;
+  z-index: 0;
+  animation: j-surface-sheen var(--j-idle-sheen-duration) ease-in-out infinite;
+}
+.j-panel > * { position: relative; z-index: 1; }
+@keyframes j-surface-sheen {
+  0%,100% { background-position: 0% 0%, 10% 20%; opacity: 0.52; }
+  50%     { background-position: 100% 100%, 88% 74%; opacity: 0.8; }
+}
+
+.j-inner-panel {
+  background-color: var(--j-inner-border);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-lg);
+  position: relative;
+}
+
+/* Sway — only the top panel */
+.j-panel--sway { animation: j-sway 4s ease-in-out infinite; transform-origin: center top; }
+@keyframes j-sway {
+  0%,100% { transform: rotate(-0.4deg) translateY(0); }
+  50%     { transform: rotate(0.4deg) translateY(-1px); }
+}
+
+/* ── .j-btn ───────────────────────────────────────────────────────────── */
+.j-btn {
+  appearance: none; -webkit-appearance: none;
+  display: inline-block; position: relative;
+  cursor: pointer; border: none; padding: 0;
+  background: transparent;
+  font-family: var(--j-font);
+  color: var(--j-white);
+  -webkit-user-select: none; user-select: none;
+}
+.j-btn--full { width: 100%; }
+.j-btn--full .j-btn__face { display: block; width: 100%; }
+.j-btn--disabled { opacity: 0.55; cursor: not-allowed; }
+.j-btn__face {
+  position: relative;
+  border-radius: var(--j-radius-md);
+  background: var(--j-btn-face-color, var(--j-orange));
+  text-align: center;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  box-shadow: 0 calc(var(--j-press-y) + 2px) 0 0 rgba(0,0,0,0.8);
+  transform: translate(0, 0);
+  transition:
+    transform var(--j-press-speed) linear,
+    box-shadow var(--j-press-speed) linear,
+    background-color var(--j-press-speed) linear;
+  overflow: hidden;
+}
+.j-btn[data-pressed="true"] .j-btn__face,
+.j-btn:not(.j-btn--disabled):active .j-btn__face {
+  background: var(--j-btn-shadow-color, var(--j-dark-orange));
+  transform: translateY(var(--j-press-y));
+  box-shadow: none;
+}
+.j-btn:not(.j-btn--disabled):hover .j-btn__face {
+  background: var(--j-btn-shadow-color, var(--j-dark-orange));
+}
+.j-btn--xs .j-btn__face { padding: 6px 8px 3px;   font-size: 11px; }
+.j-btn--sm .j-btn__face { padding: 6px 12px 5px;  font-size: 13px; }
+.j-btn--md .j-btn__face { padding: 6px 18px 9px;  font-size: 16px; }
+.j-btn--lg .j-btn__face { padding: 6px 18px 11px; font-size: 20px; }
+
+.j-btn--orange   { --j-btn-face-color: var(--j-orange);   --j-btn-shadow-color: var(--j-dark-orange); }
+.j-btn--red      { --j-btn-face-color: var(--j-red);      --j-btn-shadow-color: var(--j-dark-red); }
+.j-btn--blue     { --j-btn-face-color: var(--j-blue);     --j-btn-shadow-color: var(--j-dark-blue); }
+.j-btn--green    { --j-btn-face-color: var(--j-green);    --j-btn-shadow-color: var(--j-dark-green); }
+.j-btn--tarot    { --j-btn-face-color: var(--j-tarot-btn);    --j-btn-shadow-color: var(--j-tarot-btn-dark); }
+.j-btn--planet   { --j-btn-face-color: var(--j-planet-btn);   --j-btn-shadow-color: var(--j-planet-btn-dark); }
+.j-btn--spectral { --j-btn-face-color: var(--j-spectral-btn); --j-btn-shadow-color: var(--j-spectral-btn-dark); }
+.j-btn--grey     { --j-btn-face-color: var(--j-grey);     --j-btn-shadow-color: var(--j-dark-grey); }
+.j-btn--gold     { --j-btn-face-color: var(--j-gold);     --j-btn-shadow-color: #a87f1e; color: #2a1f00; text-shadow: none; }
+
+/* ── .j-badge ─────────────────────────────────────────────────────────── */
+.j-badge {
+  display: inline-flex; align-items: center;
+  border-radius: var(--j-radius-sm);
+  font-family: var(--j-font); font-weight: 400;
+  letter-spacing: 0.04em; white-space: nowrap;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+.j-badge--sm { padding: 2px 6px; font-size: 10px; }
+.j-badge--md { padding: 4px 8px; font-size: 12px; }
+.j-badge--dark    { background: var(--j-darkest); color: var(--j-white); }
+.j-badge--blue    { background: var(--j-blue);    color: var(--j-white); }
+.j-badge--red     { background: var(--j-red);     color: var(--j-white); }
+.j-badge--green   { background: var(--j-green);   color: var(--j-white); }
+.j-badge--orange  { background: var(--j-orange);  color: var(--j-white); }
+.j-badge--purple  { background: var(--j-purple);  color: var(--j-white); }
+.j-badge--gold    { background: var(--j-gold);    color: #2a1f00; text-shadow: none; }
+.j-badge--grey    { background: var(--j-teal-grey); color: var(--j-white); }
+
+/* ── .j-section-header ────────────────────────────────────────────────── */
+.j-section-header {
+  display: flex; align-items: center;
+  gap: var(--j-space-md);
+  margin-bottom: var(--j-space-md);
+}
+.j-section-header__tag {
+  font-family: var(--j-font);
+  font-size: 11px; letter-spacing: 2px;
+  padding: 2px 8px;
+  color: var(--j-white);
+  border-radius: 3px;
+  text-shadow: var(--j-text-shadow);
+  flex-shrink: 0;
+}
+.j-section-header__rule {
+  flex: 1; height: 2px; border-radius: 1px; opacity: 0.33;
+}
+.j-bg--red    { background: var(--j-red); }
+.j-bg--blue   { background: var(--j-blue); }
+.j-bg--green  { background: var(--j-green); }
+.j-bg--gold   { background: var(--j-gold); }
+.j-bg--orange { background: var(--j-orange); }
+.j-bg--purple { background: var(--j-purple); }
+
+/* ── .j-stat-grid ─────────────────────────────────────────────────────── */
+.j-stat-grid {
+  background: var(--j-dark-grey);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  box-shadow: 0 2px 0 var(--j-black);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--j-space-md);
+  text-align: center;
+}
+.j-stat-grid__value { font-family: var(--j-font); font-size: 16px; color: var(--j-gold-text); text-shadow: var(--j-text-shadow); }
+.j-stat-grid__label { font-family: var(--j-font); font-size: 9px;  color: var(--j-grey); letter-spacing: 2px; margin-top: 2px; }
+
+/* ── .j-info-card ─────────────────────────────────────────────────────── */
+.j-info-card {
+  background: var(--j-dark-grey);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  box-shadow: 0 2px 0 var(--j-black);
+  display: flex; align-items: center;
+  gap: var(--j-space-md);
+  cursor: pointer;
+  border: var(--j-panel-border-width) solid transparent;
+  transition: filter 120ms linear, transform 120ms linear;
+}
+.j-info-card:hover { filter: brightness(1.10); transform: translateY(-1px); }
+.j-info-card__body  { flex: 1; min-width: 0; }
+.j-info-card__title { font-family: var(--j-font); font-size: 13px; color: var(--j-white); letter-spacing: 1px; text-shadow: var(--j-text-shadow); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.j-info-card__sub   { font-family: var(--j-font); font-size: 9px; color: var(--j-gold-text); letter-spacing: 1px; margin-top: 2px; }
+.j-info-card__aside { text-align: right; flex-shrink: 0; }
+.j-border--red    { border-color: var(--j-red)    !important; }
+.j-border--blue   { border-color: var(--j-blue)   !important; }
+.j-border--green  { border-color: var(--j-green)  !important; }
+.j-border--gold   { border-color: var(--j-gold)   !important; }
+.j-border--orange { border-color: var(--j-orange) !important; }
+.j-border--purple { border-color: var(--j-purple) !important; }
+
+/* ── .j-inset ─────────────────────────────────────────────────────────── */
+.j-inset {
+  background: var(--j-dark-grey);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  box-shadow: 0 2px 0 var(--j-black);
+  font-family: var(--j-font);
+  color: var(--j-white);
+}
+
+/* ── .j-tabs (real, with bouncing triangle + idle-bob) ────────────────── */
+.j-tabs {
+  display: flex;
+  gap: var(--j-space-sm);
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+}
+.j-tab { display: flex; flex-direction: column; align-items: center; position: relative; flex: 0 0 auto; }
+.j-tab__indicator { height: 10px; margin-bottom: 3px; display: flex; justify-content: center; align-items: flex-end; }
+.j-tab__indicator svg { fill: var(--j-red); display: block; }
+.j-tab__indicator[data-active="true"]  { animation: jimbo-bounce 0.6s linear infinite; }
+.j-tab__indicator[data-active="false"] { visibility: hidden; }
+.j-tab__btn {
+  appearance: none; -webkit-appearance: none;
+  border: none; cursor: pointer;
+  border-radius: var(--j-radius-md);
+  padding: 6px 14px;
+  min-height: 28px;
+  background: var(--j-red);
+  box-shadow: 0 5px 0 0 rgba(0,0,0,0.6);
+  color: var(--j-white);
+  text-align: center;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  transition: filter 80ms linear, opacity 80ms linear;
+  font-family: var(--j-font);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.j-tab__btn[data-active="true"]  { animation: j-idle-bob var(--j-idle-bob-duration) ease-in-out infinite; }
+.j-tab__btn[data-active="false"]:hover { background: var(--j-dark-red); }
+@keyframes jimbo-bounce {
+  0%,15%    { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+  85%,100%  { transform: translateY(0); }
+}
+@keyframes j-idle-bob {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-1px); }
+}
+
+/* ── .j-app (mobile shell) ────────────────────────────────────────────── */
+.j-app {
+  width: 320px; height: 568px;
+  background: var(--j-darkest);
+  font-family: var(--j-font); color: var(--j-white);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--j-radius-md);
+  position: relative;
+  box-shadow: 0 8px 0 0 rgba(0,0,0,0.6);
+  border: 3px solid #000;
+}
+.j-app__scroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--j-space-lg); }
+.j-app__footer {
+  flex-shrink: 0;
+  padding: var(--j-space-md) var(--j-space-lg);
+  border-top: var(--j-panel-border-width) solid var(--j-black);
+  background: var(--j-dark-grey);
+  display: flex; flex-direction: column;
+  gap: var(--j-space-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/* PROPOSED PRIMITIVES — see jaml-ui-review.md §10                          */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Stepper (proposed) ───────────────────────────────────────────────── */
+.j-stepper {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.j-stepper__value {
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 4px 18px 3px;
+  color: var(--j-white);
+  font-size: 14px;
+  min-width: 70px;
+  text-align: center;
+  box-shadow: 0 3px 0 0 var(--j-dark-red);
+  align-self: center;
+  text-shadow: var(--j-text-shadow);
+  letter-spacing: 0.06em;
+}
+
+/* ── Slider (proposed) ────────────────────────────────────────────────── */
+.j-slider-row { display: inline-flex; align-items: center; gap: 10px; }
+.j-slider {
+  position: relative;
+  height: 18px; width: 240px;
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-pill);
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.j-slider__fill {
+  position: absolute; inset: 0 auto 0 0;
+  background: var(--j-red);
+  box-shadow: inset 0 -4px 0 0 var(--j-dark-red);
+  border-radius: var(--j-radius-pill);
+  transition: width 60ms linear;
+}
+.j-slider__pill {
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 2px 10px 1px;
+  font-size: 11px;
+  box-shadow: 0 2px 0 0 var(--j-dark-red);
+  min-width: 36px; text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* ── Paginator (proposed) ─────────────────────────────────────────────── */
+.j-pager {
+  display: inline-flex; gap: 6px; align-items: stretch;
+}
+.j-pager__current {
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 6px 18px 5px;
+  box-shadow: 0 3px 0 0 var(--j-dark-red);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  align-self: center;
+  text-shadow: var(--j-text-shadow);
+}
+
+/* ── Tooltip (proposed, rich form) ────────────────────────────────────── */
+.j-tooltip {
+  display: inline-block;
+  background: var(--j-white);
+  color: #000;
+  text-shadow: none;
+  border-radius: var(--j-radius-md);
+  padding: 8px 12px 6px;
+  font-size: 12px;
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.4);
+  border: 2px solid rgba(0,0,0,0.15);
+  line-height: 1.3;
+  max-width: 200px;
+}
+.j-tooltip .tag-row {
+  margin-top: 4px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* ── Stat row (proposed — Game-Over style) ────────────────────────────── */
+.j-stat-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: stretch;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.j-stat-row__label {
+  background: var(--j-border-silver);
+  color: var(--j-darkest);
+  border-radius: var(--j-radius-sm);
+  padding: 5px 10px 4px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-shadow: none;
+}
+.j-stat-row__value {
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-sm);
+  padding: 5px 14px 4px;
+  font-size: 13px;
+  text-align: right;
+  min-width: 80px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Tag icon grid (proposed) ─────────────────────────────────────────── */
+.j-tag-grid {
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-md);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(6, 36px);
+  gap: 6px;
+  border: 2px solid rgba(0,0,0,0.4);
+}
+.j-tag {
+  width: 36px; height: 36px;
+  background: var(--j-border-silver);
+  border-radius: var(--j-radius-sm);
+  display: grid; place-items: center;
+  font-size: 16px;
+  color: var(--j-darkest);
+  text-shadow: none;
+  box-shadow: 0 2px 0 0 var(--j-border-south), inset 0 1px 0 0 rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: transform 100ms var(--j-ease-bounce);
+}
+.j-tag:hover { transform: translateY(-2px) scale(1.06); }
+
+/* ── Score widget (proposed — chips × mult) ───────────────────────────── */
+.j-score {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--j-radius-md);
+  overflow: hidden;
+  box-shadow: 0 4px 0 0 rgba(0,0,0,0.6);
+  position: relative;
+}
+.j-score__side {
+  padding: 12px 22px 10px;
+  font-size: 32px;
+  min-width: 96px;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  transition: transform 200ms var(--j-ease-bounce);
+}
+.j-score__chips { background: var(--j-blue); color: var(--j-white); }
+.j-score__x {
+  background: var(--j-darkest);
+  color: var(--j-red);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; padding: 0 10px;
+}
+.j-score__mult { background: var(--j-red); color: var(--j-white); }
+.j-score__side.is-pulsing { transform: scale(1.08); }
+
+/* ── Action bar (proposed — Play / Sort / Discard) ────────────────────── */
+.j-action-bar {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-md);
+  border: 2px solid rgba(0,0,0,0.4);
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.55);
+}
+.j-action-bar__primary {
+  background: var(--j-grey);
+  border-radius: var(--j-radius-md);
+  padding: 10px 28px 8px;
+  color: var(--j-white);
+  font-size: 14px;
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.55);
+  letter-spacing: 0.04em;
+  align-self: center;
+  cursor: pointer;
+}
+.j-action-bar__middle {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 6px;
+  border-left: 1px dashed rgba(255,255,255,0.12);
+  border-right: 1px dashed rgba(255,255,255,0.12);
+}
+.j-action-bar__middle-label {
+  font-size: 11px; color: var(--j-white); margin-bottom: 4px;
+  letter-spacing: 0.06em;
+}
+.j-action-bar__middle-pair { display: flex; gap: 4px; }
+
+/* ── Score-at-least readout (proposed) ────────────────────────────────── */
+.j-target {
+  background: var(--j-darkest);
+  border: 2px solid rgba(0,0,0,0.4);
+  border-radius: var(--j-radius-md);
+  padding: 10px 14px 8px;
+  text-align: center;
+  min-width: 130px;
+}
+.j-target__lbl { font-size: 10px; color: var(--j-border-silver); letter-spacing: 0.10em; }
+.j-target__chip { display: inline-block; vertical-align: middle; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff7c2, #c98c0e 70%); margin-right: 6px; box-shadow: inset 0 -2px 0 0 #6b4708; }
+.j-target__n { display: block; font-size: 28px; color: var(--j-red); line-height: 1; margin-top: 4px; }
+.j-target__reward { font-size: 10px; color: var(--j-border-silver); margin-top: 4px; letter-spacing: 0.08em; }
+.j-target__reward .dollar { color: var(--j-gold-text); }
+
+/* ── Card slot frames ────────────────────────────────────────────────── */
+.card-slot {
+  position: relative;
+  width: 96px; height: 134px;
+  border-radius: var(--j-radius-md);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 6px, transparent 6px 12px),
+    var(--slot-bg, var(--j-teal-grey));
+  border: 2px solid rgba(0,0,0,0.4);
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.04);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  transition: transform 140ms var(--j-ease-bounce);
+}
+.card-slot:hover { transform: translateY(-4px) rotate(-3deg) scale(1.04); }
+.card-slot--joker    { --slot-bg: #c93832; }
+.card-slot--tarot    { --slot-bg: #87724a; }
+.card-slot--planet   { --slot-bg: #163b53; }
+.card-slot--spectral { --slot-bg: #1f3aa8; }
+.card-slot--blind    { --slot-bg: #1a2b3a; }
+.card-slot--pack     { --slot-bg: #4a3a78; }
+.card-slot--standard { --slot-bg: #f3efe2; color: #3a3326; }
+.card-slot .tag {
+  background: rgba(0,0,0,0.5);
+  padding: 3px 6px 2px;
+  border-radius: var(--j-radius-sm);
+}
+.card-slot--standard .tag { background: rgba(0,0,0,0.15); color: inherit; }
+
+/* ── Type-scale + swatch helpers (page-only) ──────────────────────────── */
+.type-row { display: grid; grid-template-columns: 110px 1fr auto; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px dashed rgba(185,194,210,0.14); }
+.type-row:last-child { border-bottom: none; }
+.type-row .label { font-size: 11px; color: var(--j-gold-text); letter-spacing: 0.12em; }
+.type-row .meta  { font-size: 10px; color: var(--j-grey); letter-spacing: 0.06em; }
+
+.swatch-grid { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px; }
+.swatch {
+  border-radius: var(--j-radius-sm);
+  padding: 12px 10px 10px;
+  display: flex; flex-direction: column; gap: 4px;
+  border: 2px solid rgba(0,0,0,0.35);
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.55);
+  min-height: 86px;
+  cursor: pointer;
+  transition: transform 120ms var(--j-ease-bounce);
+  position: relative;
+}
+.swatch:hover { transform: translateY(-2px); }
+.swatch:active { transform: translateY(1px); box-shadow: 0 1px 0 0 rgba(0,0,0,0.55); }
+.swatch .name { font-size: 11px; letter-spacing: 0.08em; }
+.swatch .hex  { font-size: 10px; letter-spacing: 0.04em; opacity: 0.85; }
+.swatch .var  { font-size: 9px; opacity: 0.7; }
+.swatch.on-light { color: #111; text-shadow: none; }
+.swatch .copied {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,0.7);
+  font-size: 11px; letter-spacing: 0.08em;
+  color: var(--j-green-text);
+  border-radius: inherit;
+  text-shadow: none;
+  opacity: 0; pointer-events: none;
+  transition: opacity 120ms linear;
+}
+.swatch.is-copied .copied { opacity: 1; }
+
+.ruler { display: grid; grid-template-columns: 110px 1fr 110px; align-items: center; gap: 14px; padding: 8px 0; border-bottom: 1px dashed rgba(185,194,210,0.14); }
+.ruler:last-child { border-bottom: none; }
+.bar { height: 18px; background: var(--j-orange); border-radius: 2px; box-shadow: 0 2px 0 0 var(--j-dark-orange); }
+.radius-square {
+  width: 64px; height: 64px;
+  background: var(--j-teal-grey);
+  border: 3px solid var(--j-border-silver);
+  box-shadow: 0 3px 0 0 var(--j-border-south);
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+.foot {
+  margin-top: 80px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(185,194,210,0.18);
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--j-grey);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+</style>
+</head>
+<body data-juice="on">
+
+<!-- ── Sticky juice toggle ──────────────────────────────────────────── -->
+<div class="juice-toggle" data-on="true" id="juiceToggle">
+  <label>Juice</label>
+  <div class="switch"></div>
+</div>
+
+<main class="page" data-screen-label="01 v3 Playground">
+
+  <!-- ── Masthead ─────────────────────────────────────────────────── -->
+  <header class="masthead">
+    <div>
+      <h1 class="j-text--dance-container" id="masthead-title">
+        <span class="j-font-dance-char">J</span><span class="j-font-dance-char">i</span><span class="j-font-dance-char">m</span><span class="j-font-dance-char">b</span><span class="j-font-dance-char">o</span><span class="j-font-dance-char"> </span><span class="j-font-dance-char">D</span><span class="j-font-dance-char">e</span><span class="j-font-dance-char">s</span><span class="j-font-dance-char">i</span><span class="j-font-dance-char">g</span><span class="j-font-dance-char">n</span><span class="j-font-dance-char"> </span><span class="j-font-dance-char">S</span><span class="j-font-dance-char">y</span><span class="j-font-dance-char">s</span><span class="j-font-dance-char">t</span><span class="j-font-dance-char">e</span><span class="j-font-dance-char">m</span><span class="j-font-dance-char"> </span><span class="accent j-font-dance-char">v</span><span class="accent j-font-dance-char">3</span>
+      </h1>
+      <p>Live playground. Hover the title, press every button, drag the slider, click a swatch to copy its var, tap the scoreboard to score. Every primitive marked <span class="real">real</span> ships in jaml-ui today; <span class="proposed">proposed</span> ones don't yet — they're in <span class="tone-gold">jaml-ui-review.md §10</span>. Toggle juice off (top-right) to see the static fallback.</p>
+    </div>
+    <span class="stamp">v3 · playground</span>
+  </header>
+
+  <!-- ── 01 Type ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">01</span>
+      <span class="title">.j-text<span class="real">real</span></span>
+      <div class="blurb">
+        Hover any row to dance the letters. One face, weight 400, fixed pixel sizes.
+        <div class="ref">src/ui/jimboText.tsx · &lt;JimboText size tone dance /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="type-row"><span class="label">display / 26</span><span class="j-text j-text--display j-text--dance-container" data-dance>Browse curated seeds</span><span class="meta">spacing 0.04em · line 1.0</span></div>
+      <div class="type-row"><span class="label">xl / 24</span><span class="j-text j-text--xl j-text--dance-container" data-dance>Run workbench</span><span class="meta">spacing 0.04em</span></div>
+      <div class="type-row"><span class="label">lg / 18</span><span class="j-text j-text--lg j-text--dance-container" data-dance>Score at least <span class="tone-red">300</span></span><span class="meta">spacing 0.04em</span></div>
+      <div class="type-row"><span class="label">heading / 14</span><span class="j-text j-text--heading j-text--dance-container" data-dance>Base Cards</span><span class="meta">spacing 0.08em</span></div>
+      <div class="type-row"><span class="label">md / 14</span><span class="j-text j-text--md">Default body — clearest at small sizes.</span><span class="meta">default body</span></div>
+      <div class="type-row"><span class="label">sm / 12</span><span class="j-text j-text--sm">Reward: <span class="tone-gold">$$$+</span></span><span class="meta">tile copy</span></div>
+      <div class="type-row"><span class="label">body / 11</span><span class="j-text j-text--body">Long-form body for descriptions and rules. Tracks at 0.05em with 1.3 line height so blocks of pixel type still read at small sizes.</span><span class="meta">spacing 0.05em · line 1.3</span></div>
+      <div class="type-row"><span class="label">label / 9</span><span class="j-text j-text--label">Consumables</span><span class="meta">spacing 0.10em</span></div>
+      <div class="type-row"><span class="label">micro / 8</span><span class="j-text j-text--micro">52 / 52</span><span class="meta">counts &amp; meta only</span></div>
+    </div>
+
+    <div class="section-head" style="margin-top:28px;">
+      <span class="num">·</span><span class="title">Tones<span class="real">real</span></span>
+      <div class="blurb">Color carries meaning. Never decorate with accent tones.</div>
+    </div>
+    <div class="j-panel">
+      <div class="row" style="gap:24px;">
+        <span class="j-text j-text--lg tone-red">+30 mult</span>
+        <span class="j-text j-text--lg tone-blue">+50 chips</span>
+        <span class="j-text j-text--lg tone-gold">$14</span>
+        <span class="j-text j-text--lg tone-green">1 in 5</span>
+        <span class="j-text j-text--lg tone-orange">Primary</span>
+        <span class="j-text j-text--lg tone-purple">Tarot</span>
+        <span class="j-text j-text--lg tone-grey">Upcoming</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 Color ─────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">02</span>
+      <span class="title">Color tokens<span class="real">real</span><span class="live">clickable</span></span>
+      <div class="blurb">
+        Click any swatch to copy its CSS custom-property name. Every saturated face has a matched "underside" — pair them.
+        <div class="ref">src/ui/tokens.ts · :root in jimbo.css</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <h3 style="margin:0 0 14px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Face / shadow pairs</h3>
+      <div class="swatch-grid" id="swatch-grid">
+        <div class="swatch" data-var="--j-red" style="background:var(--j-red);    box-shadow:0 4px 0 0 var(--j-dark-red);"><span class="name">red</span><span class="hex">#fe5148</span><span class="var">--j-red / --j-dark-red</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-blue" style="background:var(--j-blue);   box-shadow:0 4px 0 0 var(--j-dark-blue);"><span class="name">blue</span><span class="hex">#0093ff</span><span class="var">--j-blue / --j-dark-blue</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-green" style="background:var(--j-green);  box-shadow:0 4px 0 0 var(--j-dark-green);"><span class="name">green</span><span class="hex">#429f79</span><span class="var">--j-green / --j-dark-green</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-orange" style="background:var(--j-orange); box-shadow:0 4px 0 0 var(--j-dark-orange);"><span class="name">orange</span><span class="hex">#ff9800</span><span class="var">--j-orange / --j-dark-orange</span><span class="copied">copied!</span></div>
+        <div class="swatch on-light" data-var="--j-gold" style="background:var(--j-gold); box-shadow:0 4px 0 0 #a87f1e;"><span class="name">gold</span><span class="hex">#e4b643</span><span class="var">--j-gold</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-purple" style="background:var(--j-purple); box-shadow:0 4px 0 0 var(--j-dark-purple);"><span class="name">purple</span><span class="hex">#9e74ce</span><span class="var">--j-purple / --j-dark-purple</span><span class="copied">copied!</span></div>
+      </div>
+
+      <h3 style="margin:18px 0 14px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Consumable tones</h3>
+      <div class="swatch-grid">
+        <div class="swatch" data-var="--j-tarot-btn"    style="background:var(--j-tarot-btn);    box-shadow:0 4px 0 0 var(--j-tarot-btn-dark);"><span class="name">tarot</span><span class="hex">#9e74ce</span><span class="var">--j-tarot-btn</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-planet-btn"   style="background:var(--j-planet-btn);   box-shadow:0 4px 0 0 var(--j-planet-btn-dark);"><span class="name">planet</span><span class="hex">#00a7ca</span><span class="var">--j-planet-btn</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-spectral-btn" style="background:var(--j-spectral-btn); box-shadow:0 4px 0 0 var(--j-spectral-btn-dark);"><span class="name">spectral</span><span class="hex">#2e76fd</span><span class="var">--j-spectral-btn</span><span class="copied">copied!</span></div>
+      </div>
+
+      <h3 style="margin:18px 0 14px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Surfaces &amp; chrome</h3>
+      <div class="swatch-grid">
+        <div class="swatch" data-var="--j-darkest" style="background:var(--j-darkest); border-color:#000;"><span class="name">darkest</span><span class="hex">#1e2b2d</span><span class="var">.j-app fill</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-dark-grey" style="background:var(--j-dark-grey);"><span class="name">dark-grey</span><span class="hex">#3a5055</span><span class="var">.j-panel fill</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-teal-grey" style="background:var(--j-teal-grey);"><span class="name">teal-grey</span><span class="hex">#404c4e</span><span class="var">tile fill</span><span class="copied">copied!</span></div>
+        <div class="swatch on-light" data-var="--j-border-silver" style="background:var(--j-border-silver);"><span class="name">silver</span><span class="hex">#b9c2d2</span><span class="var">panel border</span><span class="copied">copied!</span></div>
+        <div class="swatch on-light" data-var="--j-border-south" style="background:var(--j-border-south);"><span class="name">south-edge</span><span class="hex">#777e89</span><span class="var">panel under-edge</span><span class="copied">copied!</span></div>
+        <div class="swatch" data-var="--j-grey" style="background:var(--j-grey);"><span class="name">grey</span><span class="hex">#708386</span><span class="var">muted / disabled</span><span class="copied">copied!</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 Spacing & Radius ──────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">03</span>
+      <span class="title">Spacing &amp; radius<span class="real">real</span></span>
+      <div class="blurb">Tight scale: 2 / 4 / 8 / 12 / 16. Radius caps at 10.</div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Spacing</h3>
+        <div class="ruler"><span class="tone-gold" style="font-size:11px;letter-spacing:0.12em;">xs · 2</span><div class="bar" style="width:2px;"></div><span class="note">--j-space-xs</span></div>
+        <div class="ruler"><span class="tone-gold" style="font-size:11px;letter-spacing:0.12em;">sm · 4</span><div class="bar" style="width:4px;"></div><span class="note">--j-space-sm</span></div>
+        <div class="ruler"><span class="tone-gold" style="font-size:11px;letter-spacing:0.12em;">md · 8</span><div class="bar" style="width:8px;"></div><span class="note">--j-space-md</span></div>
+        <div class="ruler"><span class="tone-gold" style="font-size:11px;letter-spacing:0.12em;">lg · 12</span><div class="bar" style="width:12px;"></div><span class="note">--j-space-lg</span></div>
+        <div class="ruler"><span class="tone-gold" style="font-size:11px;letter-spacing:0.12em;">xl · 16</span><div class="bar" style="width:16px;"></div><span class="note">--j-space-xl</span></div>
+      </div>
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Radius</h3>
+        <div class="row" style="gap:18px; align-items:flex-end;">
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:4px;"></div><span class="j-text j-text--label">sm · 4</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:6px;"></div><span class="j-text j-text--label">md · 6</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:8px;"></div><span class="j-text j-text--label">lg · 8</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:10px;"></div><span class="j-text j-text--label">pill · 10</span></div>
+        </div>
+        <p class="note" style="margin:10px 0 0;">Anything &gt; 10 reads as web-app. To soften, bump border + shadow instead.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 Panels ────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">04</span>
+      <span class="title">Panels<span class="real">real</span></span>
+      <div class="blurb">
+        Sheen animates by default. <span class="tone-gold">sway</span> is reserved for the topmost panel of a screen.
+        <div class="ref">src/ui/panel.tsx · &lt;JimboPanel sway onBack&gt;</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel j-panel--sway">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em;">.j-panel + sway</h3>
+        <p class="note" style="margin:0 0 12px;">Outer surface. Silver border, sheen overlay, south-edge shadow. This one's swaying.</p>
+        <div class="j-inner-panel">
+          <span class="j-text j-text--heading">.j-inner-panel</span>
+          <p class="note" style="margin:6px 0 0; color:var(--j-border-silver);">Inner surface — deeper fill, near-black 3px border. Host tiles and content.</p>
+        </div>
+      </div>
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em;">onBack prop</h3>
+        <p class="note" style="margin:0 0 12px;">Passing <span class="tone-gold">onBack</span> attaches a full-width orange "Back" button at the panel foot.</p>
+        <div class="j-inner-panel" style="margin-bottom: 12px;">
+          <span class="j-text j-text--sm">Panel body. Whatever the screen needs.</span>
+        </div>
+        <button class="j-btn j-btn--sm j-btn--orange j-btn--full"><span class="j-btn__face"><span class="j-text j-text--sm">Back</span></span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 Section header ────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">05</span>
+      <span class="title">.j-section-header<span class="real">real</span></span>
+      <div class="blurb">
+        Colored tag + horizontal rule at 0.33 opacity. The only sanctioned section divider.
+        <div class="ref">src/ui/jimboSectionHeader.tsx · &lt;JimboSectionHeader label tone /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="stack" style="gap:14px;">
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--blue">Filters</div><div class="j-section-header__rule j-bg--blue"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--green">Recent</div><div class="j-section-header__rule j-bg--green"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--gold">Favorites</div><div class="j-section-header__rule j-bg--gold"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--red">Boss</div><div class="j-section-header__rule j-bg--red"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--orange">Run info</div><div class="j-section-header__rule j-bg--orange"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--purple">Tarot</div><div class="j-section-header__rule j-bg--purple"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 06 Buttons ───────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">06</span>
+      <span class="title">.j-btn<span class="real">real</span><span class="live">press me</span></span>
+      <div class="blurb">
+        Black underside via box-shadow. Press sinks 3px in 55ms linear. Hover &amp; press flip face to dark partner.
+        <div class="ref">src/ui/panel.tsx · &lt;JimboButton tone size fullWidth /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Tones</h3>
+      <div class="row" style="margin-bottom:18px;">
+        <button class="j-btn j-btn--md j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--md">Select</span></span></button>
+        <button class="j-btn j-btn--md j-btn--red"><span class="j-btn__face"><span class="j-text j-text--md">Skip</span></span></button>
+        <button class="j-btn j-btn--md j-btn--blue"><span class="j-btn__face"><span class="j-text j-text--md">Next</span></span></button>
+        <button class="j-btn j-btn--md j-btn--green"><span class="j-btn__face"><span class="j-text j-text--md">Reroll</span></span></button>
+        <button class="j-btn j-btn--md j-btn--tarot"><span class="j-btn__face"><span class="j-text j-text--md">Tarot</span></span></button>
+        <button class="j-btn j-btn--md j-btn--planet"><span class="j-btn__face"><span class="j-text j-text--md">Planet</span></span></button>
+        <button class="j-btn j-btn--md j-btn--spectral"><span class="j-btn__face"><span class="j-text j-text--md">Spectral</span></span></button>
+        <button class="j-btn j-btn--md j-btn--gold"><span class="j-btn__face"><span class="j-text j-text--md">Gold</span></span></button>
+        <button class="j-btn j-btn--md j-btn--grey j-btn--disabled"><span class="j-btn__face"><span class="j-text j-text--md">Disabled</span></span></button>
+      </div>
+
+      <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Sizes</h3>
+      <div class="row" style="align-items:flex-end; margin-bottom:18px;">
+        <button class="j-btn j-btn--xs j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--xs">xs · 11</span></span></button>
+        <button class="j-btn j-btn--sm j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--sm">sm · 13</span></span></button>
+        <button class="j-btn j-btn--md j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--md">md · 16</span></span></button>
+        <button class="j-btn j-btn--lg j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--lg">lg · 20</span></span></button>
+      </div>
+
+      <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">States</h3>
+      <div class="row" style="margin-bottom:18px;">
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--md">Rest</span></span></button>
+          <span class="note">rest</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange" data-pressed="true"><span class="j-btn__face"><span class="j-text j-text--md">Press</span></span></button>
+          <span class="note">data-pressed="true"</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange j-btn--disabled"><span class="j-btn__face"><span class="j-text j-text--md">Disabled</span></span></button>
+          <span class="note">opacity 0.55</span>
+        </div>
+      </div>
+
+      <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Choreography demo</h3>
+      <div class="row">
+        <button class="j-btn j-btn--md j-btn--orange" id="press-all-btn"><span class="j-btn__face"><span class="j-text j-text--md">Press them all ↓</span></span></button>
+        <span class="note" id="press-counter">click to ripple-press the row above</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 Badges ────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">07</span>
+      <span class="title">.j-badge<span class="real">real</span></span>
+      <div class="blurb">
+        Flat pill. No shadow, no edges. Two sizes, eight tones.
+        <div class="ref">src/ui/JimboBadge.tsx · &lt;JimboBadge size tone /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="row" style="margin-bottom:10px;">
+        <span class="j-badge j-badge--sm j-badge--dark">dark</span>
+        <span class="j-badge j-badge--sm j-badge--blue">blue</span>
+        <span class="j-badge j-badge--sm j-badge--red">red</span>
+        <span class="j-badge j-badge--sm j-badge--green">green</span>
+        <span class="j-badge j-badge--sm j-badge--orange">orange</span>
+        <span class="j-badge j-badge--sm j-badge--purple">purple</span>
+        <span class="j-badge j-badge--sm j-badge--gold">gold</span>
+        <span class="j-badge j-badge--sm j-badge--grey">grey</span>
+      </div>
+      <div class="row">
+        <span class="j-badge j-badge--md j-badge--blue">+50 chips</span>
+        <span class="j-badge j-badge--md j-badge--red">+30 mult</span>
+        <span class="j-badge j-badge--md j-badge--green">Found</span>
+        <span class="j-badge j-badge--md j-badge--gold">Boss reward</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 08 Tabs ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">08</span>
+      <span class="title">.j-tabs<span class="real">real</span><span class="live">try them</span></span>
+      <div class="blurb">
+        Click a tab to move the bouncing triangle. Active tab idle-bobs at 1px. No background swap — the indicator alone is the cue.
+        <div class="ref">src/ui/jimboTabs.tsx · &lt;JimboTabs tabs activeTab onTabChange /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="j-tabs" id="live-tabs">
+        <div class="j-tab"><div class="j-tab__indicator"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div><button class="j-tab__btn" data-tab="filters">Filters</button></div>
+        <div class="j-tab"><div class="j-tab__indicator"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div><button class="j-tab__btn" data-tab="seeds">Seeds</button></div>
+        <div class="j-tab"><div class="j-tab__indicator"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div><button class="j-tab__btn" data-tab="antes">Antes</button></div>
+        <div class="j-tab"><div class="j-tab__indicator"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div><button class="j-tab__btn" data-tab="workbench">Workbench</button></div>
+      </div>
+      <div class="j-inner-panel" style="margin-top: 18px; text-align: center;">
+        <span class="j-text j-text--lg tone-gold" id="active-tab-readout">filters</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 09 InfoCard + StatGrid + Inset ───────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">09</span>
+      <span class="title">.j-info-card · .j-stat-grid · .j-inset<span class="real">real</span></span>
+      <div class="blurb">
+        InfoCard is the canonical list row — left slot · body · aside. StatGrid is always 3 columns, gold values, grey 2px-tracked labels. Inset is the dark recessed companion.
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel">
+        <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">InfoCard rows</h3>
+        <div class="stack" style="gap:8px;">
+          <div class="j-info-card j-border--blue">
+            <div class="row-tight">
+              <div class="card-slot card-slot--joker" style="width:22px; height:30px; transition: none;"></div>
+              <div class="card-slot card-slot--joker" style="width:22px; height:30px; transition: none;"></div>
+            </div>
+            <div class="j-info-card__body">
+              <div class="j-info-card__title">Negative tag stack</div>
+              <div class="j-info-card__sub">by player_one</div>
+            </div>
+            <div class="j-info-card__aside"><span class="j-text j-text--xs tone-blue">412 hits</span></div>
+          </div>
+          <div class="j-info-card j-border--gold">
+            <div class="row-tight">
+              <div class="card-slot card-slot--tarot" style="width:22px; height:30px; transition: none;"></div>
+              <div class="card-slot card-slot--planet" style="width:22px; height:30px; transition: none;"></div>
+            </div>
+            <div class="j-info-card__body">
+              <div class="j-info-card__title">High-rarity opener</div>
+              <div class="j-info-card__sub">by curator</div>
+            </div>
+            <div class="j-info-card__aside"><span class="j-text j-text--xs tone-gold">$$$+</span></div>
+          </div>
+          <div class="j-info-card j-border--red">
+            <div class="card-slot card-slot--blind" style="width:22px; height:30px; transition: none;"></div>
+            <div class="j-info-card__body">
+              <div class="j-info-card__title">Boss-blind survival</div>
+              <div class="j-info-card__sub">by seedhunter</div>
+            </div>
+            <div class="j-info-card__aside"><span class="j-text j-text--xs tone-red">12 / 50</span></div>
+          </div>
+          <div class="j-info-card j-border--green">
+            <div class="card-slot card-slot--spectral" style="width:22px; height:30px; transition: none;"></div>
+            <div class="j-info-card__body">
+              <div class="j-info-card__title">Spectral chain</div>
+              <div class="j-info-card__sub">by archive</div>
+            </div>
+            <div class="j-info-card__aside"><span class="j-text j-text--xs tone-green">+1 found</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="stack" style="gap:14px;">
+        <div class="j-panel">
+          <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">StatGrid</h3>
+          <div class="j-stat-grid">
+            <div><div class="j-stat-grid__value">4</div><div class="j-stat-grid__label">HANDS</div></div>
+            <div><div class="j-stat-grid__value">3</div><div class="j-stat-grid__label">DISCARDS</div></div>
+            <div><div class="j-stat-grid__value">$14</div><div class="j-stat-grid__label">WALLET</div></div>
+          </div>
+        </div>
+        <div class="j-panel">
+          <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Inset</h3>
+          <div class="j-inset">
+            <div class="row" style="justify-content:space-between;"><span class="j-text j-text--sm tone-gold">7LB2C9XZ</span><span class="j-text j-text--micro tone-grey">Negative tag</span></div>
+            <div class="row" style="justify-content:space-between; margin-top:4px;"><span class="j-text j-text--sm tone-gold">M3N81ZQA</span><span class="j-text j-text--micro tone-grey">Boss survival</span></div>
+            <div class="row" style="justify-content:space-between; margin-top:4px;"><span class="j-text j-text--sm tone-gold">QQ77V12B</span><span class="j-text j-text--micro tone-grey">Spectral chain</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 10 Stepper / Slider / Paginator ──────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">10</span>
+      <span class="title">Stepper · Slider · Paginator<span class="proposed">proposed</span><span class="live">interactive</span></span>
+      <div class="blurb">
+        Settings, options, paged collections. Steppers wrap a red value pill in two red buttons. Sliders are flat tracks with a red fill and a value pill aside.
+        <div class="ref">jaml-ui-review.md §10 · &lt;JimboStepper&gt; &lt;JimboSlider&gt; &lt;JimboPager&gt;</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel">
+        <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Steppers</h3>
+        <div class="stack" style="gap:14px;">
+          <div class="stack" style="align-items:center; gap:6px;">
+            <span class="j-text j-text--sm">Game Speed</span>
+            <div class="j-stepper" data-stepper data-value="4" data-min="1" data-max="8">
+              <button class="j-btn j-btn--sm j-btn--red" data-step="-1"><span class="j-btn__face"><span class="j-text j-text--sm">‹</span></span></button>
+              <span class="j-stepper__value" data-stepper-value>4</span>
+              <button class="j-btn j-btn--sm j-btn--red" data-step="1"><span class="j-btn__face"><span class="j-text j-text--sm">›</span></span></button>
+            </div>
+          </div>
+          <div class="stack" style="align-items:center; gap:6px;">
+            <span class="j-text j-text--sm">Shadows</span>
+            <div class="j-stepper" data-stepper data-value="Off" data-options="Off,Low,High">
+              <button class="j-btn j-btn--sm j-btn--red" data-step="-1"><span class="j-btn__face"><span class="j-text j-text--sm">‹</span></span></button>
+              <span class="j-stepper__value" data-stepper-value>Off</span>
+              <button class="j-btn j-btn--sm j-btn--red" data-step="1"><span class="j-btn__face"><span class="j-text j-text--sm">›</span></span></button>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin:18px 0 10px; font-size:14px; letter-spacing:0.08em;">Sliders</h3>
+        <div class="stack" style="gap:14px;">
+          <div class="stack" style="gap:4px; align-items:center;">
+            <span class="j-text j-text--sm">Screenshake</span>
+            <div class="j-slider-row">
+              <div class="j-slider" data-slider data-value="70"><div class="j-slider__fill"></div></div>
+              <span class="j-slider__pill" data-slider-pill>70</span>
+            </div>
+          </div>
+          <div class="stack" style="gap:4px; align-items:center;">
+            <span class="j-text j-text--sm">CRT</span>
+            <div class="j-slider-row">
+              <div class="j-slider" data-slider data-value="27"><div class="j-slider__fill"></div></div>
+              <span class="j-slider__pill" data-slider-pill>27</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="j-panel">
+        <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Paginator</h3>
+        <div class="row" style="justify-content:center; margin-bottom:18px;">
+          <div class="j-pager" data-pager data-page="1" data-pages="8">
+            <button class="j-btn j-btn--sm j-btn--red" data-page-step="-1"><span class="j-btn__face"><span class="j-text j-text--sm">‹</span></span></button>
+            <span class="j-pager__current" data-pager-label>Page 1 / 8</span>
+            <button class="j-btn j-btn--sm j-btn--red" data-page-step="1"><span class="j-btn__face"><span class="j-text j-text--sm">›</span></span></button>
+          </div>
+        </div>
+        <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Tooltip<span class="proposed">proposed</span></h3>
+        <p class="note" style="margin-bottom:14px;">White face, no shadow on text. Inline a colored badge for the term being defined.</p>
+        <div class="row" style="gap:18px; align-items:flex-start;">
+          <div class="j-tooltip">
+            +30 extra chips
+            <div class="tag-row"><span class="j-badge j-badge--sm j-badge--purple">Bonus Card</span></div>
+          </div>
+          <div class="j-tooltip">
+            <span class="tone-red">×2 Mult</span><br/>
+            <span class="tone-green">1 in 4 chance</span> to destroy card
+            <div class="tag-row"><span class="j-badge j-badge--sm j-badge--purple">Glass Card</span></div>
+          </div>
+          <div class="j-tooltip">
+            <span class="tone-gold">$3</span> if held<br/>at end of round
+            <div class="tag-row"><span class="j-badge j-badge--sm j-badge--purple">Gold Card</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 11 Stat row / Tag grid ───────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">11</span>
+      <span class="title">Stat row · Tag-icon grid<span class="proposed">proposed</span></span>
+      <div class="blurb">
+        Pixel-bordered stat rows for end-of-run summaries (Best Hand, Cards Played…). The tag-icon grid uses 36×36 soft-white chips on a dark inset.
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel">
+        <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">End-of-run stat rows</h3>
+        <div class="j-stat-row"><span class="j-stat-row__label">Best Hand</span><span class="j-stat-row__value tone-red">3,391,488</span></div>
+        <div class="j-stat-row"><span class="j-stat-row__label">Most Played Hand</span><span class="j-stat-row__value">High Card · 10</span></div>
+        <div class="j-stat-row"><span class="j-stat-row__label">Cards Played</span><span class="j-stat-row__value tone-blue">161</span></div>
+        <div class="j-stat-row"><span class="j-stat-row__label">Cards Discarded</span><span class="j-stat-row__value tone-red">140</span></div>
+        <div class="j-stat-row"><span class="j-stat-row__label">Cards Purchased</span><span class="j-stat-row__value tone-gold">34</span></div>
+        <div class="j-stat-row"><span class="j-stat-row__label">Times Rerolled</span><span class="j-stat-row__value tone-green">5</span></div>
+        <div class="j-stat-row"><span class="j-stat-row__label">Ante</span><span class="j-stat-row__value tone-orange">11</span></div>
+        <div class="j-stat-row"><span class="j-stat-row__label">Seed</span><span class="j-stat-row__value tone-gold">VPH79EQ9</span></div>
+      </div>
+      <div class="j-panel">
+        <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Tag-icon grid</h3>
+        <div class="j-tag-grid">
+          <span class="j-tag" style="background:#7eb472;">♣</span>
+          <span class="j-tag" style="background:#d96b5b;">♥</span>
+          <span class="j-tag" style="background:#cbd6df;">+</span>
+          <span class="j-tag" style="background:#cbd6df;">▣</span>
+          <span class="j-tag" style="background:#cbd6df;">◆</span>
+          <span class="j-tag" style="background:#cbd6df;">✦</span>
+          <span class="j-tag" style="background:#e4b643; color:#2a1f00;">$</span>
+          <span class="j-tag" style="background:#d96b5b;">▤</span>
+          <span class="j-tag" style="background:#c2a3e0;">⟳</span>
+          <span class="j-tag" style="background:#e29a3b; color:#2a1f00;">8</span>
+          <span class="j-tag" style="background:#9e74ce;">◉</span>
+          <span class="j-tag" style="background:#7eb472;">☻</span>
+          <span class="j-tag" style="background:#cbd6df;">⇅</span>
+          <span class="j-tag" style="background:#cbd6df;">✋</span>
+          <span class="j-tag" style="background:#d96b5b;">🗑</span>
+          <span class="j-tag" style="background:#5fb3c4;">⏿</span>
+          <span class="j-tag" style="background:#d96b5b;">🏷</span>
+          <span class="j-tag" style="background:#9e74ce;">▦</span>
+          <span class="j-tag" style="background:#cbd6df;">⠿</span>
+          <span class="j-tag" style="background:#cbd6df;">⊞</span>
+          <span class="j-tag" style="background:#5fb3c4;">⇮</span>
+          <span class="j-tag" style="background:#e4b643; color:#2a1f00;">◐</span>
+          <span class="j-tag" style="background:#9e74ce;">●</span>
+          <span class="j-tag" style="background:#e4b643; color:#2a1f00;">∿</span>
+        </div>
+        <p class="note" style="margin-top:12px;">Hover lifts the chip 2px and scales 1.06 via <span class="tone-gold">--j-ease-bounce</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 12 Scoreboard + Action bar + Target ──────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">12</span>
+      <span class="title">Scoreboard · Action bar · Target<span class="proposed">proposed</span><span class="live">click chips / mult</span></span>
+      <div class="blurb">
+        The chips × mult composite is the HUD centerpiece. Click each side to score — the active side pulses. Action bar is the Play / Sort / Discard triad with embedded label.
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="row" style="justify-content:center; gap:36px; margin-bottom:18px;">
+        <div class="j-target">
+          <div class="j-target__lbl">Score at least</div>
+          <div class="j-target__n"><span class="j-target__chip"></span>600</div>
+          <div class="j-target__reward">Reward: <span class="dollar">$$$$+</span></div>
+        </div>
+        <div class="j-score" id="live-score">
+          <div class="j-score__side j-score__chips" id="score-chips" data-val="0">0</div>
+          <div class="j-score__side j-score__x">×</div>
+          <div class="j-score__side j-score__mult" id="score-mult" data-val="0">0</div>
+        </div>
+      </div>
+      <div class="row" style="justify-content:center; gap:8px; margin-bottom: 18px;">
+        <button class="j-btn j-btn--sm j-btn--blue" id="add-chips"><span class="j-btn__face"><span class="j-text j-text--sm">+50 chips</span></span></button>
+        <button class="j-btn j-btn--sm j-btn--red" id="add-mult"><span class="j-btn__face"><span class="j-text j-text--sm">+5 mult</span></span></button>
+        <button class="j-btn j-btn--sm j-btn--grey" id="reset-score"><span class="j-btn__face"><span class="j-text j-text--sm">Reset</span></span></button>
+        <span class="j-text j-text--sm tone-gold" id="score-product" style="align-self:center; margin-left:10px;">→ 0</span>
+      </div>
+      <div class="row" style="justify-content:center;">
+        <div class="j-action-bar">
+          <div class="j-action-bar__primary">Play Hand</div>
+          <div class="j-action-bar__middle">
+            <span class="j-action-bar__middle-label">Sort Hand</span>
+            <div class="j-action-bar__middle-pair">
+              <button class="j-btn j-btn--xs j-btn--gold"><span class="j-btn__face"><span class="j-text j-text--xs">Rank</span></span></button>
+              <button class="j-btn j-btn--xs j-btn--gold"><span class="j-btn__face"><span class="j-text j-text--xs">Suit</span></span></button>
+            </div>
+          </div>
+          <div class="j-action-bar__primary">Discard</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 13 App shell ─────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">13</span>
+      <span class="title">.j-app — mobile shell<span class="real">real</span></span>
+      <div class="blurb">
+        Hard-locked at <span class="tone-gold">320 × 568</span>. Add <span class="tone-gold">.j-app--fluid</span> to release for MCP / desktop.
+        <div class="ref">src/ui/jimboApp.tsx · &lt;JimboApp&gt; &lt;JimboAppScroll&gt; &lt;JimboAppFooter&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel" style="display:flex; justify-content:center; padding: 28px;">
+      <div class="j-app">
+        <div class="j-app__scroll">
+          <div style="text-align:center; margin-bottom:10px;">
+            <div class="j-text j-text--lg tone-gold j-text--dance-container" data-dance><span class="j-font-dance-char">B</span><span class="j-font-dance-char">a</span><span class="j-font-dance-char">l</span><span class="j-font-dance-char">a</span><span class="j-font-dance-char">t</span><span class="j-font-dance-char">r</span><span class="j-font-dance-char">o</span></div>
+            <div class="j-text j-text--micro tone-grey" style="letter-spacing:3px;">SEED CURATOR</div>
+          </div>
+
+          <div class="j-section-header" style="margin-bottom:6px;">
+            <div class="j-section-header__tag j-bg--blue">Filters</div>
+            <div class="j-section-header__rule j-bg--blue"></div>
+          </div>
+          <div class="stack" style="gap:4px;">
+            <div class="j-info-card j-border--blue">
+              <div class="j-info-card__body">
+                <div class="j-info-card__title">Negative tag stack</div>
+                <div class="j-info-card__sub">by player_one</div>
+              </div>
+              <div class="j-info-card__aside"><span class="j-text j-text--xs tone-blue">412</span></div>
+            </div>
+            <div class="j-info-card j-border--gold">
+              <div class="j-info-card__body">
+                <div class="j-info-card__title">High-rarity opener</div>
+                <div class="j-info-card__sub">by curator</div>
+              </div>
+              <div class="j-info-card__aside"><span class="j-text j-text--xs tone-gold">$$$+</span></div>
+            </div>
+            <div class="j-info-card j-border--red">
+              <div class="j-info-card__body">
+                <div class="j-info-card__title">Boss survival</div>
+                <div class="j-info-card__sub">by seedhunter</div>
+              </div>
+              <div class="j-info-card__aside"><span class="j-text j-text--xs tone-red">12 / 50</span></div>
+            </div>
+          </div>
+
+          <div class="j-section-header" style="margin:10px 0 6px;">
+            <div class="j-section-header__tag j-bg--green">Recent</div>
+            <div class="j-section-header__rule j-bg--green"></div>
+          </div>
+          <div class="j-inset">
+            <div class="row" style="justify-content:space-between;"><span class="j-text j-text--xs tone-gold">7LB2C9XZ</span><span class="j-text j-text--micro tone-grey">Neg tag</span></div>
+            <div class="row" style="justify-content:space-between; margin-top:4px;"><span class="j-text j-text--xs tone-gold">M3N81ZQA</span><span class="j-text j-text--micro tone-grey">Boss</span></div>
+            <div class="row" style="justify-content:space-between; margin-top:4px;"><span class="j-text j-text--xs tone-gold">QQ77V12B</span><span class="j-text j-text--micro tone-grey">Spectral</span></div>
+          </div>
+        </div>
+        <div class="j-app__footer">
+          <button class="j-btn j-btn--lg j-btn--green j-btn--full"><span class="j-btn__face"><span class="j-text j-text--lg">New Search</span></span></button>
+          <button class="j-btn j-btn--lg j-btn--blue j-btn--full"><span class="j-btn__face"><span class="j-text j-text--lg">Browse Filters</span></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 14 Card frames ───────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">14</span>
+      <span class="title">Card frames<span class="proposed">illustrative</span><span class="live">hover them</span></span>
+      <div class="blurb">
+        Real card art comes from <span class="tone-gold">JamlGameCard / GameCard / CardFan / DeckSprite</span>. These slots document the frame: 96×134, rounded-md, 2px black border, 3px south shadow. Hover any card.
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="row" style="gap:18px; justify-content:flex-start;">
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--joker"><div class="tag">Joker</div></div><span class="j-text j-text--label tone-grey">joker</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--tarot"><div class="tag">Tarot</div></div><span class="j-text j-text--label tone-grey">tarot</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--planet"><div class="tag">Planet</div></div><span class="j-text j-text--label tone-grey">planet</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--spectral"><div class="tag">Spectral</div></div><span class="j-text j-text--label tone-grey">spectral</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--blind"><div class="tag">Blind</div></div><span class="j-text j-text--label tone-grey">blind back</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--pack"><div class="tag">Pack</div></div><span class="j-text j-text--label tone-grey">booster</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--standard"><div class="tag">Standard</div></div><span class="j-text j-text--label tone-grey">standard</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 15 House rules ───────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">15</span>
+      <span class="title">House rules</span>
+      <div class="blurb">Lifted from CLAUDE.md / AGENTS.md. Non-negotiable.</div>
+    </div>
+    <div class="j-inset" style="padding:18px;">
+      <ul style="margin:0; padding-left:18px; list-style:square;">
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">Never ALL CAPS.</span> Title-case headings, sentence-case body. Letter-spacing carries emphasis.</li>
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">Never bold.</span> One weight — 400. Differentiate with color or size.</li>
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">Never grey-on-grey.</span> Muted text on grey must shift to white or a tone.</li>
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">Mobile-first at 320px.</span> .j-app is the default — fluid is opt-in.</li>
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">Juice is CSS.</span> Press, sway, idle-bob, font-dance, scale 1.05 — all keyframes or transitions.</li>
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">No visible scrollbars.</span> Hidden globally; use magnetic scroll snapping.</li>
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">Chunky, not bubbly.</span> Radius ≤ 10. Buttons must have a black underside and 3px press.</li>
+        <li class="j-text j-text--body" style="margin:6px 0;"><span class="tone-gold">Color carries meaning.</span> Red = mult / destructive / boss · Blue = chips / info · Orange = primary · Green = success / reroll · Gold = currency · Purple / Teal / Blue = tarot / planet / spectral.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>jaml-ui · jimbo design system · v3 — alive</span>
+    <span>m6x11plus · weight 400 only · juice toggle above</span>
+  </footer>
+
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   v3 interactions — all vanilla, no deps
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Juice toggle ───────────────────────────────────────────────────── */
+const juiceEl = document.getElementById('juiceToggle');
+juiceEl.addEventListener('click', () => {
+  const on = juiceEl.dataset.on === 'true';
+  juiceEl.dataset.on = on ? 'false' : 'true';
+  document.documentElement.dataset.juice = on ? 'off' : 'on';
+});
+
+/* ── Color swatches: click to copy var ──────────────────────────────── */
+document.querySelectorAll('[data-var]').forEach(sw => {
+  sw.addEventListener('click', () => {
+    const varName = sw.dataset.var;
+    if (navigator.clipboard) navigator.clipboard.writeText(`var(${varName})`).catch(() => {});
+    sw.classList.add('is-copied');
+    setTimeout(() => sw.classList.remove('is-copied'), 900);
+  });
+});
+
+/* ── Tabs ───────────────────────────────────────────────────────────── */
+const tabContainer = document.getElementById('live-tabs');
+const tabReadout = document.getElementById('active-tab-readout');
+function setActiveTab(id) {
+  tabContainer.querySelectorAll('.j-tab').forEach(tab => {
+    const btn = tab.querySelector('.j-tab__btn');
+    const ind = tab.querySelector('.j-tab__indicator');
+    const isActive = btn.dataset.tab === id;
+    btn.dataset.active = isActive;
+    ind.dataset.active = isActive;
+  });
+  tabReadout.textContent = id;
+}
+tabContainer.querySelectorAll('.j-tab__btn').forEach(btn => {
+  btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+});
+setActiveTab('filters');
+
+/* ── Press-them-all demo ────────────────────────────────────────────── */
+document.getElementById('press-all-btn').addEventListener('click', () => {
+  const targets = [...document.querySelectorAll('.section')]
+    .find(s => s.querySelector('.section-head .num')?.textContent === '06')
+    .querySelectorAll('.j-btn--md');
+  const counter = document.getElementById('press-counter');
+  let count = 0;
+  targets.forEach((btn, i) => {
+    setTimeout(() => {
+      if (btn.classList.contains('j-btn--disabled')) return;
+      btn.dataset.pressed = 'true';
+      setTimeout(() => { delete btn.dataset.pressed; }, 140);
+      counter.textContent = `${++count} buttons pressed`;
+    }, i * 60);
+  });
+  setTimeout(() => { counter.textContent = 'pressed every button in sequence'; }, targets.length * 60 + 400);
+});
+
+/* ── Steppers ───────────────────────────────────────────────────────── */
+document.querySelectorAll('[data-stepper]').forEach(stepper => {
+  const valueEl = stepper.querySelector('[data-stepper-value]');
+  const options = stepper.dataset.options?.split(',');
+  let value = options ? options.indexOf(stepper.dataset.value) : Number(stepper.dataset.value);
+  const min = Number(stepper.dataset.min ?? 0);
+  const max = options ? options.length - 1 : Number(stepper.dataset.max ?? 99);
+  function render() {
+    valueEl.textContent = options ? options[value] : String(value);
+  }
+  stepper.querySelectorAll('[data-step]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const delta = Number(btn.dataset.step);
+      value = Math.max(min, Math.min(max, value + delta));
+      render();
+    });
+  });
+  render();
+});
+
+/* ── Sliders ────────────────────────────────────────────────────────── */
+document.querySelectorAll('[data-slider]').forEach(slider => {
+  const fill = slider.querySelector('.j-slider__fill');
+  const pill = slider.parentElement.querySelector('[data-slider-pill]');
+  let value = Number(slider.dataset.value);
+  function render() {
+    fill.style.width = value + '%';
+    if (pill) pill.textContent = String(value);
+  }
+  function setFromPointer(e) {
+    const rect = slider.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    value = Math.max(0, Math.min(100, Math.round((x / rect.width) * 100)));
+    render();
+  }
+  let dragging = false;
+  slider.addEventListener('mousedown', e => { dragging = true; setFromPointer(e); });
+  window.addEventListener('mousemove', e => { if (dragging) setFromPointer(e); });
+  window.addEventListener('mouseup', () => { dragging = false; });
+  slider.addEventListener('touchstart', e => { dragging = true; setFromPointer(e); }, { passive: true });
+  window.addEventListener('touchmove', e => { if (dragging) setFromPointer(e); }, { passive: true });
+  window.addEventListener('touchend', () => { dragging = false; });
+  render();
+});
+
+/* ── Paginator ──────────────────────────────────────────────────────── */
+document.querySelectorAll('[data-pager]').forEach(pager => {
+  const label = pager.querySelector('[data-pager-label]');
+  let page = Number(pager.dataset.page);
+  const pages = Number(pager.dataset.pages);
+  function render() { label.textContent = `Page ${page} / ${pages}`; }
+  pager.querySelectorAll('[data-page-step]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const delta = Number(btn.dataset.pageStep);
+      page = Math.max(1, Math.min(pages, page + delta));
+      render();
+    });
+  });
+  render();
+});
+
+/* ── Live scoreboard ────────────────────────────────────────────────── */
+const chipsEl = document.getElementById('score-chips');
+const multEl = document.getElementById('score-mult');
+const productEl = document.getElementById('score-product');
+function pulse(el) {
+  el.classList.add('is-pulsing');
+  setTimeout(() => el.classList.remove('is-pulsing'), 220);
+}
+function updateProduct() {
+  const c = Number(chipsEl.dataset.val);
+  const m = Number(multEl.dataset.val);
+  productEl.textContent = `→ ${(c * m).toLocaleString()}`;
+}
+chipsEl.addEventListener('click', () => {
+  chipsEl.dataset.val = String(Number(chipsEl.dataset.val) + 50);
+  chipsEl.textContent = chipsEl.dataset.val;
+  pulse(chipsEl); updateProduct();
+});
+multEl.addEventListener('click', () => {
+  multEl.dataset.val = String(Number(multEl.dataset.val) + 5);
+  multEl.textContent = multEl.dataset.val;
+  pulse(multEl); updateProduct();
+});
+document.getElementById('add-chips').addEventListener('click', () => chipsEl.click());
+document.getElementById('add-mult').addEventListener('click', () => multEl.click());
+document.getElementById('reset-score').addEventListener('click', () => {
+  chipsEl.dataset.val = '0'; chipsEl.textContent = '0';
+  multEl.dataset.val = '0';  multEl.textContent = '0';
+  updateProduct();
+});
+updateProduct();
+</script>
+</body>
+</html>

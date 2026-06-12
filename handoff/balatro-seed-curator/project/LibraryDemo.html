@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Library Demo — Seed Card</title>
+<link rel="stylesheet" href="src/ui/jimbo.css" />
+<link rel="stylesheet" href="src/ui/jimbo-addons.css" />
+<style>
+  @font-face {
+    font-family: 'm6x11plus';
+    src: url('public/fonts/m6x11plusplus.otf') format('opentype');
+    font-display: block;
+  }
+  html, body, #root {
+    margin: 0; padding: 0; height: 100%;
+    background: #0b1416; overflow: hidden;
+  }
+  body { font-family: 'm6x11plus', monospace; color: #fff; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  #root { display: flex; justify-content: center; align-items: center; }
+  .stage {
+    width: 320px;
+    height: 568px;
+    flex: 0 0 auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="src/tokens.js"></script>
+<script type="text/babel" src="src/v2/BalatroComponents.jsx"></script>
+
+<script type="text/babel">
+const {
+  JimboPanel, JimboInnerPanel, JimboButton, JimboBackButton, JimboBadge,
+  JimboText, JimboStack, JimboRow, JimboDivider,
+  JimboStatCallout, JimboSectionHeader, JimboDualChip,
+  JimboPriceTag, JimboTooltip, JimboProgressBar, JimboStatusPill,
+  JimboToggleRow, JimboMarquee, JimboToast, JimboSpinner,
+} = window;
+
+function Demo() {
+  const [hands, setHands] = React.useState(4);
+  const [discards] = React.useState(3);
+  const [money] = React.useState(21);
+  const [ante] = React.useState(4);
+  const [round] = React.useState(8);
+  const [score] = React.useState(13954);
+  const [highContrast, setHighContrast] = React.useState(true);
+  const [showToast, setShowToast] = React.useState(false);
+  const [speed, setSpeed] = React.useState(4);
+
+  return (
+    <div className="stage">
+      <JimboPanel onBack={() => alert('back to menu')}>
+        <JimboStack gap="md">
+
+          {/* Section header — looks like a Balatro tab card */}
+          <JimboSectionHeader title="run info" tone="red" />
+
+          {/* Seed display */}
+          <JimboRow gap="sm" justify="center">
+            <JimboText size="sm" tone="grey">seed:</JimboText>
+            <JimboBadge tone="red" size="md">RECTUM55</JimboBadge>
+            <JimboButton tone="blue" size="xs" onClick={() => setShowToast(true)}>copy</JimboButton>
+          </JimboRow>
+
+          {/* Score readout */}
+          <JimboInnerPanel>
+            <JimboStack gap="xs">
+              <JimboRow gap="sm" justify="between">
+                <JimboText size="sm" tone="grey">round score</JimboText>
+                <JimboText size="lg" tone="gold">{score.toLocaleString()}</JimboText>
+              </JimboRow>
+              <JimboDualChip
+                left={{ value: 0, tone: 'blue' }}
+                right={{ value: 0, tone: 'red' }}
+              />
+            </JimboStack>
+          </JimboInnerPanel>
+
+          {/* Stat callouts — HUD primitives */}
+          <JimboRow gap="sm" justify="between">
+            <JimboStatCallout label="hands" value={hands} tone="blue" />
+            <JimboStatCallout label="discards" value={discards} tone="red" />
+            <JimboStatCallout label="$" value={money} tone="gold" valueTone="gold" />
+            <JimboStatCallout label="ante" value={`${ante}/8`} tone="orange" />
+            <JimboStatCallout label="round" value={round} tone="grey" />
+          </JimboRow>
+
+          {/* Progress bar */}
+          <JimboStack gap="xs">
+            <JimboText size="xs" tone="grey">deck remaining</JimboText>
+            <JimboProgressBar value={37} max={52} tone="blue" caption="37/52" />
+          </JimboStack>
+
+          {/* Spinner setting */}
+          <JimboSpinner
+            label="game speed"
+            value={speed}
+            onPrev={() => setSpeed((s) => Math.max(1, s - 1))}
+            onNext={() => setSpeed((s) => Math.min(8, s + 1))}
+          />
+
+          {/* Toggle */}
+          <JimboToggleRow
+            label="high contrast cards"
+            checked={highContrast}
+            onChange={setHighContrast}
+            tone="red"
+          />
+
+          {/* Marquee */}
+          <JimboMarquee title="SHOP" subtitle="improve your run!" />
+
+          {/* Status pills row */}
+          <JimboRow gap="sm">
+            <JimboStatusPill status="ok" label="filter loaded" />
+            <JimboStatusPill status="running" label="searching" />
+            <JimboTooltip content="press play to begin">
+              <JimboStatusPill status="idle" label="idle" />
+            </JimboTooltip>
+          </JimboRow>
+
+          {/* Price-tagged item */}
+          <JimboRow gap="md" justify="center">
+            <div style={{ position: 'relative', width: 60, height: 80, background: '#3a5055', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <JimboPriceTag amount={5} float />
+              <JimboText size="xs" tone="grey">joker</JimboText>
+            </div>
+            <div style={{ position: 'relative', width: 60, height: 80, background: '#3a5055', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <JimboPriceTag amount={6} float />
+              <JimboText size="xs" tone="grey">pack</JimboText>
+            </div>
+          </JimboRow>
+
+        </JimboStack>
+      </JimboPanel>
+
+      {showToast && (
+        <JimboToast
+          message="copied!"
+          tone="green"
+          onDismiss={() => setShowToast(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

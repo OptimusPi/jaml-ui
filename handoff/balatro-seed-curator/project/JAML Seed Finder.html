@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=320,initial-scale=1" />
+<title>JAML Seed Finder</title>
+<link rel="stylesheet" href="src/ui/jimbo.css" />
+<link rel="stylesheet" href="src/ui/jimbo-addons.css" />
+<style>
+  @font-face {
+    font-family: 'm6x11plus';
+    src: url('public/fonts/m6x11plusplus.otf') format('opentype');
+    font-display: block;
+  }
+  html, body, #root {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background: #0b1416;
+    overflow: hidden;
+  }
+  body { font-family: 'm6x11plus', monospace; color: #fff; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  #root { display: flex; justify-content: center; align-items: center; }
+  .stage {
+    width: 320px; height: 568px;
+    padding: 2px;
+    display: flex; flex-direction: column;
+    flex: 0 0 auto;
+  }
+  /* Tighter panel padding inside the 320 stage */
+  .stage .j-panel { padding: 6px; flex: 1; min-height: 0; }
+  /* Result row */
+  .seed-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    background: #1e2b2d;
+    border: 2px solid #334461;
+    border-radius: 4px;
+    cursor: pointer;
+    appearance: none;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    width: 100%;
+    animation: row-in 200ms ease-out;
+  }
+  .seed-row:hover { background: #3a5055; border-color: #b9c2d2; }
+  @keyframes row-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .seed-row__code {
+    font-family: 'm6x11plus', monospace;
+    font-size: 12px;
+    color: #fff;
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+    flex: 1;
+  }
+  .seed-row__score {
+    font-family: 'm6x11plus', monospace;
+    font-size: 12px;
+    color: #e4b643;
+  }
+  .results-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .results-scroll::-webkit-scrollbar { display: none; }
+
+  /* Settings roll-up */
+  .settings-roll {
+    overflow: hidden;
+    transition: max-height 260ms ease, opacity 200ms ease, margin 200ms ease;
+    max-height: 400px;
+    opacity: 1;
+  }
+  .settings-roll--closed {
+    max-height: 0;
+    opacity: 0;
+    margin-top: -8px;
+    pointer-events: none;
+  }
+  .settings-edit-btn {
+    appearance: none;
+    background: #3a5055;
+    border: 2px solid #1e2b2d;
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: #b9c2d2;
+    font-family: 'm6x11plus', monospace;
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .settings-edit-btn:hover { background: #708386; color: #fff; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="src/tokens.js"></script>
+<script src="src/v2/mock-filters.js"></script>
+<script type="text/babel" src="src/v2/BalatroComponents.jsx"></script>
+
+<script type="text/babel">
+const {
+  JimboPanel, JimboButton, JimboBackButton, JimboBadge, JimboText,
+  JimboStack, JimboRow, JimboSectionHeader, JimboSpinner,
+  JimboStatCallout, JimboStatusPill, JimboInnerPanel, JimboToast,
+} = window;
+
+const DECK_PALETTE = {
+  Red:    '#a02721',
+  Blue:   '#0057a1',
+  Yellow: '#a05b00',
+  Green:  '#215f46',
+  Black:  '#1e2b2d',
+  Magic:  '#5e437e',
+  Nebula: '#14449e',
+  Ghost:  '#708386',
+};
+
+function DeckPill({ deck, size = 22 }) {
+  return (
+    <div style={{
+      width: size,
+      height: size * 1.34,
+      background: DECK_PALETTE[deck] || '#3a5055',
+      border: '2px solid #1e2b2d',
+      borderRadius: 4,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#fff',
+      fontFamily: "'m6x11plus', monospace",
+      fontSize: size * 0.55,
+      textShadow: '1px 1px 0 rgba(0,0,0,0.7)',
+      flexShrink: 0,
+    }}>
+      {deck.charAt(0)}
+    </div>
+  );
+}
+
+function ResultRow({ row, onOpen }) {
+  return (
+    <button className="seed-row" onClick={() => onOpen(row.seed)}>
+      <span className="seed-row__code">{row.seed}</span>
+      <JimboBadge tone="dark" size="sm">a{row.ante}</JimboBadge>
+      <span className="seed-row__score">+{row.score}</span>
+    </button>
+  );
+}
+
+function Finder() {
+  // Read JAML from URL — fall back to first filter so opening direct works
+  const params = new URLSearchParams(window.location.search);
+  const jamlId = params.get('jaml');
+  const filter = (jamlId && window.findFilter(jamlId)) || window.FILTERS[0];
+
+  // Deck + stake live on the JAML, not on the search settings.
+  const deck = filter?.deck ?? 'Red';
+  const stake = filter?.stake ?? 'White';
+
+  const [maxAnte, setMaxAnte] = React.useState(8);
+  const [searching, setSearching] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = React.useState(true);
+  const [results, setResults] = React.useState([]);
+  const [searched, setSearched] = React.useState(0);
+  const [toast, setToast] = React.useState(null);
+  const intervalRef = React.useRef(null);
+  const counterRef = React.useRef(null);
+  const queueRef = React.useRef([...window.MOCK_RESULTS]);
+
+  // Load stake sprite atlas
+  React.useEffect(() => {
+    // stake sprite positions are statically registered by sprites.jsx
+  }, []);
+
+  React.useEffect(() => () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (counterRef.current) clearInterval(counterRef.current);
+  }, []);
+
+  if (!filter) {
+    return (
+      <div className="stage">
+        <JimboPanel onBack={() => window.location.href = 'JAML Browser.html'}>
+          <JimboStack gap="md">
+            <JimboSectionHeader title="error" tone="red" />
+            <JimboText size="sm" tone="grey">no jaml loaded</JimboText>
+          </JimboStack>
+        </JimboPanel>
+      </div>
+    );
+  }
+
+  const startSearch = () => {
+    if (searching) return;
+    setSearching(true);
+    setSettingsOpen(false);
+    queueRef.current = [...window.MOCK_RESULTS];
+    setResults([]);
+    setSearched(0);
+
+    // Stream in results
+    intervalRef.current = window.setInterval(() => {
+      const next = queueRef.current.shift();
+      if (!next) {
+        stopSearch();
+        return;
+      }
+      setResults((r) => [...r, { ...next, _id: Date.now() + Math.random() }]);
+    }, 600);
+
+    // Counter ticks
+    counterRef.current = window.setInterval(() => {
+      setSearched((c) => c + Math.floor(800 + Math.random() * 400));
+    }, 120);
+  };
+
+  const stopSearch = () => {
+    setSearching(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (counterRef.current) {
+      clearInterval(counterRef.current);
+      counterRef.current = null;
+    }
+  };
+
+  const openSeed = (seed) => {
+    window.location.href = `JAMLyzer.html?jaml=${encodeURIComponent(filter.id)}&seeds=${encodeURIComponent(seed)}`;
+  };
+
+  const openAll = () => {
+    if (results.length === 0) return;
+    const seedList = results.map((r) => r.seed).join(',');
+    window.location.href = `JAMLyzer.html?jaml=${encodeURIComponent(filter.id)}&seeds=${encodeURIComponent(seedList)}`;
+  };
+
+  return (
+    <div className="stage">
+      <JimboPanel onBack={() => window.location.href = 'JAML Browser.html'}>
+        <JimboStack gap="md">
+
+          {/* Filter context strip */}
+          <JimboRow gap="sm" justify="between">
+            <JimboRow gap="sm">
+              <DeckPill deck={deck} size={22} />
+              {window.StakeSprite && <window.StakeSprite name={stake} size={18} />}
+              <JimboText size="sm" tone="gold">{filter.name}</JimboText>
+            </JimboRow>
+            <JimboRow gap="sm">
+              <JimboStatusPill
+                status={searching ? 'running' : results.length > 0 ? 'ok' : 'idle'}
+                label={searching ? 'searching' : results.length > 0 ? 'paused' : 'idle'}
+              />
+              {!settingsOpen && (
+                <button
+                  className="settings-edit-btn"
+                  onClick={() => { stopSearch(); setSettingsOpen(true); }}
+                  title="edit search settings"
+                >⚙ edit</button>
+              )}
+            </JimboRow>
+          </JimboRow>
+
+          {/* Settings (roll up on start) */}
+          <div className={`settings-roll ${settingsOpen ? '' : 'settings-roll--closed'}`}>
+            <JimboStack gap="sm">
+              <JimboSpinner
+                label="max ante"
+                value={maxAnte}
+                onPrev={() => setMaxAnte((a) => Math.max(1, a - 1))}
+                onNext={() => setMaxAnte((a) => Math.min(8, a + 1))}
+              />
+            </JimboStack>
+          </div>
+
+          {/* Start / Stop */}
+          {!searching ? (
+            <JimboButton tone="green" size="md" fullWidth onClick={startSearch}>
+              {results.length > 0 ? 'resume search' : 'start search'}
+            </JimboButton>
+          ) : (
+            <JimboButton tone="red" size="md" fullWidth onClick={stopSearch}>
+              stop search
+            </JimboButton>
+          )}
+
+          {/* Counters */}
+          <JimboRow gap="sm" justify="between">
+            <JimboStatCallout label="hits" value={results.length} tone="green" />
+            <JimboStatCallout label="seeds" value={searched.toLocaleString()} tone="grey" />
+            <JimboButton
+              tone="orange"
+              size="xs"
+              disabled={results.length === 0}
+              onClick={openAll}
+            >
+              analyze all
+            </JimboButton>
+          </JimboRow>
+
+          {/* Results — flow in */}
+          <div className="results-scroll">
+            {results.length === 0 && !searching && (
+              <JimboText size="xs" tone="grey">press start to begin</JimboText>
+            )}
+            {results.length === 0 && searching && (
+              <JimboText size="xs" tone="grey">searching... no hits yet</JimboText>
+            )}
+            {results.map((r) => (
+              <ResultRow key={r._id} row={r} onOpen={openSeed} />
+            ))}
+          </div>
+        </JimboStack>
+      </JimboPanel>
+
+      {toast && (
+        <JimboToast message={toast.message} tone={toast.tone} onDismiss={() => setToast(null)} />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Finder />);
+</script>
+</body>
+</html>

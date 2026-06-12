@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=320,initial-scale=1" />
+<title>JAMLyzer</title>
+<link rel="stylesheet" href="src/ui/jimbo.css" />
+<link rel="stylesheet" href="src/ui/jimbo-addons.css" />
+<style>
+  @font-face {
+    font-family: 'm6x11plus';
+    src: url('public/fonts/m6x11plusplus.otf') format('opentype');
+    font-display: block;
+  }
+  html, body, #root {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background: #0b1416;
+    overflow: hidden;
+  }
+  body { font-family: 'm6x11plus', monospace; color: #fff; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  #root { display: flex; justify-content: center; align-items: center; }
+  .stage {
+    width: 320px; height: 568px;
+    padding: 2px;
+    display: flex; flex-direction: column;
+    flex: 0 0 auto;
+  }
+  /* Tighter panel padding inside the 320 stage */
+  .stage .j-panel { padding: 6px; flex: 1; min-height: 0; }
+  .seed-pager-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+  }
+  .seed-code {
+    font-family: 'm6x11plus', monospace;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 2.5px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+    flex: 1;
+    text-align: center;
+  }
+  .ante-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-snap-type: y mandatory;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ante-scroll::-webkit-scrollbar { display: none; }
+  .ante-section {
+    scroll-snap-align: start;
+    background: #1e2b2d;
+    border: 2px solid #334461;
+    border-radius: 6px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ante-section__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+  .ante-section__title {
+    font-family: 'm6x11plus', monospace;
+    font-size: 13px;
+    color: #e4b643;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+  }
+  .stream {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 4px;
+    border-radius: 3px;
+    background: #0b1416;
+  }
+  .stream--hit {
+    background: rgba(228,182,67,0.18);
+    box-shadow: inset 0 0 0 1px rgba(228,182,67,0.4);
+  }
+  .stream__label {
+    font-family: 'm6x11plus', monospace;
+    font-size: 10px;
+    color: #708386;
+    width: 56px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .stream__items {
+    flex: 1;
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+  }
+  .stream-item {
+    background: #0b1416;
+    border: 1px solid #334461;
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-family: 'm6x11plus', monospace;
+    font-size: 10px;
+    color: #b9c2d2;
+    white-space: nowrap;
+  }
+  .stream-item--hit {
+    background: rgba(228,182,67,0.25);
+    color: #fff;
+    border-color: #e4b643;
+    box-shadow: 0 0 4px rgba(228,182,67,0.5);
+  }
+  .stream-item--must-hit {
+    background: rgba(0,147,255,0.3);
+    border-color: #0093ff;
+  }
+  .stream-item--should-hit {
+    background: rgba(255,76,64,0.3);
+    border-color: #ff4c40;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="src/tokens.js"></script>
+<script src="src/v2/mock-filters.js"></script>
+<script src="src/v2/data.js"></script>
+<script type="text/babel" src="src/v2/BalatroComponents.jsx"></script>
+
+<script type="text/babel">
+const {
+  JimboPanel, JimboButton, JimboBackButton, JimboBadge, JimboText,
+  JimboStack, JimboRow, JimboInnerPanel, JimboStatCallout,
+  JimboStatusPill, JimboSpinner,
+} = window;
+
+// Determine which streams the JAML cares about from its clauses.
+function streamsOfInterest(filter) {
+  const streams = new Set();
+  [...filter.must, ...filter.should].forEach((c) => {
+    if (c.type === 'joker' && c.sources?.shopSlots) streams.add('shop');
+    if (c.type === 'joker' && c.sources?.packSlots) streams.add('packs');
+    if (c.type === 'voucher') streams.add('voucher');
+    if (c.type === 'smallblindtag') streams.add('smallTag');
+    if (c.type === 'bigblindtag') streams.add('bigTag');
+    if (c.type === 'souljoker') streams.add('soul');
+    if (c.type === 'boss') streams.add('boss');
+  });
+  return streams;
+}
+
+// For each ante, return the items in each stream the JAML cares about.
+function antePayload(seedData, ante, streams, filter) {
+  const a = seedData.antes.find((x) => x.ante === ante);
+  if (!a) return null;
+
+  const payload = { ante };
+
+  // Find which clauses target this ante
+  const clausesForAnte = [...filter.must, ...filter.should].filter((c) => c.antes.includes(ante));
+
+  if (streams.has('shop')) {
+    const slotsOfInterest = new Set();
+    clausesForAnte.forEach((c) => {
+      if (c.type === 'joker' && c.sources?.shopSlots) {
+        c.sources.shopSlots.forEach((s) => slotsOfInterest.add(s));
+      }
+    });
+    payload.shop = (a.shopQueue || []).map((item, idx) => ({
+      ...item, idx, ofInterest: slotsOfInterest.has(idx),
+    })).filter((item) => slotsOfInterest.size === 0 || item.ofInterest);
+  }
+  if (streams.has('packs')) {
+    payload.packs = a.boosterPacks || [];
+  }
+  if (streams.has('voucher')) payload.voucher = a.voucher;
+  if (streams.has('smallTag')) payload.smallTag = a.smallBlindTag;
+  if (streams.has('bigTag')) payload.bigTag = a.bigBlindTag;
+  if (streams.has('soul')) payload.soul = a.soulJoker;
+  if (streams.has('boss')) payload.boss = a.boss;
+
+  return payload;
+}
+
+function StreamItem({ item, hitKind }) {
+  let cls = 'stream-item';
+  if (hitKind === 'must') cls += ' stream-item--must-hit';
+  else if (hitKind === 'should') cls += ' stream-item--should-hit';
+  else if (hitKind) cls += ' stream-item--hit';
+  return <span className={cls}>{item}</span>;
+}
+
+function Stream({ label, items, hits = {} }) {
+  if (!items || items.length === 0) {
+    return (
+      <div className="stream">
+        <span className="stream__label">{label}</span>
+        <span className="stream__items">
+          <span className="stream-item" style={{ opacity: 0.3 }}>—</span>
+        </span>
+      </div>
+    );
+  }
+  const hasHit = items.some((it) => hits[typeof it === 'string' ? it : it.value]);
+  return (
+    <div className={`stream ${hasHit ? 'stream--hit' : ''}`}>
+      <span className="stream__label">{label}</span>
+      <span className="stream__items">
+        {items.map((it, i) => {
+          const value = typeof it === 'string' ? it : it.value;
+          return <StreamItem key={i} item={value} hitKind={hits[value]} />;
+        })}
+      </span>
+    </div>
+  );
+}
+
+function AnteSection({ payload, filter, seedData }) {
+  // Map item value → 'must' | 'should' if it's a hit
+  const hitMap = {};
+  [...filter.must, ...filter.should].forEach((c) => {
+    if (!c.antes.includes(payload.ante)) return;
+    const kind = filter.must.includes(c) ? 'must' : 'should';
+    if (c.value !== 'any') hitMap[c.value] = kind;
+  });
+
+  return (
+    <div className="ante-section">
+      <div className="ante-section__head">
+        <span className="ante-section__title">ante {payload.ante}</span>
+        {payload.boss && <JimboBadge tone="dark" size="sm">{payload.boss}</JimboBadge>}
+      </div>
+      {payload.smallTag !== undefined && (
+        <Stream label="sm tag" items={payload.smallTag ? [payload.smallTag] : []} hits={hitMap} />
+      )}
+      {payload.bigTag !== undefined && (
+        <Stream label="big tag" items={payload.bigTag ? [payload.bigTag] : []} hits={hitMap} />
+      )}
+      {payload.voucher !== undefined && (
+        <Stream label="voucher" items={payload.voucher ? [payload.voucher] : []} hits={hitMap} />
+      )}
+      {payload.shop && (
+        <Stream label="shop" items={payload.shop.map((it) => it.value)} hits={hitMap} />
+      )}
+      {payload.packs && (
+        <Stream
+          label="packs"
+          items={payload.packs.flatMap((p) => p.items)}
+          hits={hitMap}
+        />
+      )}
+      {payload.soul !== undefined && (
+        <Stream label="soul" items={payload.soul ? [payload.soul.value] : []} hits={hitMap} />
+      )}
+    </div>
+  );
+}
+
+function Analyzer() {
+  const params = new URLSearchParams(window.location.search);
+  const jamlId = params.get('jaml');
+  const seedsParam = params.get('seeds') || '';
+  const seedList = seedsParam.split(',').filter(Boolean);
+
+  const filter = jamlId ? window.findFilter(jamlId) : null;
+  const [seedIdx, setSeedIdx] = React.useState(0);
+
+  if (!filter || seedList.length === 0) {
+    return (
+      <div className="stage">
+        <JimboPanel onBack={() => history.back()}>
+          <JimboStack gap="md">
+            <JimboText size="sm" tone="grey">missing jaml or seeds</JimboText>
+          </JimboStack>
+        </JimboPanel>
+      </div>
+    );
+  }
+
+  // We only have data.js mock for one seed. Use seed1 data for any seed code.
+  const realSeed = window.SEEDS_V2[0];
+  const currentSeedCode = seedList[seedIdx];
+  // Fake: clone the seed1 data but rename the seed code.
+  const seedData = { ...realSeed, seed: currentSeedCode };
+
+  const streams = streamsOfInterest(filter);
+  const antes = filter.antes;
+
+  return (
+    <div className="stage">
+      <JimboPanel onBack={() => history.back()}>
+        <JimboStack gap="sm">
+
+          {/* Top: filter + seed pager */}
+          <JimboRow gap="sm" justify="between">
+            <JimboText size="xs" tone="gold">{filter.name}</JimboText>
+            <JimboBadge tone="grey" size="sm">{seedIdx + 1}/{seedList.length}</JimboBadge>
+          </JimboRow>
+
+          {/* Seed pager — large code with prev/next */}
+          <div className="seed-pager-row">
+            <JimboButton
+              tone="red"
+              size="sm"
+              disabled={seedIdx === 0}
+              onClick={() => setSeedIdx((i) => Math.max(0, i - 1))}
+            >
+              {'<'}
+            </JimboButton>
+            <span className="seed-code">{currentSeedCode}</span>
+            <JimboButton
+              tone="red"
+              size="sm"
+              disabled={seedIdx === seedList.length - 1}
+              onClick={() => setSeedIdx((i) => Math.min(seedList.length - 1, i + 1))}
+            >
+              {'>'}
+            </JimboButton>
+          </div>
+
+          {/* Per-ante streams (only the ones the JAML cares about) */}
+          <div className="ante-scroll">
+            {antes.map((ante) => {
+              const payload = antePayload(seedData, ante, streams, filter);
+              if (!payload) return null;
+              return (
+                <AnteSection
+                  key={ante}
+                  payload={payload}
+                  filter={filter}
+                  seedData={seedData}
+                />
+              );
+            })}
+          </div>
+        </JimboStack>
+      </JimboPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Analyzer />);
+</script>
+</body>
+</html>

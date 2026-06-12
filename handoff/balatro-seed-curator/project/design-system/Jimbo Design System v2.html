@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jimbo Design System v2 — Reference</title>
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   v2 — every class on this page mirrors a real class in
+   jaml-ui/src/ui/jimbo.css. Tokens copied verbatim from jimbo.css.
+   The only invented thing is page chrome (.page, .section, .swatch-grid).
+   ───────────────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'm6x11plus';
+  src: url('../fonts/m6x11plus.otf') format('opentype');
+  font-display: swap;
+}
+
+:root {
+  /* Face / shadow pairs — eyedropped from shader output, NOT Lua hex. */
+  --j-red:        #fe5148;  --j-dark-red:    #a02721;
+  --j-blue:       #0093ff;  --j-dark-blue:   #0057a1;
+  --j-green:      #429f79;  --j-dark-green:  #215f46;
+  --j-orange:     #ff9800;  --j-dark-orange: #a05b00;
+  --j-gold:       #e4b643;
+  --j-purple:     #9e74ce;  --j-dark-purple: #5e437e;
+  --j-tarot-btn:    #9e74ce;  --j-tarot-btn-dark:    #5e437e;
+  --j-planet-btn:   #00a7ca;  --j-planet-btn-dark:   #00657c;
+  --j-spectral-btn: #2e76fd;  --j-spectral-btn-dark: #14449e;
+
+  --j-darkest:        #1e2b2d;
+  --j-dark-grey:      #3a5055;
+  --j-teal-grey:      #404c4e;
+  --j-grey:           #708386;
+  --j-panel-edge:     #1e2e32;
+  --j-inner-border:   #334461;
+  --j-border-silver:  #b9c2d2;
+  --j-border-south:   #777e89;
+
+  --j-white:        #ffffff;
+  --j-black:        #000000;
+  --j-gold-text:    #e4b643;
+  --j-green-text:   #35bd86;
+  --j-orange-text:  #ff8f00;
+
+  --j-font: 'm6x11plus', ui-monospace, Menlo, Consolas, monospace;
+  --j-text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+
+  --j-space-xs: 2px;
+  --j-space-sm: 4px;
+  --j-space-md: 8px;
+  --j-space-lg: 12px;
+  --j-space-xl: 16px;
+
+  --j-radius-sm: 4px;
+  --j-radius-md: 6px;
+  --j-radius-lg: 8px;
+  --j-radius-pill: 10px;
+
+  --j-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --j-press-y: 3px;
+  --j-press-speed: 55ms;
+  --j-panel-border-width: 3px;
+  --j-surface-shadow-depth: 4px;
+  --j-idle-bob-duration: 3400ms;
+
+  --bg-grad-1: #243634;
+  --bg-grad-2: #1a2625;
+}
+
+* { box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { display: none; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--j-font);
+  color: var(--j-white);
+  background:
+    radial-gradient(ellipse at 20% -10%, rgba(255,255,255,0.04), transparent 60%),
+    radial-gradient(ellipse at 90% 110%, rgba(0,0,0,0.4), transparent 60%),
+    linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
+  min-height: 100vh;
+  letter-spacing: 0.02em;
+  text-shadow: var(--j-text-shadow);
+  -webkit-font-smoothing: none;
+}
+
+/* ── Page chrome (NOT a library primitive) ────────────────────────────── */
+.page { max-width: 1240px; margin: 0 auto; padding: 48px 28px 96px; }
+.masthead {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 36px;
+  padding-bottom: 20px;
+  border-bottom: 2px dashed rgba(185,194,210,0.18);
+}
+.masthead h1 { margin: 0; font-size: 44px; line-height: 1; letter-spacing: 0.04em; }
+.masthead p  { margin: 10px 0 0; font-size: 14px; color: var(--j-border-silver); max-width: 60ch; line-height: 1.4; }
+.masthead .stamp {
+  font-size: 11px; color: var(--j-gold-text); letter-spacing: 0.12em;
+  border: 2px solid var(--j-gold-text); padding: 6px 10px 4px; border-radius: var(--j-radius-md);
+}
+.section { margin-top: 56px; }
+.section-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; }
+.section-head .num { font-size: 36px; color: var(--j-gold-text); min-width: 1.6ch; }
+.section-head .title { font-size: 22px; letter-spacing: 0.04em; }
+.section-head .blurb { font-size: 12px; color: var(--j-border-silver); margin-left: auto; text-align: right; max-width: 48ch; line-height: 1.35; }
+.section-head .ref   { font-size: 10px; color: var(--j-grey); letter-spacing: 0.08em; }
+
+.grid { display: grid; gap: 14px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.row   { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.note  { font-size: 11px; color: var(--j-grey); letter-spacing: 0.06em; }
+.tone-red    { color: var(--j-red); }
+.tone-blue   { color: var(--j-blue); }
+.tone-gold   { color: var(--j-gold-text); }
+.tone-green  { color: var(--j-green-text); }
+.tone-orange { color: var(--j-orange-text); }
+.tone-purple { color: var(--j-purple); }
+.tone-grey   { color: var(--j-grey); }
+
+/* "Real" badge — marks every primitive that exists in jaml-ui today */
+.real {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--j-green-text);
+  border: 1px solid var(--j-green-text);
+  border-radius: 3px;
+  padding: 1px 5px 0;
+  margin-left: 6px;
+  text-shadow: none;
+}
+.proposed {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--j-orange-text);
+  border: 1px solid var(--j-orange-text);
+  border-radius: 3px;
+  padding: 1px 5px 0;
+  margin-left: 6px;
+  text-shadow: none;
+}
+
+/* ═════════════════════════════════════════════════════════════════════ */
+/* Mirrored from jimbo.css below this line                                 */
+/* ═════════════════════════════════════════════════════════════════════ */
+
+/* ── .j-text scale ────────────────────────────────────────────────────── */
+.j-text { font-family: var(--j-font); font-weight: 400; line-height: 1.2; text-shadow: var(--j-text-shadow); color: var(--j-white); }
+.j-text--display { font-size: 26px; letter-spacing: 0.04em; line-height: 1; }
+.j-text--xl      { font-size: 24px; letter-spacing: 0.04em; }
+.j-text--lg      { font-size: 18px; letter-spacing: 0.04em; }
+.j-text--heading { font-size: 14px; letter-spacing: 0.08em; line-height: 1.2; }
+.j-text--md      { font-size: 14px; }
+.j-text--sm      { font-size: 12px; }
+.j-text--body    { font-size: 11px; letter-spacing: 0.05em; line-height: 1.3; }
+.j-text--xs      { font-size: 10px; }
+.j-text--label   { font-size: 9px;  letter-spacing: 0.10em; line-height: 1; }
+.j-text--micro   { font-size: 8px;  letter-spacing: 0.08em; line-height: 1; }
+.j-text--no-shadow { text-shadow: none; }
+
+/* ── .j-panel + .j-inner-panel ────────────────────────────────────────── */
+.j-panel {
+  background-color: var(--j-dark-grey);
+  border: var(--j-panel-border-width) solid var(--j-border-silver);
+  border-radius: var(--j-radius-md);
+  box-shadow:
+    0 calc(var(--j-panel-border-width) / 2) 0 0 var(--j-border-south),
+    0 calc(var(--j-surface-shadow-depth) + var(--j-panel-border-width)/2) 0 0 rgba(0,0,0,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+  padding: var(--j-space-lg);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.j-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,0.10), transparent 38%),
+    linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.05) 30%, transparent 56%);
+  pointer-events: none;
+  z-index: 0;
+}
+.j-panel > * { position: relative; z-index: 1; }
+
+.j-inner-panel {
+  background-color: var(--j-inner-border);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-lg);
+  position: relative;
+}
+
+/* ── .j-btn ───────────────────────────────────────────────────────────── */
+.j-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: transparent;
+  font-family: var(--j-font);
+  color: var(--j-white);
+}
+.j-btn--full { width: 100%; }
+.j-btn--disabled { opacity: 0.55; cursor: not-allowed; }
+.j-btn__face {
+  position: relative;
+  border-radius: var(--j-radius-md);
+  background: var(--j-btn-face-color, var(--j-orange));
+  text-align: center;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  box-shadow: 0 calc(var(--j-press-y) + 2px) 0 0 rgba(0,0,0,0.8);
+  transform: translate(0, 0);
+  transition:
+    transform var(--j-press-speed) linear,
+    box-shadow var(--j-press-speed) linear,
+    background-color var(--j-press-speed) linear;
+  overflow: hidden;
+}
+.j-btn[data-pressed="true"] .j-btn__face,
+.j-btn:not(.j-btn--disabled):active .j-btn__face {
+  background: var(--j-btn-shadow-color, var(--j-dark-orange));
+  transform: translateY(var(--j-press-y));
+  box-shadow: none;
+}
+.j-btn:not(.j-btn--disabled):hover .j-btn__face {
+  background: var(--j-btn-shadow-color, var(--j-dark-orange));
+}
+.j-btn--xs .j-btn__face { padding: 6px 8px 3px;   font-size: 11px; }
+.j-btn--sm .j-btn__face { padding: 6px 12px 5px;  font-size: 13px; }
+.j-btn--md .j-btn__face { padding: 6px 18px 9px;  font-size: 16px; }
+.j-btn--lg .j-btn__face { padding: 6px 18px 11px; font-size: 20px; }
+.j-btn--full .j-btn__face { display: block; width: 100%; }
+
+.j-btn--orange   { --j-btn-face-color: var(--j-orange);   --j-btn-shadow-color: var(--j-dark-orange); }
+.j-btn--red      { --j-btn-face-color: var(--j-red);      --j-btn-shadow-color: var(--j-dark-red); }
+.j-btn--blue     { --j-btn-face-color: var(--j-blue);     --j-btn-shadow-color: var(--j-dark-blue); }
+.j-btn--green    { --j-btn-face-color: var(--j-green);    --j-btn-shadow-color: var(--j-dark-green); }
+.j-btn--tarot    { --j-btn-face-color: var(--j-tarot-btn);    --j-btn-shadow-color: var(--j-tarot-btn-dark); }
+.j-btn--planet   { --j-btn-face-color: var(--j-planet-btn);   --j-btn-shadow-color: var(--j-planet-btn-dark); }
+.j-btn--spectral { --j-btn-face-color: var(--j-spectral-btn); --j-btn-shadow-color: var(--j-spectral-btn-dark); }
+.j-btn--grey     { --j-btn-face-color: var(--j-grey);     --j-btn-shadow-color: var(--j-dark-grey); }
+
+/* ── .j-badge ─────────────────────────────────────────────────────────── */
+.j-badge {
+  display: inline-flex; align-items: center;
+  border-radius: var(--j-radius-sm);
+  font-family: var(--j-font);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+.j-badge--sm { padding: 2px 6px; font-size: 10px; }
+.j-badge--md { padding: 4px 8px; font-size: 12px; }
+.j-badge--dark    { background: var(--j-darkest); color: var(--j-white); }
+.j-badge--blue    { background: var(--j-blue);    color: var(--j-white); }
+.j-badge--red     { background: var(--j-red);     color: var(--j-white); }
+.j-badge--green   { background: var(--j-green);   color: var(--j-white); }
+.j-badge--orange  { background: var(--j-orange);  color: var(--j-white); }
+.j-badge--purple  { background: var(--j-purple);  color: var(--j-white); }
+.j-badge--gold    { background: var(--j-gold);    color: #2a1f00; text-shadow: none; }
+.j-badge--grey    { background: var(--j-teal-grey); color: var(--j-white); }
+
+/* ── .j-section-header ────────────────────────────────────────────────── */
+.j-section-header {
+  display: flex; align-items: center;
+  gap: var(--j-space-md);
+  margin-bottom: var(--j-space-md);
+}
+.j-section-header__tag {
+  font-family: var(--j-font);
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  color: var(--j-white);
+  border-radius: 3px;
+  text-shadow: var(--j-text-shadow);
+  flex-shrink: 0;
+}
+.j-section-header__rule {
+  flex: 1;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.33;
+}
+.j-bg--red    { background: var(--j-red); }
+.j-bg--blue   { background: var(--j-blue); }
+.j-bg--green  { background: var(--j-green); }
+.j-bg--gold   { background: var(--j-gold); }
+.j-bg--orange { background: var(--j-orange); }
+.j-bg--purple { background: var(--j-purple); }
+
+/* ── .j-stat-grid ─────────────────────────────────────────────────────── */
+.j-stat-grid {
+  background: var(--j-dark-grey);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  box-shadow: 0 2px 0 var(--j-black);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--j-space-md);
+  text-align: center;
+}
+.j-stat-grid__value { font-family: var(--j-font); font-size: 16px; color: var(--j-gold-text); text-shadow: var(--j-text-shadow); }
+.j-stat-grid__label { font-family: var(--j-font); font-size: 9px;  color: var(--j-grey); letter-spacing: 2px; margin-top: 2px; }
+
+/* ── .j-info-card ─────────────────────────────────────────────────────── */
+.j-info-card {
+  background: var(--j-dark-grey);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  box-shadow: 0 2px 0 var(--j-black);
+  display: flex;
+  align-items: center;
+  gap: var(--j-space-md);
+  cursor: pointer;
+  border: var(--j-panel-border-width) solid transparent;
+}
+.j-info-card:hover { filter: brightness(1.08); }
+.j-info-card__body  { flex: 1; min-width: 0; }
+.j-info-card__title { font-family: var(--j-font); font-size: 13px; color: var(--j-white); letter-spacing: 1px; text-shadow: var(--j-text-shadow); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.j-info-card__sub   { font-family: var(--j-font); font-size: 9px; color: var(--j-gold-text); letter-spacing: 1px; margin-top: 2px; }
+.j-info-card__aside { text-align: right; flex-shrink: 0; }
+.j-border--red    { border-color: var(--j-red) !important; }
+.j-border--blue   { border-color: var(--j-blue) !important; }
+.j-border--green  { border-color: var(--j-green) !important; }
+.j-border--gold   { border-color: var(--j-gold) !important; }
+.j-border--orange { border-color: var(--j-orange) !important; }
+.j-border--purple { border-color: var(--j-purple) !important; }
+
+/* ── .j-inset ─────────────────────────────────────────────────────────── */
+.j-inset {
+  background: var(--j-dark-grey);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  box-shadow: 0 2px 0 var(--j-black);
+  font-family: var(--j-font);
+  color: var(--j-white);
+}
+
+/* ── .j-tabs (bouncing triangle + idle-bob) ───────────────────────────── */
+.j-tabs {
+  display: flex;
+  gap: var(--j-space-sm);
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: auto;
+}
+.j-tab { display: flex; flex-direction: column; align-items: center; position: relative; flex: 0 0 auto; }
+.j-tab__indicator { height: 10px; margin-bottom: 3px; display: flex; justify-content: center; align-items: flex-end; }
+.j-tab__indicator svg { fill: var(--j-red); display: block; }
+.j-tab__indicator[data-active="true"]  { animation: jimbo-bounce 0.6s linear infinite; }
+.j-tab__indicator[data-active="false"] { visibility: hidden; }
+.j-tab__btn {
+  appearance: none; -webkit-appearance: none;
+  border: none; cursor: pointer;
+  border-radius: var(--j-radius-md);
+  padding: 6px 14px;
+  min-height: 28px;
+  background: var(--j-red);
+  box-shadow: 0 5px 0 0 rgba(0,0,0,0.6);
+  color: var(--j-white);
+  text-align: center;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  transition: filter 80ms linear, opacity 80ms linear;
+  font-family: var(--j-font);
+  font-size: 12px;
+}
+.j-tab__btn[data-active="true"]  { animation: j-idle-bob var(--j-idle-bob-duration) ease-in-out infinite; }
+.j-tab__btn[data-active="false"]:hover { background: var(--j-dark-red); }
+@keyframes jimbo-bounce {
+  0%,15%    { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+  85%,100%  { transform: translateY(0); }
+}
+@keyframes j-idle-bob {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-1px); }
+}
+
+/* ── .j-app (320×568 mobile shell) ────────────────────────────────────── */
+.j-app {
+  width: 320px;
+  height: 568px;
+  background: var(--j-darkest);
+  font-family: var(--j-font);
+  color: var(--j-white);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--j-radius-md);
+  position: relative;
+  box-shadow: 0 6px 0 0 rgba(0,0,0,0.6);
+  border: 2px solid #000;
+}
+.j-app__scroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--j-space-lg); }
+.j-app__footer {
+  flex-shrink: 0;
+  padding: var(--j-space-md) var(--j-space-lg);
+  border-top: var(--j-panel-border-width) solid var(--j-black);
+  background: var(--j-dark-grey);
+  display: flex;
+  flex-direction: column;
+  gap: var(--j-space-sm);
+}
+
+/* ── Type-scale / swatch helpers (page-only) ──────────────────────────── */
+.type-row { display: grid; grid-template-columns: 110px 1fr auto; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px dashed rgba(185,194,210,0.14); }
+.type-row:last-child { border-bottom: none; }
+.type-row .label { font-size: 11px; color: var(--j-gold-text); letter-spacing: 0.12em; }
+.type-row .meta  { font-size: 10px; color: var(--j-grey); letter-spacing: 0.06em; }
+
+.swatch-grid { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px; }
+.swatch {
+  border-radius: var(--j-radius-sm);
+  padding: 10px 10px 8px;
+  display: flex; flex-direction: column; gap: 4px;
+  border: 2px solid rgba(0,0,0,0.35);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.55);
+  min-height: 78px;
+}
+.swatch .name { font-size: 10px; letter-spacing: 0.08em; }
+.swatch .hex  { font-size: 10px; letter-spacing: 0.04em; opacity: 0.85; }
+.swatch .var  { font-size: 9px; opacity: 0.7; }
+.swatch.on-light { color: #111; text-shadow: none; }
+
+.ruler { display: grid; grid-template-columns: 110px 1fr 110px; align-items: center; gap: 14px; padding: 8px 0; border-bottom: 1px dashed rgba(185,194,210,0.14); }
+.ruler:last-child { border-bottom: none; }
+.bar { height: 18px; background: var(--j-orange); border-radius: 2px; box-shadow: 0 2px 0 0 var(--j-dark-orange); }
+.radius-square {
+  width: 64px; height: 64px;
+  background: var(--j-teal-grey);
+  border: 3px solid var(--j-border-silver);
+  box-shadow: 0 3px 0 0 var(--j-border-south);
+}
+
+/* Placeholder card slots — illustrative only, not a library primitive */
+.card-slot {
+  position: relative;
+  width: 96px; height: 134px;
+  border-radius: var(--j-radius-md);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 6px, transparent 6px 12px),
+    var(--slot-bg, var(--j-teal-grey));
+  border: 2px solid rgba(0,0,0,0.4);
+  box-shadow: 0 3px 0 0 rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.04);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.8);
+}
+.card-slot--joker    { --slot-bg: #c93832; }
+.card-slot--tarot    { --slot-bg: #87724a; }
+.card-slot--planet   { --slot-bg: #163b53; }
+.card-slot--spectral { --slot-bg: #1f3aa8; }
+.card-slot--blind    { --slot-bg: #1a2b3a; }
+.card-slot--pack     { --slot-bg: #4a3a78; }
+.card-slot--standard { --slot-bg: #f3efe2; color: #3a3326; }
+.card-slot .tag {
+  background: rgba(0,0,0,0.5);
+  padding: 3px 6px 2px;
+  border-radius: var(--j-radius-sm);
+}
+.card-slot--standard .tag { background: rgba(0,0,0,0.12); color: inherit; }
+
+.foot {
+  margin-top: 72px;
+  padding-top: 18px;
+  border-top: 1px dashed rgba(185,194,210,0.18);
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--j-grey);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+</style>
+</head>
+<body>
+<main class="page" data-screen-label="01 Reference v2">
+
+  <!-- ── Masthead ─────────────────────────────────────────────────────── -->
+  <header class="masthead">
+    <div>
+      <h1>Jimbo Design System <span style="color:var(--j-gold-text);">v2</span></h1>
+      <p>Single-source visual reference for <span class="tone-gold">jaml-ui</span>. Every primitive on this page exists as a real class in <span class="tone-gold">src/ui/jimbo.css</span> — v1 mixed in invented controls and got tabs wrong, this version is faithful. The <span class="real">real</span> badge marks classes shipping today; <span class="proposed">proposed</span> marks placeholders that don't have a library implementation yet.</p>
+    </div>
+    <span class="stamp">v2 · spec</span>
+  </header>
+
+  <!-- ── 01 Type ─────────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">01</span>
+      <span class="title">.j-text scale<span class="real">real</span></span>
+      <div class="blurb">
+        m6x11plus, weight 400 only. Letter-spacing replaces weight as emphasis.
+        <div class="ref">src/ui/jimboText.tsx · &lt;JimboText size tone /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="type-row"><span class="label">display / 26</span><span class="j-text j-text--display">Browse curated seeds</span><span class="meta">spacing 0.04em · line 1.0</span></div>
+      <div class="type-row"><span class="label">xl / 24</span><span class="j-text j-text--xl">Run workbench</span><span class="meta">spacing 0.04em</span></div>
+      <div class="type-row"><span class="label">lg / 18</span><span class="j-text j-text--lg">Score at least <span class="tone-red">300</span></span><span class="meta">spacing 0.04em</span></div>
+      <div class="type-row"><span class="label">heading / 14</span><span class="j-text j-text--heading">Base Cards</span><span class="meta">spacing 0.08em</span></div>
+      <div class="type-row"><span class="label">md / 14</span><span class="j-text j-text--md">Default body copy.</span><span class="meta">default body</span></div>
+      <div class="type-row"><span class="label">sm / 12</span><span class="j-text j-text--sm">Reward: <span class="tone-gold">$$$+</span></span><span class="meta">tile copy</span></div>
+      <div class="type-row"><span class="label">body / 11</span><span class="j-text j-text--body">Long-form body for descriptions and rules. Tracks at 0.05em with 1.3 line height so blocks of pixel type still read at small sizes.</span><span class="meta">spacing 0.05em · line 1.3</span></div>
+      <div class="type-row"><span class="label">label / 9</span><span class="j-text j-text--label">Consumables</span><span class="meta">spacing 0.10em</span></div>
+      <div class="type-row"><span class="label">micro / 8</span><span class="j-text j-text--micro">52 / 52</span><span class="meta">counts &amp; metadata only</span></div>
+    </div>
+
+    <div class="section-head" style="margin-top:32px;">
+      <span class="num">·</span><span class="title">Tones<span class="real">real</span></span>
+      <div class="blurb">Color carries meaning. Never use accent tones for decoration.</div>
+    </div>
+    <div class="j-panel">
+      <div class="row" style="gap:24px;">
+        <span class="j-text j-text--lg tone-red">+30 mult</span>
+        <span class="j-text j-text--lg tone-blue">+50 chips</span>
+        <span class="j-text j-text--lg tone-gold">$14</span>
+        <span class="j-text j-text--lg tone-green">1 in 5</span>
+        <span class="j-text j-text--lg tone-orange">Primary action</span>
+        <span class="j-text j-text--lg tone-purple">Tarot</span>
+        <span class="j-text j-text--lg tone-grey">Upcoming</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 Color ────────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">02</span>
+      <span class="title">Color tokens<span class="real">real</span></span>
+      <div class="blurb">
+        Every saturated face has a matched "underside" shadow. Pick them as a pair.
+        <div class="ref">src/ui/tokens.ts · :root in jimbo.css</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <h3 style="margin:0 0 14px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Face / shadow pairs</h3>
+      <div class="swatch-grid">
+        <div class="swatch" style="background:var(--j-red);    box-shadow:0 4px 0 0 var(--j-dark-red);"><span class="name">red</span><span class="hex">#fe5148</span><span class="var">--j-red / --j-dark-red</span></div>
+        <div class="swatch" style="background:var(--j-blue);   box-shadow:0 4px 0 0 var(--j-dark-blue);"><span class="name">blue</span><span class="hex">#0093ff</span><span class="var">--j-blue / --j-dark-blue</span></div>
+        <div class="swatch" style="background:var(--j-green);  box-shadow:0 4px 0 0 var(--j-dark-green);"><span class="name">green</span><span class="hex">#429f79</span><span class="var">--j-green / --j-dark-green</span></div>
+        <div class="swatch" style="background:var(--j-orange); box-shadow:0 4px 0 0 var(--j-dark-orange);"><span class="name">orange</span><span class="hex">#ff9800</span><span class="var">--j-orange / --j-dark-orange</span></div>
+        <div class="swatch on-light" style="background:var(--j-gold); box-shadow:0 4px 0 0 #a87f1e;"><span class="name">gold</span><span class="hex">#e4b643</span><span class="var">--j-gold</span></div>
+        <div class="swatch" style="background:var(--j-purple); box-shadow:0 4px 0 0 var(--j-dark-purple);"><span class="name">purple</span><span class="hex">#9e74ce</span><span class="var">--j-purple / --j-dark-purple</span></div>
+      </div>
+
+      <h3 style="margin:18px 0 14px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Consumable tones</h3>
+      <div class="swatch-grid">
+        <div class="swatch" style="background:var(--j-tarot-btn);    box-shadow:0 4px 0 0 var(--j-tarot-btn-dark);"><span class="name">tarot</span><span class="hex">#9e74ce</span><span class="var">--j-tarot-btn</span></div>
+        <div class="swatch" style="background:var(--j-planet-btn);   box-shadow:0 4px 0 0 var(--j-planet-btn-dark);"><span class="name">planet</span><span class="hex">#00a7ca</span><span class="var">--j-planet-btn</span></div>
+        <div class="swatch" style="background:var(--j-spectral-btn); box-shadow:0 4px 0 0 var(--j-spectral-btn-dark);"><span class="name">spectral</span><span class="hex">#2e76fd</span><span class="var">--j-spectral-btn</span></div>
+      </div>
+
+      <h3 style="margin:18px 0 14px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Surfaces &amp; chrome</h3>
+      <div class="swatch-grid">
+        <div class="swatch" style="background:var(--j-darkest); border-color:#000;"><span class="name">darkest</span><span class="hex">#1e2b2d</span><span class="var">.j-app fill</span></div>
+        <div class="swatch" style="background:var(--j-dark-grey);"><span class="name">dark-grey</span><span class="hex">#3a5055</span><span class="var">.j-panel fill</span></div>
+        <div class="swatch" style="background:var(--j-teal-grey);"><span class="name">teal-grey</span><span class="hex">#404c4e</span><span class="var">tile fill</span></div>
+        <div class="swatch on-light" style="background:var(--j-border-silver);"><span class="name">silver</span><span class="hex">#b9c2d2</span><span class="var">panel border</span></div>
+        <div class="swatch on-light" style="background:var(--j-border-south);"><span class="name">south-edge</span><span class="hex">#777e89</span><span class="var">panel under-edge</span></div>
+        <div class="swatch" style="background:var(--j-grey);"><span class="name">grey</span><span class="hex">#708386</span><span class="var">muted / disabled</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 Spacing & Radius ─────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">03</span>
+      <span class="title">Spacing &amp; radius<span class="real">real</span></span>
+      <div class="blurb">Tight scale: 2 / 4 / 8 / 12 / 16. Radius caps at 10.</div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Spacing</h3>
+        <div class="ruler"><span style="font-size:11px; color:var(--j-gold-text); letter-spacing:0.12em;">xs · 2</span><div class="bar" style="width:2px;"></div><span class="note">--j-space-xs</span></div>
+        <div class="ruler"><span style="font-size:11px; color:var(--j-gold-text); letter-spacing:0.12em;">sm · 4</span><div class="bar" style="width:4px;"></div><span class="note">--j-space-sm</span></div>
+        <div class="ruler"><span style="font-size:11px; color:var(--j-gold-text); letter-spacing:0.12em;">md · 8</span><div class="bar" style="width:8px;"></div><span class="note">--j-space-md</span></div>
+        <div class="ruler"><span style="font-size:11px; color:var(--j-gold-text); letter-spacing:0.12em;">lg · 12</span><div class="bar" style="width:12px;"></div><span class="note">--j-space-lg</span></div>
+        <div class="ruler"><span style="font-size:11px; color:var(--j-gold-text); letter-spacing:0.12em;">xl · 16</span><div class="bar" style="width:16px;"></div><span class="note">--j-space-xl</span></div>
+      </div>
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em; color:var(--j-border-silver);">Radius</h3>
+        <div class="row" style="gap:18px; align-items:flex-end;">
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:4px;"></div><span class="j-text j-text--label">sm · 4</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:6px;"></div><span class="j-text j-text--label">md · 6</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:8px;"></div><span class="j-text j-text--label">lg · 8</span></div>
+          <div class="stack" style="align-items:center;"><div class="radius-square" style="border-radius:10px;"></div><span class="j-text j-text--label">pill · 10</span></div>
+        </div>
+        <p class="note" style="margin:10px 0 0;">Anything &gt; 10px reads as web-app, not arcade. To soften, increase border + shadow instead.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 Panels ───────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">04</span>
+      <span class="title">Panels<span class="real">real</span></span>
+      <div class="blurb">
+        Two nested surfaces: outer (silver border + south-edge) and inner (deep, near-black border).
+        <div class="ref">src/ui/panel.tsx · &lt;JimboPanel&gt; &lt;JimboInnerPanel&gt;</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em;">.j-panel</h3>
+        <p class="note" style="margin:0 0 12px;">Top-level surface. 3px silver border, soft sheen, south-edge shadow.</p>
+        <div class="j-inner-panel">
+          <span class="j-text j-text--heading">.j-inner-panel</span>
+          <p class="note" style="margin:6px 0 0; color:var(--j-border-silver);">Nested surface. Inner-border fill, near-black 3px border. Hosts tiles and content.</p>
+        </div>
+      </div>
+      <div class="j-panel">
+        <h3 style="margin:0 0 8px; font-size:14px; letter-spacing:0.08em;">Sway prop</h3>
+        <p class="note" style="margin:0 0 12px;">JimboPanel accepts <span class="tone-gold">sway</span> — adds idle tilt via useSway hook. Reserve for the topmost panel; never nest sway.</p>
+        <p class="note" style="margin:0 0 12px;">JimboPanel also accepts <span class="tone-gold">onBack</span> — renders a full-width orange "Back" button at the panel's foot via <span class="tone-gold">.j-panel__back</span>.</p>
+        <div style="margin-top:14px;">
+          <button class="j-btn j-btn--sm j-btn--orange j-btn--full"><span class="j-btn__face"><span class="j-text j-text--sm">Back</span></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 Section header ──────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">05</span>
+      <span class="title">.j-section-header<span class="real">real</span></span>
+      <div class="blurb">
+        Colored tag + 2px horizontal rule at 0.33 opacity. The only sanctioned section divider.
+        <div class="ref">src/ui/jimboSectionHeader.tsx · &lt;JimboSectionHeader label tone /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="stack" style="gap:14px;">
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--blue">Filters</div><div class="j-section-header__rule j-bg--blue"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--green">Recent</div><div class="j-section-header__rule j-bg--green"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--gold">Favorites</div><div class="j-section-header__rule j-bg--gold"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--red">Boss</div><div class="j-section-header__rule j-bg--red"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--orange">Run info</div><div class="j-section-header__rule j-bg--orange"></div></div>
+        <div class="j-section-header"><div class="j-section-header__tag j-bg--purple">Tarot</div><div class="j-section-header__rule j-bg--purple"></div></div>
+      </div>
+      <p class="note" style="margin-top:14px;">Always pair tag and rule with the same tone. The tag tracks at 2px and is title-case — never ALL CAPS.</p>
+    </div>
+  </section>
+
+  <!-- ── 06 Buttons ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">06</span>
+      <span class="title">.j-btn<span class="real">real</span></span>
+      <div class="blurb">
+        Black underside via box-shadow. Press sinks 3px in 55ms linear. Hover and press flip face to the dark partner — never lighten.
+        <div class="ref">src/ui/panel.tsx · &lt;JimboButton tone size fullWidth /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Tones</h3>
+      <div class="row" style="margin-bottom:18px;">
+        <button class="j-btn j-btn--md j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--md">Select</span></span></button>
+        <button class="j-btn j-btn--md j-btn--red"><span class="j-btn__face"><span class="j-text j-text--md">Skip</span></span></button>
+        <button class="j-btn j-btn--md j-btn--blue"><span class="j-btn__face"><span class="j-text j-text--md">Next</span></span></button>
+        <button class="j-btn j-btn--md j-btn--green"><span class="j-btn__face"><span class="j-text j-text--md">Reroll</span></span></button>
+        <button class="j-btn j-btn--md j-btn--tarot"><span class="j-btn__face"><span class="j-text j-text--md">Tarot</span></span></button>
+        <button class="j-btn j-btn--md j-btn--planet"><span class="j-btn__face"><span class="j-text j-text--md">Planet</span></span></button>
+        <button class="j-btn j-btn--md j-btn--spectral"><span class="j-btn__face"><span class="j-text j-text--md">Spectral</span></span></button>
+        <button class="j-btn j-btn--md j-btn--grey j-btn--disabled"><span class="j-btn__face"><span class="j-text j-text--md">Disabled</span></span></button>
+      </div>
+
+      <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">Sizes</h3>
+      <div class="row" style="align-items:flex-end; margin-bottom:18px;">
+        <button class="j-btn j-btn--xs j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--xs">xs · 11</span></span></button>
+        <button class="j-btn j-btn--sm j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--sm">sm · 13</span></span></button>
+        <button class="j-btn j-btn--md j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--md">md · 16</span></span></button>
+        <button class="j-btn j-btn--lg j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--lg">lg · 20</span></span></button>
+      </div>
+
+      <h3 style="margin:0 0 10px; font-size:14px; letter-spacing:0.08em;">States</h3>
+      <div class="row">
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange"><span class="j-btn__face"><span class="j-text j-text--md">Rest</span></span></button>
+          <span class="note">rest</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange" data-pressed="true"><span class="j-btn__face"><span class="j-text j-text--md">Press</span></span></button>
+          <span class="note">data-pressed="true" — sink 3px, shadow collapse</span>
+        </div>
+        <div class="stack" style="align-items:center; gap:6px;">
+          <button class="j-btn j-btn--md j-btn--orange j-btn--disabled"><span class="j-btn__face"><span class="j-text j-text--md">Disabled</span></span></button>
+          <span class="note">opacity 0.55, no hover</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 Badges ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">07</span>
+      <span class="title">.j-badge<span class="real">real</span></span>
+      <div class="blurb">
+        Flat label pill. No shadow, no edges. Two sizes, eight tones.
+        <div class="ref">src/ui/JimboBadge.tsx · &lt;JimboBadge size tone /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="row" style="margin-bottom:10px;">
+        <span class="j-badge j-badge--sm j-badge--dark">dark</span>
+        <span class="j-badge j-badge--sm j-badge--blue">blue</span>
+        <span class="j-badge j-badge--sm j-badge--red">red</span>
+        <span class="j-badge j-badge--sm j-badge--green">green</span>
+        <span class="j-badge j-badge--sm j-badge--orange">orange</span>
+        <span class="j-badge j-badge--sm j-badge--purple">purple</span>
+        <span class="j-badge j-badge--sm j-badge--gold">gold</span>
+        <span class="j-badge j-badge--sm j-badge--grey">grey</span>
+      </div>
+      <div class="row">
+        <span class="j-badge j-badge--md j-badge--blue">+50 chips</span>
+        <span class="j-badge j-badge--md j-badge--red">+30 mult</span>
+        <span class="j-badge j-badge--md j-badge--green">Found</span>
+        <span class="j-badge j-badge--md j-badge--gold">Boss reward</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 08 Tabs ────────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">08</span>
+      <span class="title">.j-tabs<span class="real">real</span></span>
+      <div class="blurb">
+        Red pill buttons in a row. The active tab idle-bobs at 1px and shows a bouncing red triangle 10px above it. There is no separate "active background" state — the indicator alone is the cue.
+        <div class="ref">src/ui/jimboTabs.tsx · &lt;JimboTabs tabs activeTab onTabChange /&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="j-tabs">
+        <div class="j-tab" data-active="true">
+          <div class="j-tab__indicator" data-active="true"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div>
+          <button class="j-tab__btn" data-active="true">Filters</button>
+        </div>
+        <div class="j-tab" data-active="false">
+          <div class="j-tab__indicator" data-active="false"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div>
+          <button class="j-tab__btn" data-active="false">Seeds</button>
+        </div>
+        <div class="j-tab" data-active="false">
+          <div class="j-tab__indicator" data-active="false"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div>
+          <button class="j-tab__btn" data-active="false">Antes</button>
+        </div>
+        <div class="j-tab" data-active="false">
+          <div class="j-tab__indicator" data-active="false"><svg width="14" height="10" viewBox="0 0 14 10"><polygon points="7,10 0,0 14,0" /></svg></div>
+          <button class="j-tab__btn" data-active="false">Workbench</button>
+        </div>
+      </div>
+      <p class="note" style="margin-top:14px;">Hover on inactive tabs flips background to <span class="tone-gold">--j-dark-red</span>. Hover on the active tab is a no-op.</p>
+    </div>
+  </section>
+
+  <!-- ── 09 InfoCard ─────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">09</span>
+      <span class="title">.j-info-card<span class="real">real</span></span>
+      <div class="blurb">
+        Clickable row card — for filter lists, seed lists, anything list-shaped. <span class="tone-gold">left slot · body · aside</span> grid. Border tone hints at category.
+        <div class="ref">src/ui/jimboInfoCard.tsx · &lt;JimboInfoCard tone&gt;…&lt;/JimboInfoCard&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="stack" style="gap:8px;">
+        <div class="j-info-card j-border--blue">
+          <div class="row" style="gap:4px;">
+            <div class="card-slot card-slot--joker" style="width:22px; height:30px;"></div>
+            <div class="card-slot card-slot--joker" style="width:22px; height:30px;"></div>
+          </div>
+          <div class="j-info-card__body">
+            <div class="j-info-card__title">Negative Tag Stack</div>
+            <div class="j-info-card__sub">by player_one</div>
+          </div>
+          <div class="j-info-card__aside"><span class="j-text j-text--xs tone-blue">412 hits</span></div>
+        </div>
+
+        <div class="j-info-card j-border--gold">
+          <div class="row" style="gap:4px;">
+            <div class="card-slot card-slot--tarot" style="width:22px; height:30px;"></div>
+            <div class="card-slot card-slot--planet" style="width:22px; height:30px;"></div>
+          </div>
+          <div class="j-info-card__body">
+            <div class="j-info-card__title">High-rarity opener</div>
+            <div class="j-info-card__sub">by curator</div>
+          </div>
+          <div class="j-info-card__aside"><span class="j-text j-text--xs tone-gold">$$$+</span></div>
+        </div>
+
+        <div class="j-info-card j-border--red">
+          <div class="row" style="gap:4px;">
+            <div class="card-slot card-slot--blind" style="width:22px; height:30px;"></div>
+          </div>
+          <div class="j-info-card__body">
+            <div class="j-info-card__title">Boss-blind survival</div>
+            <div class="j-info-card__sub">by seedhunter</div>
+          </div>
+          <div class="j-info-card__aside"><span class="j-text j-text--xs tone-red">12 / 50</span></div>
+        </div>
+
+        <div class="j-info-card j-border--green">
+          <div class="row" style="gap:4px;">
+            <div class="card-slot card-slot--spectral" style="width:22px; height:30px;"></div>
+          </div>
+          <div class="j-info-card__body">
+            <div class="j-info-card__title">Spectral chain</div>
+            <div class="j-info-card__sub">by archive</div>
+          </div>
+          <div class="j-info-card__aside"><span class="j-text j-text--xs tone-green">+1 found</span></div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:14px;">Hover applies <span class="tone-gold">brightness(1.08)</span> on the whole card — never a glow. Use <span class="tone-gold">tone</span> for border, never inner backgrounds.</p>
+    </div>
+  </section>
+
+  <!-- ── 10 StatGrid & Inset ─────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">10</span>
+      <span class="title">.j-stat-grid &amp; .j-inset<span class="real">real</span></span>
+      <div class="blurb">
+        Always 3 columns — gold value (16px), grey 2px-tracked label (9px). The inset is the dark recessed companion for log output and recent finds.
+        <div class="ref">src/ui/jimboStatGrid.tsx · src/ui/jimboInset.tsx</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="j-panel">
+        <div class="j-stat-grid">
+          <div><div class="j-stat-grid__value">4</div><div class="j-stat-grid__label">HANDS</div></div>
+          <div><div class="j-stat-grid__value">3</div><div class="j-stat-grid__label">DISCARDS</div></div>
+          <div><div class="j-stat-grid__value">$14</div><div class="j-stat-grid__label">WALLET</div></div>
+        </div>
+        <p class="note" style="margin-top:12px;">The label tracking is the same 2px used by section-header tags — a deliberate echo.</p>
+      </div>
+      <div class="j-panel">
+        <div class="j-inset">
+          <div class="row" style="justify-content:space-between;">
+            <span class="j-text j-text--sm tone-gold">7LB2C9XZ</span>
+            <span class="j-text j-text--micro tone-grey">Negative Tag</span>
+          </div>
+          <div class="row" style="justify-content:space-between; margin-top:4px;">
+            <span class="j-text j-text--sm tone-gold">M3N81ZQA</span>
+            <span class="j-text j-text--micro tone-grey">Boss survival</span>
+          </div>
+          <div class="row" style="justify-content:space-between; margin-top:4px;">
+            <span class="j-text j-text--sm tone-gold">QQ77V12B</span>
+            <span class="j-text j-text--micro tone-grey">Spectral chain</span>
+          </div>
+        </div>
+        <p class="note" style="margin-top:12px;">.j-inset is just a dark recessed container — pour any pixel content in.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 11 App shell ────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">11</span>
+      <span class="title">.j-app — mobile-first shell<span class="real">real</span></span>
+      <div class="blurb">
+        Hard-locked at <span class="tone-gold">320 × 568</span>. Layout MUST hold at this size before scaling up. Add <span class="tone-gold">.j-app--fluid</span> to release for MCP / desktop (up to 750px).
+        <div class="ref">src/ui/jimboApp.tsx · &lt;JimboApp&gt; &lt;JimboAppScroll&gt; &lt;JimboAppFooter&gt;</div>
+      </div>
+    </div>
+    <div class="j-panel" style="display:flex; justify-content:center; padding:24px;">
+      <div class="j-app">
+        <div class="j-app__scroll">
+          <div style="text-align:center; margin-bottom:10px;">
+            <div class="j-text j-text--lg tone-gold">Balatro</div>
+            <div class="j-text j-text--micro tone-grey" style="letter-spacing:3px;">SEED CURATOR</div>
+          </div>
+
+          <div class="j-section-header" style="margin-bottom:6px;">
+            <div class="j-section-header__tag j-bg--blue">Filters</div>
+            <div class="j-section-header__rule j-bg--blue"></div>
+          </div>
+          <div class="stack" style="gap:4px;">
+            <div class="j-info-card j-border--blue">
+              <div class="j-info-card__body">
+                <div class="j-info-card__title">Negative Tag Stack</div>
+                <div class="j-info-card__sub">by player_one</div>
+              </div>
+              <div class="j-info-card__aside"><span class="j-text j-text--xs tone-blue">412</span></div>
+            </div>
+            <div class="j-info-card j-border--gold">
+              <div class="j-info-card__body">
+                <div class="j-info-card__title">High-rarity opener</div>
+                <div class="j-info-card__sub">by curator</div>
+              </div>
+              <div class="j-info-card__aside"><span class="j-text j-text--xs tone-gold">$$$+</span></div>
+            </div>
+          </div>
+
+          <div class="j-section-header" style="margin:10px 0 6px;">
+            <div class="j-section-header__tag j-bg--green">Recent</div>
+            <div class="j-section-header__rule j-bg--green"></div>
+          </div>
+          <div class="j-inset">
+            <div class="row" style="justify-content:space-between;"><span class="j-text j-text--xs tone-gold">7LB2C9XZ</span><span class="j-text j-text--micro tone-grey">Neg tag</span></div>
+            <div class="row" style="justify-content:space-between; margin-top:4px;"><span class="j-text j-text--xs tone-gold">M3N81ZQA</span><span class="j-text j-text--micro tone-grey">Boss</span></div>
+            <div class="row" style="justify-content:space-between; margin-top:4px;"><span class="j-text j-text--xs tone-gold">QQ77V12B</span><span class="j-text j-text--micro tone-grey">Spectral</span></div>
+          </div>
+        </div>
+        <div class="j-app__footer">
+          <button class="j-btn j-btn--lg j-btn--green j-btn--full"><span class="j-btn__face"><span class="j-text j-text--lg">New Search</span></span></button>
+          <button class="j-btn j-btn--lg j-btn--blue j-btn--full"><span class="j-btn__face"><span class="j-text j-text--lg">Browse Filters</span></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 12 Card slots ──────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">12</span>
+      <span class="title">Card-shape frames<span class="proposed">illustrative</span></span>
+      <div class="blurb">
+        The library renders real card art via <span class="tone-gold">JamlGameCard / GameCard / CardFan / DeckSprite</span>. These placeholder slots only document the shared frame: 110×154, rounded-md, black inner border, 3px south shadow. Card kind is signalled by background tone, never shape.
+        <div class="ref">src/components/GameCard.tsx · CardFan.tsx · DeckSprite.tsx</div>
+      </div>
+    </div>
+    <div class="j-panel">
+      <div class="row" style="gap:18px; justify-content:flex-start;">
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--joker"><div class="tag">Joker</div></div><span class="j-text j-text--label tone-grey">joker</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--tarot"><div class="tag">Tarot</div></div><span class="j-text j-text--label tone-grey">tarot</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--planet"><div class="tag">Planet</div></div><span class="j-text j-text--label tone-grey">planet</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--spectral"><div class="tag">Spectral</div></div><span class="j-text j-text--label tone-grey">spectral</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--blind"><div class="tag">Blind</div></div><span class="j-text j-text--label tone-grey">blind back</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--pack"><div class="tag">Pack</div></div><span class="j-text j-text--label tone-grey">booster</span></div>
+        <div class="stack" style="align-items:center; gap:6px;"><div class="card-slot card-slot--standard"><div class="tag">Standard</div></div><span class="j-text j-text--label tone-grey">standard</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 13 House rules ─────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">13</span>
+      <span class="title">House rules</span>
+      <div class="blurb">Lifted from CLAUDE.md / AGENTS.md. Non-negotiable for any UI work in jaml-ui.</div>
+    </div>
+    <div class="j-inset" style="padding:16px;">
+      <ul style="margin:0; padding-left:18px; list-style:square;">
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">Never ALL CAPS.</span> Title-case headings, sentence-case body. Letter-spacing carries emphasis.</li>
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">Never bold.</span> One weight only — 400. Differentiate with color or size.</li>
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">Never grey-on-grey.</span> Muted text on a grey surface must shift to white or a tone.</li>
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">Mobile-first at 320px.</span> .j-app is the default shell — fluid is opt-in.</li>
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">Juice is CSS.</span> Press, sway, idle-bob, font-dance, scale 1.05 are all keyframes or transitions — never JS wrappers.</li>
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">No visible scrollbars.</span> Hidden globally; use magnetic scroll snapping.</li>
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">Chunky, not bubbly.</span> Radius ≤ 10px. Buttons must have a black underside and 3px press.</li>
+        <li class="j-text j-text--body" style="margin:4px 0;"><span class="tone-gold">Color carries meaning.</span> Red = mult / destructive / boss · Blue = chips / informational · Orange = primary · Green = success / reroll · Gold = currency · Purple / Teal / Blue = tarot / planet / spectral.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>jaml-ui · jimbo design system · v2</span>
+    <span>m6x11plus · weight 400 only</span>
+  </footer>
+
+</main>
+</body>
+</html>

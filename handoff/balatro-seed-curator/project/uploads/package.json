@@ -1,0 +1,119 @@
+{
+  "name": "jaml-ui",
+  "version": "0.14.2",
+  "description": "Balatro rendering components, sprite metadata, and optional Motely helpers for React apps.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js"
+    },
+    "./motely": {
+      "types": "./dist/motely.d.ts",
+      "import": "./dist/motely.js"
+    },
+    "./ui": {
+      "types": "./dist/ui.d.ts",
+      "import": "./dist/ui.js"
+    },
+    "./r3f": {
+      "types": "./dist/r3f.d.ts",
+      "import": "./dist/r3f.js"
+    },
+    "./fonts.css": "./fonts.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "./fonts.css"
+  ],
+  "files": [
+    "dist",
+    "assets",
+    "fonts.css",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --pretty false",
+    "dev": "tsc --watch",
+    "demo": "vite --config demo/vite.config.ts",
+    "typecheck": "tsc --noEmit --pretty false",
+    "prepack": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OptimusPi/jaml-ui"
+  },
+  "homepage": "https://github.com/OptimusPi/jaml-ui#readme",
+  "bugs": {
+    "url": "https://github.com/OptimusPi/jaml-ui/issues"
+  },
+  "keywords": [
+    "balatro",
+    "jaml",
+    "motely",
+    "seed",
+    "card",
+    "sprite",
+    "ui"
+  ],
+  "author": "pifreak",
+  "license": "MIT",
+  "peerDependencies": {
+    "@monaco-editor/react": ">=4.0.0",
+    "@react-spring/three": ">=9.0.0",
+    "@react-three/fiber": ">=8.0.0",
+    "monaco-editor": ">=0.50.0",
+    "motely-wasm": "^10.2.0 || ^11.0.0 || ^12.0.0 || ^13.0.0 || ^14.0.0",
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0",
+    "react-icons": ">=5.0.0",
+    "three": ">=0.150.0"
+  },
+  "peerDependenciesMeta": {
+    "@react-spring/three": {
+      "optional": true
+    },
+    "@react-three/fiber": {
+      "optional": true
+    },
+    "motely-wasm": {
+      "optional": true
+    },
+    "react-icons": {
+      "optional": true
+    },
+    "three": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@react-spring/three": "^10.0.3",
+    "@react-three/fiber": "^9.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "monaco-editor": "^0.55.1",
+    "motely-wasm": "^14.0.2",
+"react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-icons": "^5.6.0",
+    "three": "^0.184.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.9"
+  }
+}
