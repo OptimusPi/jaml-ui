@@ -126,7 +126,7 @@ export function Jamlyzer({ jaml, className = "", style }: JamlyzerProps) {
         try {
           config = Motely.fromJaml(trimmed);
         } catch (e) {
-          throw new Error(e instanceof Error ? e.message : "Invalid JAML");
+          throw new Error(e instanceof Error ? e.message : "Invalid JAML", { cause: e });
         }
         const seeds = Array.from(config.seeds ?? []);
         if (seeds.length === 0) {

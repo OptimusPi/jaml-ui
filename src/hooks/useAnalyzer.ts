@@ -34,7 +34,7 @@ export function useAnalyzer() {
                 try {
                     config = Motely.fromJaml(jaml);
                 } catch (e) {
-                    throw new Error(e instanceof Error ? e.message : "Invalid JAML.");
+                    throw new Error(e instanceof Error ? e.message : "Invalid JAML.", { cause: e });
                 }
                 config.seeds = [seed];
                 setTallyLabels(Array.from(Motely.createPlan(config).tallyLabels));

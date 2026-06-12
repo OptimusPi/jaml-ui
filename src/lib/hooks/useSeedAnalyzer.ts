@@ -39,7 +39,7 @@ export function useSeedAnalyzer(motely: MotelyApi | null, seed: string | null, j
                 try {
                     parsed = motely.fromJaml(config);
                 } catch (e) {
-                    throw new Error(e instanceof Error ? e.message : "Invalid JAML.");
+                    throw new Error(e instanceof Error ? e.message : "Invalid JAML.", { cause: e });
                 }
                 if (abortController.signal.aborted) return;
 

@@ -16,6 +16,7 @@ import { tags } from "@lezer/highlight";
 import { JimboColorOption } from "../ui/tokens.js";
 import { JimboPanel, JimboInnerPanel, JimboButton } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
+import { JimboTextInput } from "../ui/JimboTextInput.js";
 
 /**
  * A Jimmolate predicate: per-seed JavaScript that runs INSIDE the Motely search
@@ -270,7 +271,7 @@ export function JimmolateEditor({
         }}
       >
         <JimboText size="xs" className="j-text--grey">Test seed</JimboText>
-        <input
+        <JimboTextInput
           className="j-jimmolate__seed"
           value={seed}
           onChange={(e) => setSeed(e.target.value.toUpperCase())}
@@ -289,13 +290,16 @@ export function JimmolateEditor({
         <JimboButton tone="blue" size="sm" onClick={runTest} disabled={!compiled.predicate}>
           Test
         </JimboButton>
-        <JimmolateOutcomeBadge outcome={outcome} />
+        {renderOutcomeBadge(outcome)}
       </div>
     </JimboPanel>
   );
 }
 
-function JimmolateOutcomeBadge({ outcome }: { outcome: TestOutcome }) {
+// Consumer-screen render helper (lowercase, not a design-system component): the
+// outcome badge is Jimmolate-domain-specific (TestOutcome), so it stays local
+// rather than moving into the neutral src/ui/ primitive set.
+function renderOutcomeBadge(outcome: TestOutcome) {
   if (outcome.kind === "idle") return null;
   if (outcome.kind === "pass") return <JimboText size="xs" className="j-text--green">Kept (true)</JimboText>;
   if (outcome.kind === "fail") return <JimboText size="xs" className="j-text--grey">Rejected (false)</JimboText>;
