@@ -34,6 +34,14 @@ override convenience. Do not relitigate them.
    consent. Don't steamroll. Don't doctor stories/output to *fake* "done." Confirm
    before any irreversible or outward-facing action (publish, force-push, deletes).
 
+**Enforcement (not advisory):** a `Stop` hook
+(`.claude/hooks/no-soft-code.mjs`) refuses to end a turn while the current change
+contains soft code — LLM placeholders/stubs, untagged `TODO`/`FIXME`, or `display:flex`
+in `*.css` (rule #4). It scans only *added* lines + untracked files, so legacy
+`TODO(jimbo-primitives)` markers pass; deferrals must be tagged `TODO(#issue)`. The
+JSX hard rules (#2/#3) are enforced by `eslint-rules/jaml-design.js`, which the same
+hook runs on changed files. Don't fake "done" — the gate checks.
+
 ## Commands (pnpm — `pnpm-lock.yaml` is the lockfile)
 
 - `pnpm build` — Vite library build → `dist/` (the published artifact).
