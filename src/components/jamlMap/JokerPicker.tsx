@@ -1,14 +1,14 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { MotelyJokerRarity } from "motely-wasm/motely/enums";
 import { JimboSprite } from "../../ui/sprites.js";
 import { JimboText } from "../../ui/jimboText.js";
 import { JimboTextInput } from "../../ui/JimboTextInput.js";
 import { JOKERS, type SpriteEntry } from "../../sprites/spriteData.js";
 import type { SlotSelection } from "./MysterySlot.js";
 
-// JokerRarity is the motely-wasm enum — re-aliased for public-API stability.
-export type JokerRarity = MotelyJokerRarity;
+// Joker rarity is a static Balatro fact — four tiers, fixed forever. No engine
+// enum needed; the joker→tier sets below ARE the source of truth.
+export type JokerRarity = "common" | "uncommon" | "rare" | "legendary";
 
 const LEGENDARY_JOKERS = new Set([
   "Canio", "Triboulet", "Yorick", "Chicot", "Perkeo",
@@ -52,21 +52,16 @@ const UNCOMMON_JOKERS = new Set([
   "Swashbuckler", "Troubadour", "Bootstraps",
 ]);
 
-function getJokerRarity(name: string): MotelyJokerRarity {
-  if (LEGENDARY_JOKERS.has(name)) return MotelyJokerRarity.Legendary;
-  if (RARE_JOKERS.has(name)) return MotelyJokerRarity.Rare;
-  if (UNCOMMON_JOKERS.has(name)) return MotelyJokerRarity.Uncommon;
-  return MotelyJokerRarity.Common;
+function getJokerRarity(name: string): JokerRarity {
+  if (LEGENDARY_JOKERS.has(name)) return "legendary";
+  if (RARE_JOKERS.has(name)) return "rare";
+  if (UNCOMMON_JOKERS.has(name)) return "uncommon";
+  return "common";
 }
 
-function rarityToClauseKey(rarity: MotelyJokerRarity): string {
-  switch (rarity) {
-    case MotelyJokerRarity.Legendary: return "legendaryJoker";
-    case MotelyJokerRarity.Rare:      return "rareJoker";
-    case MotelyJokerRarity.Uncommon:  return "uncommonJoker";
-    case MotelyJokerRarity.Common:    return "commonJoker";
-    default:                          return "commonJoker";
-  }
+// Clause keys are literally `${rarity}Joker` (commonJoker, rareJoker, ...).
+function rarityToClauseKey(rarity: JokerRarity): string {
+  return `${rarity}Joker`;
 }
 
 const LEGENDARY_LIST = JOKERS.filter((j) => LEGENDARY_JOKERS.has(j.name));

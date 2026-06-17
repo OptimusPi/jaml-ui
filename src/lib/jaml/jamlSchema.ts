@@ -2,8 +2,6 @@ import {
   MotelyDeck,
   MotelyStake,
   MotelyItemEdition,
-  MotelyItemSeal,
-  MotelyItemEnhancement,
 } from 'motely-wasm/motely/enums';
 
 const enumNames = (e: Record<string, string | number>): readonly string[] =>
@@ -12,8 +10,12 @@ const enumNames = (e: Record<string, string | number>): readonly string[] =>
 export const DECK_VALUES   = enumNames(MotelyDeck);
 export const STAKE_VALUES  = enumNames(MotelyStake);
 export const EDITION_VALUES = enumNames(MotelyItemEdition);
-export const SEAL_VALUES   = enumNames(MotelyItemSeal);
-export const ENHANCEMENT_VALUES = enumNames(MotelyItemEnhancement);
+// Seals (5) and enhancements (9) are static Balatro facts. v22 stopped exporting
+// these enums; they never change, so the lists live here.
+export const SEAL_VALUES: readonly string[] = ['None', 'Gold', 'Red', 'Blue', 'Purple'];
+export const ENHANCEMENT_VALUES: readonly string[] = [
+  'None', 'Bonus', 'Mult', 'Wild', 'Glass', 'Steel', 'Stone', 'Gold', 'Lucky',
+];
 
 export const CLAUSE_TYPE_KEYS: readonly string[] = [
   'joker', 'jokers',
