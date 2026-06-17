@@ -1,10 +1,10 @@
-import { Motely } from "motely-wasm";
+import * as MotelyEnumsNs from "motely-wasm/motely/enums";
 import { MOTELY_ITEM_FORMATS_BY_VALUE } from "./decode/motelyItemFormats.js";
 
 type RuntimeEnum = Record<string, string | number>;
-type MotelyRuntimeEnums = typeof Motely & Record<string, RuntimeEnum>;
+type MotelyRuntimeEnums = typeof MotelyEnumsNs & Record<string, RuntimeEnum>;
 
-const MotelyEnums = Motely as MotelyRuntimeEnums;
+const MotelyEnums = MotelyEnumsNs as MotelyRuntimeEnums;
 
 function runtimeEnumKey(
   enumObject: Record<string, unknown>,

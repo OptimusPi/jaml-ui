@@ -4,14 +4,13 @@ import React from "react";
 import { JimboButton } from "../ui/panel.js";
 import { JimboTabs } from "../ui/jimboTabs.js";
 
-export type JamlIdeMode = "visual" | "code" | "map" | "results" | "jamlyzer";
+export type JamlIdeMode = "visual" | "code" | "map" | "results";
 
 export interface JamlIdeToolbarProps {
   mode: JamlIdeMode;
   onModeChange: (mode: JamlIdeMode) => void;
   resultCount?: number;
   showResultsTab?: boolean;
-  showJamlyzerTab?: boolean;
   className?: string;
   onSearch?: () => void;
   isSearching?: boolean;
@@ -24,7 +23,6 @@ export function JamlIdeToolbar({
   onModeChange,
   resultCount = 0,
   showResultsTab = false,
-  showJamlyzerTab = false,
   className = "",
   onSearch,
   isSearching = false,
@@ -39,10 +37,6 @@ export function JamlIdeToolbar({
 
   if (showResultsTab) {
     tabs.push({ id: "results", label: resultCount > 0 ? `Results (${resultCount})` : "Results" });
-  }
-
-  if (showJamlyzerTab) {
-    tabs.push({ id: "jamlyzer", label: "Test" });
   }
 
   return (

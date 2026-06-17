@@ -1,6 +1,6 @@
 "use client";
 
-import { JamlAesthetic } from "motely-wasm";
+import { JamlAesthetic } from "motely-wasm/motely/filters/jaml";
 import { JimboBadge } from "../ui/JimboBadge.js";
 import { JimboPanelSpinner } from "../ui/JimboPanelSpinner.js";
 

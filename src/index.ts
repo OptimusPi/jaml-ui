@@ -110,7 +110,7 @@ export {
     JamlAestheticSelector,
     type JamlAestheticSelectorProps,
 } from "./components/JamlAestheticSelector.js";
-export { JamlAesthetic } from "motely-wasm";
+export { JamlAesthetic } from "motely-wasm/motely/filters/jaml";
 export {
     JamlSeedInput,
     type JamlSeedInputProps,
@@ -121,7 +121,6 @@ export {
     JamlSeedSpinner,
     type JamlSeedSpinnerProps,
 } from "./components/JamlSeedSpinner.js";
-export { Jamlyzer, type JamlyzerProps } from "./components/Jamlyzer.js";
 export { RunConfigModal, type RunConfigModalProps } from "./components/RunConfigModal.js";
 
 export {

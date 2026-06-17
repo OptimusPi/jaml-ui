@@ -6,7 +6,7 @@
 /* eslint-disable jaml-design/no-inline-style */
 
 import React, { useState } from "react";
-import type { MotelyJokerRarity } from "motely-wasm";
+import type { MotelyJokerRarity } from "motely-wasm/motely/enums";
 import { JimboSprite } from "../../ui/sprites.js";
 import { JimboColorOption, withAlpha, JIMBO_ANIMATIONS } from "../../ui/tokens.js";
 import type { SpriteSheetType } from "../../sprites/spriteMapper.js";

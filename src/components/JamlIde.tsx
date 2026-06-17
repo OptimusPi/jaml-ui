@@ -26,12 +26,10 @@ import {
 import { JamlIdeToolbar, type JamlIdeMode } from "./JamlIdeToolbar.js";
 import { JamlIdeVisual, type JamlVisualFilter, type JamlZone, type JamlVisualClause } from "./JamlIdeVisual.js";
 import { JamlCodeEditor } from "./JamlCodeEditor.js";
-import { Jamlyzer } from "./Jamlyzer.js";
 import { normalizeJamlSeed } from "./jamlSeedUtils.js";
 import { JimboColorOption } from "../ui/tokens.js";
 import { JimboButton, JimboModal } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
-import { mergeSeedsIntoJaml } from "../lib/jaml/jamlSeeds.js";
 import { jamlTextToVisualFilter, visualFilterToJamlText } from "../utils/jamlVisualFilter.js";
 const CATEGORY_CONFIG_MAP = {
   voucher: VOUCHER_PICKER_CONFIG,
@@ -403,7 +401,6 @@ export function JamlIde({
     "code",
     "map",
     ...(showResultsTab ? (["results"] as JamlIdeMode[]) : []),
-    "jamlyzer",
   ];
   const headerVisible = Boolean(title || subtitle || actions);
 
@@ -440,15 +437,6 @@ export function JamlIde({
     }
   };
 
-  const handleVerifyInJamlyzer = () => {
-    const seeds = searchResults
-      .map((result) => normalizeJamlSeed(result.seed))
-      .filter((seed) => seed.length === 8);
-    if (seeds.length === 0) return;
-    handleTextChange(mergeSeedsIntoJaml(text, seeds, 1000));
-    setMode("jamlyzer");
-  };
-
   return (
     <div
       className={`j-ide ${className}`.trim()}
@@ -473,7 +461,6 @@ export function JamlIde({
         onModeChange={setMode}
         resultCount={searchResults.length}
         showResultsTab={showResultsTab}
-        showJamlyzerTab
         onSearch={onSearch}
         isSearching={isSearching}
         onLoadFile={showLoadFileButton ? handleLoadFile : undefined}
@@ -497,13 +484,7 @@ export function JamlIde({
 
         {mode === "results" ? (
           <div className="j-ide__results">
-            <ResultsView results={searchResults} jaml={text} onVerify={handleVerifyInJamlyzer} />
-          </div>
-        ) : null}
-
-        {mode === "jamlyzer" ? (
-          <div className="j-ide__jamlyzer">
-            <Jamlyzer jaml={text} />
+            <ResultsView results={searchResults} jaml={text} />
           </div>
         ) : null}
       </div>
