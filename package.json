@@ -43,7 +43,7 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "typecheck": "tsc --noEmit --pretty false",
-    "typecheck:all": "pnpm -r --if-present run typecheck",
+    "typecheck:all": "pnpm typecheck && pnpm -r --if-present run typecheck",
     "prepack": "npm run build",
     "storybook": "pnpm run build && pnpm --filter jaml-codemirror build && storybook dev -p 3141",
     "build-storybook": "pnpm run build && pnpm --filter jaml-codemirror build && storybook build",
