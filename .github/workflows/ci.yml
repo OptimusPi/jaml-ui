@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify:
-    name: typecheck · lint · build
+    name: typecheck · vocab · lint · build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +31,12 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
+
+      # jaml-lang (name lists) and motely-wasm (runtime enums) are versioned
+      # independently — this fails the build when they describe different
+      # engine builds, instead of letting an ordinal decode to a wrong name.
+      - name: Vocabulary drift
+        run: pnpm vocab:check
 
       - name: Lint
         run: pnpm lint

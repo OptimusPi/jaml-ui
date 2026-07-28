@@ -1,7 +1,12 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Vocab } from "jaml-lang";
 import { JokerRarityTier } from "./jokerRarity.js";
+import {
+  isLegendaryJokerName,
+  jokerRarityOf,
+  rarityClauseKey,
+  type JokerRarityName,
+} from "../../vocab.js";
 import { JimboSprite } from "../../ui/sprites.js";
 import { JimboText } from "../../ui/jimboText.js";
 import { JimboTextInput } from "../../ui/JimboTextInput.js";
@@ -19,52 +24,20 @@ import type { SlotSelection } from "./MysterySlot.js";
 // JokerRarity re-aliases the local rarity tier — kept for public-API stability.
 export type JokerRarity = JokerRarityTier;
 
-// Rarity membership comes straight from jaml-lang's generated vocab — itself
-// generated from the Motely engine — so it can never drift from the engine.
-// Engine keys are PascalCase ids (e.g. "GreedyJoker"); our sprite names are
-// spaced (e.g. "Greedy Joker"), so both are normalized to lowercase-
-// alphanumeric before matching. One spelling the engine doesn't share: it
-// writes "8 Ball" as "EightBall" — bridged explicitly below.
-const normalizeJokerName = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]/g, "");
-
-const DISPLAY_NAME_ALIASES: Record<string, string> = {
-  "8 Ball": "EightBall",
+// Rarity membership, name normalization and the engine-key aliases all live in
+// src/vocab.ts — the single place engine vocabulary enters this package, guarded
+// against upstream drift by scripts/check-vocab-drift.mjs. All this module owns
+// is the mapping from the engine's rarity name onto the local UI tier enum.
+const RARITY_TIERS: Record<JokerRarityName, JokerRarityTier> = {
+  Common: JokerRarityTier.Common,
+  Uncommon: JokerRarityTier.Uncommon,
+  Rare: JokerRarityTier.Rare,
+  Legendary: JokerRarityTier.Legendary,
 };
 
-const normalizedKeySet = (names: readonly string[]): Set<string> =>
-  new Set(names.map(normalizeJokerName));
+const getJokerRarity = (name: string): JokerRarityTier => RARITY_TIERS[jokerRarityOf(name)];
 
-const UNCOMMON_KEYS = normalizedKeySet(Vocab.Enums.MotelyJokerUncommon);
-const RARE_KEYS = normalizedKeySet(Vocab.Enums.MotelyJokerRare);
-const COMMON_KEYS = normalizedKeySet(Vocab.Enums.MotelyJokerCommon);
-// Legendary jokers are the engine's full joker set minus the three named tiers.
-const LEGENDARY_KEYS = new Set(
-  Vocab.Enums.MotelyJoker.map(normalizeJokerName)
-    .filter((key) => !COMMON_KEYS.has(key) && !UNCOMMON_KEYS.has(key) && !RARE_KEYS.has(key)),
-);
-
-const engineKey = (name: string): string =>
-  normalizeJokerName(DISPLAY_NAME_ALIASES[name] ?? name);
-
-function getJokerRarity(name: string): JokerRarityTier {
-  const key = engineKey(name);
-  if (LEGENDARY_KEYS.has(key)) return JokerRarityTier.Legendary;
-  if (RARE_KEYS.has(key)) return JokerRarityTier.Rare;
-  if (UNCOMMON_KEYS.has(key)) return JokerRarityTier.Uncommon;
-  return JokerRarityTier.Common;
-}
-
-function rarityToClauseKey(rarity: JokerRarityTier): string {
-  switch (rarity) {
-    case JokerRarityTier.Legendary: return "legendaryJoker";
-    case JokerRarityTier.Rare:      return "rareJoker";
-    case JokerRarityTier.Uncommon:  return "uncommonJoker";
-    case JokerRarityTier.Common:    return "commonJoker";
-    default:                        return "commonJoker";
-  }
-}
-
-const isLegendaryJoker = (joker: SpriteEntry): boolean => LEGENDARY_KEYS.has(engineKey(joker.name));
+const isLegendaryJoker = (joker: SpriteEntry): boolean => isLegendaryJokerName(joker.name);
 const LEGENDARY_LIST = JOKERS.filter(isLegendaryJoker);
 const NON_LEGENDARY = JOKERS.filter((joker) => !isLegendaryJoker(joker));
 
@@ -83,12 +56,11 @@ export function JokerPicker({ onSelect }: JokerPickerProps) {
   }, [search]);
 
   const handleSelect = (joker: SpriteEntry) => {
-    const rarity = getJokerRarity(joker.name);
     onSelect({
       category: "joker",
       value: joker.name,
-      clauseKey: rarityToClauseKey(rarity),
-      rarity,
+      clauseKey: rarityClauseKey(jokerRarityOf(joker.name)),
+      rarity: getJokerRarity(joker.name),
     });
   };
 
