@@ -11,9 +11,24 @@
  *
  * Both are generated from the same Motely engine, but nothing in the dependency
  * graph forces the two installed versions to describe the *same engine build*.
- * When they disagree, an ordinal decodes to the wrong name and nothing throws —
- * the UI just quietly shows the wrong joker. This script turns that silent
- * failure into a build failure.
+ * When they disagree the UI quietly shows a name the engine never meant. This
+ * script turns that silent failure into a build failure.
+ *
+ * Scope — what this can and cannot check:
+ *
+ *   Names, across packages (check 1). This is the only seam that exists between
+ *   the two, because jaml-lang exposes *no ordinals at all*: its arrays are
+ *   alphabetically sorted name lists, while motely-wasm's values are bitpacked
+ *   (MotelyItemEdition.Foil is 8_388_608, not 1). There is nothing to align an
+ *   ordinal against, so cross-package ordinal comparison is not expressible.
+ *
+ *   Ordinals, within motely-wasm (check 3). Every ordinal-to-name decode in this
+ *   package reads motely-wasm's own enum (`MotelyBossBlind[boss]`) on a value
+ *   that motely-wasm's own WASM produced, so the two sides of a decode always
+ *   ship together and cannot drift apart. What *can* still corrupt a decode is a
+ *   collision inside one of those enums — two names sharing a value makes the
+ *   reverse lookup silently return the wrong one. That is checkable, so it is
+ *   checked.
  *
  * Run: pnpm vocab:check
  */
@@ -100,6 +115,58 @@ if (allJokers && common && uncommon && rare) {
   problems.push("jaml-lang Vocab is missing one of the joker rarity enums");
 }
 
+// ── 3. Decode enums must round-trip: name -> value -> same name ─────────────
+// These are the enums the UI reverse-looks-up to turn a packed search result
+// into a display name. A collision (two names sharing one value) makes that
+// lookup return whichever name was defined last, silently mislabelling the
+// item — the failure this guard exists to prevent, in the one form that is
+// actually detectable from here.
+const DECODE_ENUMS = [
+  "MotelyBossBlind",
+  "MotelyTag",
+  "MotelyVoucher",
+  "MotelyDeck",
+  "MotelyStake",
+  "MotelyBoosterPack",
+  "MotelyItemEdition",
+  "MotelyItemSeal",
+  "MotelyItemEnhancement",
+];
+
+let roundTripped = 0;
+for (const kind of DECODE_ENUMS) {
+  const runtime = Motely[kind];
+  if (runtime === undefined || typeof runtime !== "object") {
+    problems.push(`${kind}: expected by the decode path but not exported by motely-wasm`);
+    continue;
+  }
+
+  const byValue = new Map();
+  const collisions = [];
+  const broken = [];
+
+  for (const name of runtimeEnumNames(runtime)) {
+    const value = runtime[name];
+    if (byValue.has(value)) {
+      collisions.push(`${byValue.get(value)} and ${name} both = ${value}`);
+      continue;
+    }
+    byValue.set(value, name);
+    if (runtime[value] !== name) broken.push(`${name} -> ${value} -> ${runtime[value]}`);
+  }
+
+  if (collisions.length || broken.length) {
+    problems.push(
+      `${kind}: reverse lookup is not one-to-one\n` +
+        (collisions.length ? `    collisions:  ${collisions.join("; ")}\n` : "") +
+        (broken.length ? `    round-trip:  ${broken.join("; ")}\n` : ""),
+    );
+  } else {
+    roundTripped += 1;
+  }
+}
+notes.push(`${roundTripped}/${DECODE_ENUMS.length} decode enums round-trip name -> value -> name`);
+
 // ── report ──────────────────────────────────────────────────────────────────
 for (const note of notes) console.log(`  · ${note}`);
 
@@ -113,4 +180,7 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log(`\n✓ vocabulary in sync — ${compared} enum(s) cross-checked, joker tiers partition\n`);
+console.log(
+  `\n✓ vocabulary in sync — ${compared} enum(s) cross-checked, joker tiers partition, ` +
+    `${roundTripped} decode enum(s) round-trip\n`,
+);
