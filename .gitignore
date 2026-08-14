@@ -18,3 +18,6 @@ storybook-static
 /examples/mcp-seed-finder/public/motely-wasm
 
 .claude/settings.local.json
+
+.vercel
+.env*
