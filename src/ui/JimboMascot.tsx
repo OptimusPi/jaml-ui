@@ -2,7 +2,7 @@
 
 import { useState, type HTMLAttributes, type KeyboardEvent } from "react";
 import { JimboOrbitalMenu, type JimboOrbitalMenuItem } from "./JimboOrbitalMenu.js";
-import { JAMMY_SEED_MASCOT_DATA_URI } from "./jammySeedMascotImage.js";
+import { JAMMY_SEED_MASCOT_URL } from "./jammySeedMascotImage.js";
 
 function onActivateKey(handler: () => void) {
   return (e: KeyboardEvent) => {
@@ -56,7 +56,7 @@ export function JimboMascot({
         className={interactive ? "j-mascot__hit j-mascot__hit--interactive" : "j-mascot__hit"}
       >
         <img
-          src={JAMMY_SEED_MASCOT_DATA_URI}
+          src={JAMMY_SEED_MASCOT_URL}
           alt="Jammy"
           draggable={false}
           className="j-mascot__img"

@@ -9,13 +9,42 @@ map wastes a session; this list starts fresh from what's actually here.
 
 ## Open
 
-- **In-app JAML authoring help.** There is currently no live guidance surface
-  in `examples/mcp-seed-finder` or `examples/seed-finder` — no inline hints,
-  no hover docs, no "why did this fail" surfaced from `jaml-codemirror`'s
-  diagnostics beyond raw squiggles (if even wired — check
-  `SeedFinderApp.tsx`'s usage of `jaml-codemirror` props before building).
-  This is the concrete ask behind "make JAML authoring more helpful" — build
-  it, don't look for a half-finished version.
+- **41% of `jimbo.css` is unreferenced.** 243 of 595 `.j-*` classes are never
+  used by any `.ts`/`.tsx` in `src/`, stories included (template-built names
+  like `` `j-btn--${size}` `` are counted as live, so this is the conservative
+  number). It is not scattered leftovers — it is 74 whole BEM blocks, entire
+  component systems that exist only as CSS: `j-showcase` (23 classes),
+  `j-filter-browser` (16), `j-panel-spinner` (11), `j-code-block` (8),
+  `j-progress` (8), `j-tooltip` (7), `j-filter-bar` (7), plus `j-slider`,
+  `j-toast`, `j-stepper`, `j-dual-chip`, `j-marquee`, `j-stat-grid`…
+  **Not deleted yet on purpose:** `jimbo.css` is a published entry
+  (`jaml-ui/jimbo.css`) and seedfinder.app may style against these class names
+  directly, so this is a breaking change, not a cleanup. Decide per block:
+  either a consumer uses it (then it needs a `Jimbo*` primitive and a story,
+  per design rule #8) or nothing does (then it goes). Worth ~90 kB of the
+  119 kB stylesheet.
+
+- **CodeMirror ships to every consumer of the main entry.** `dist/index.js` is
+  881 kB (238 kB gzip) and roughly a third of it is bundled
+  `@codemirror/{view,state,language,autocomplete,commands,lint}` + `@lezer`,
+  pulled in by `JamlCodeEditor` / `JamlIde`. Those are **devDependencies** and
+  are not in `PEER_EXTERNALS`, so Rollup inlines them: an app that imports
+  nothing but `JimboButton` still downloads a full code editor unless its own
+  bundler manages to tree-shake the built file. The fix is a separate
+  `jaml-ui/editor` export so the editor is opt-in — that changes the public
+  API, so it needs a version bump and a call on who currently imports what.
+
+- **In-app JAML authoring help.** No live guidance surface anywhere — no
+  inline hints, no hover docs, no "why did this fail" surfaced from
+  `jaml-codemirror`'s diagnostics beyond raw squiggles. This is the concrete
+  ask behind "make JAML authoring more helpful" — build it, don't look for a
+  half-finished version.
+  **Note (2026-08-14):** this task used to point at `examples/mcp-seed-finder`
+  / `examples/seed-finder` and `SeedFinderApp.tsx`. **There is no `examples/`
+  directory in this repo** — only stale `.gitignore` entries and a `dts`
+  exclude for `SeedFinderApp.tsx` / `McpSeedFinderApp.tsx` remain. Find the
+  live consumer (seedfinder.app) before starting; do not go looking for those
+  paths here.
 - **Unify vocab sourcing between `jaml-codemirror` and `jaml-lsp`.** Both
   packages independently call `MotelyJaml.listItems(kind, "")` from their own
   `vocab.ts`. They already drifted once (the `Any`-wildcard fix landed twice,

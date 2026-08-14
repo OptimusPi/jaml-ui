@@ -1,12 +1,12 @@
 # jaml-ui
 
-Zero-dependency JSON-to-React engine (`json-render`) + Balatro card sprite rendering for MCP Apps.
+JSON-to-React engine (`json-render`) + Balatro card sprites + the Jimbo design system, for MCP Apps.
 
 ## What's inside
 
-- **`json-render`** — a tiny, zero-dep JSON-to-React engine in `src/json-render`. A JsonNode tree + a registry = rendered UI. Ships with a Balatro catalog (`Panel`, `Stack`, `Grid`, `SeedCard`, `SearchStats`, `JamlGameCard`, ...).
+- **`json-render`** — a tiny JSON-to-React engine in `src/json-render`, with no dependencies of its own beyond React. A JsonNode tree + a registry = rendered UI. Ships with a Balatro catalog (`Panel`, `Stack`, `Grid`, `SeedCard`, `SearchStats`, `JamlGameCard`, ...).
 - **Balatro card sprites** — canvas-based `JamlGameCard`, `StandardCard`, `DeckSprite`, plus sprite metadata.
-- **MCP App example** — `examples/mcp-seed-finder` is a single-file MCP App that talks to an MCP server and renders search results with `json-render`.
+- **Jimbo design system** — ~36 `Jimbo*` primitives in `src/ui` over `jimbo.css`, all grid-based. See the design rules in `CLAUDE.md`: no flex anywhere, because MCP host iframes size flex content differently per host.
 
 ## Install
 
@@ -47,20 +47,12 @@ if (bootsharp.getStatus() === bootsharp.BootStatus.Standby) await bootsharp.boot
 
 Boot once per JS realm. Each web worker is its own realm, so a worker fleet boots one engine apiece — see the fleet section in the [motely-wasm README](https://www.npmjs.com/package/motely-wasm) for the module-worker and `MessagePort` rules that keep a worker from hanging.
 
-## MCP App example
-
-```bash
-cd examples/mcp-seed-finder
-pnpm install
-pnpm dev
-```
-
 ## Package exports
 
 | Entry | What's in it |
 | ----- | ------------ |
 | `jaml-ui` | json-render engine, Balatro registry/catalog, card components |
-| `jaml-ui/ui` | Jimbo CSS tokens only |
+| `jaml-ui/ui` | Jimbo design system — every `Jimbo*` primitive plus the CSS tokens |
 | `jaml-ui/core` | Sprite metadata, asset URLs, canvas `Layer` — no React, no motely-wasm |
 | `jaml-ui/motely` | `bootsharp` + `Motely` re-exports, item decoders |
 
@@ -68,9 +60,11 @@ pnpm dev
 
 ```bash
 pnpm build      # Vite library build → dist/
-pnpm dev        # vite build --watch
+pnpm dev        # Storybook (the component workbench)
+pnpm dev:watch  # vite build --watch, for linking into a consumer app
 pnpm typecheck  # tsc --noEmit
-pnpm lint       # ESLint
+pnpm lint       # ESLint + the CSS design-rule check
+pnpm lint:css   # rule #1 (no flex) over src/**/*.css on its own
 ```
 
 ## License

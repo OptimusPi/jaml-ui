@@ -19,11 +19,20 @@ that conflicts with the committed pnpm lockfile. Use:
 
 ## Build
 
-Build entries (`src/index.ts`, `src/ui.ts`, `src/motely.ts`) declare `"use client"`, but
-Vite's library build strips module-level directives when bundling — verify `dist/*.js`
-still starts with `"use client";` after any vite.config.ts change (see the `banner`
-option in `rollupOptions.output`), or Next.js's RSC compiler will silently treat these as
-Server Components and crash on any hook use.
+Two build entries are client boundaries: **`src/index.ts` and `src/ui.ts`**. They declare
+`"use client"`, but Vite's library build strips module-level directives when bundling —
+verify `dist/index.js` and `dist/ui.js` still start with `"use client";` after any
+vite.config.ts change (see `CLIENT_ENTRIES` and the `banner` option in
+`rollupOptions.output`), or Next.js's RSC compiler will silently treat them as Server
+Components and crash on any hook use.
+
+**`src/motely.ts` must NOT get the banner**, and neither must `core.js` or the shared
+chunks. `motely.ts` exports pure enum decoders and re-exports `motely-wasm`, which runs
+in Node and the browser alike — no React, no hooks, no client boundary. Marking it client
+kills every server caller that imports `decodeMotelyItemName` through it, which is what
+took the MCP JAMLyzer down once already. `dist/motely.js` starting *without*
+`"use client"` is correct, not a regression to fix — see the comment above
+`CLIENT_ENTRIES` in `vite.config.ts`.
 
 ## Design rules
 

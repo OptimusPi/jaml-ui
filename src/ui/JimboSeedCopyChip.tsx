@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiCheck, FiCopy } from "react-icons/fi";
 
 export interface JimboSeedCopyChipProps {
@@ -29,8 +29,20 @@ export function JimboSeedCopyChip({
   style,
 }: JimboSeedCopyChipProps) {
   const [copied, setCopied] = useState(false);
+  // A bare setTimeout here leaked twice: a second tap stacked a timer that
+  // cleared the confirmation early (the first timer fires mid-second-copy), and
+  // an unmount before it fired left it running. Keep one handle, replace it on
+  // each copy, clear it on unmount.
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const display = value.trim();
   const canCopy = !disabled && display.length > 0;
+
+  useEffect(
+    () => () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    },
+    [],
+  );
 
   const handleCopy = async () => {
     if (!canCopy) return;
@@ -43,7 +55,8 @@ export function JimboSeedCopyChip({
     }
     setCopied(true);
     onCopy?.(display);
-    window.setTimeout(() => setCopied(false), copiedDurationMs);
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => setCopied(false), copiedDurationMs);
   };
 
   const rootClass = ["j-seed-copy", className].filter(Boolean).join(" ");

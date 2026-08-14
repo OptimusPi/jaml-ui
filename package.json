@@ -1,7 +1,7 @@
 {
   "name": "jaml-ui",
   "version": "4.4.0",
-  "description": "Zero-dependency json-render engine + Balatro card sprites for MCP Apps.",
+  "description": "json-render engine + Balatro card sprites and the Jimbo design system for MCP Apps.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -49,7 +49,8 @@
     "prepack": "npm run build",
     "storybook": "pnpm run build && storybook dev -p 3141",
     "build-storybook": "pnpm run build && storybook build",
-    "lint": "eslint ."
+    "lint": "eslint . && node scripts/check-css-design.mjs",
+    "lint:css": "node scripts/check-css-design.mjs"
   },
   "engines": {
     "node": ">=18"

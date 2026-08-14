@@ -219,7 +219,6 @@
 .j-panel__back {
   margin-top: var(--j-space-md);
   padding-top: var(--j-space-sm);
-  flex-shrink: 0;
   position: relative;
   z-index: 1;
 }
@@ -626,12 +625,10 @@
 }
 
 .j-toggle-item__label {
-  flex: 1;
   min-width: 0;
 }
 
 .j-toggle-item[data-variant="stacked"] {
-  flex-direction: column;
   justify-content: center;
   gap: var(--j-space-xs);
   background: transparent;
@@ -654,7 +651,6 @@
      around the empty/checked state. */
   width: 20px;
   height: 20px;
-  flex-shrink: 0;
   border-radius: 5px;
   background: var(--j-white);
   padding: 2px;
@@ -851,7 +847,6 @@
 }
 
 .j-copy-row__value {
-  flex: 1;
   padding: 6px 10px;
   background: var(--j-darkest);
   border: var(--j-panel-border-width) solid var(--j-panel-edge);
@@ -866,7 +861,6 @@
   border-radius: var(--j-radius-sm);
   padding: 4px 12px;
   cursor: pointer;
-  flex-shrink: 0;
   transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 
@@ -985,7 +979,6 @@
 }
 
 .j-filter-bar__field {
-  flex: 1;
   min-width: 200px;
   position: relative;
   margin-top: 10px;
@@ -1334,11 +1327,8 @@
 
 /* ── Utility (extras not in the Layout Utilities block) ───────────────── */
 
-.j-flex-wrap { flex-wrap: wrap; }
 .j-gap-xl { gap: var(--j-space-xl); }
 .j-mt-sm { margin-top: var(--j-space-sm); }
-.j-shrink-0 { flex-shrink: 0; }
-.j-flex-1 { flex: 1; }
 .j-min-w-0 { min-width: 0; }
 .j-overflow-hidden { overflow: hidden; }
 .j-overflow-auto { overflow: auto; }
@@ -1465,7 +1455,6 @@
    changes — Balatro panels are sized to their slot, not their payload. */
 .j-app__scroll > .j-panel,
 .j-app__content > .j-panel {
-  flex: 1 1 auto;
   min-height: 0;
 }
 
@@ -1503,7 +1492,6 @@
   color: var(--j-white);
   border-radius: 3px;
   text-shadow: var(--j-text-shadow);
-  flex-shrink: 0;
   background: var(--j-blue);
 }
 
@@ -1520,7 +1508,6 @@
 .j-section-header__tag--grey { background: var(--j-dark-grey); color: var(--j-grey); }
 
 .j-section-header__rule {
-  flex: 1;
   height: 2px;
   border-radius: 1px;
   opacity: 0.45;
@@ -1560,10 +1547,6 @@
   box-sizing: border-box;
 }
 
-.j-page__footer {
-  flex-shrink: 0;
-}
-
 .j-page__row {
   display: grid;
   grid-auto-flow: row;
@@ -1573,12 +1556,10 @@
 
 @media (min-width: 720px) {
   .j-page__row {
-    flex-direction: row;
     align-items: stretch;
   }
 
   .j-page__row > .j-panel {
-    flex: 1 1 0;
     min-width: 0;
   }
 }
@@ -1594,7 +1575,6 @@
 }
 
 .j-copy-row__code {
-  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1716,7 +1696,6 @@
 
 .j-slider__track {
   position: relative;
-  flex: 1;
   height: 14px;
   background: var(--j-surface-inset);
   border-radius: var(--j-radius-pill);
@@ -1886,7 +1865,6 @@
 }
 
 .j-info-card__body {
-  flex: 1;
   min-width: 0;
 }
 
@@ -1911,7 +1889,6 @@
 
 .j-info-card__aside {
   text-align: right;
-  flex-shrink: 0;
 }
 
 
@@ -2233,18 +2210,12 @@
 }
 
 .j-ide-toolbar__tabs {
-  flex: 1;
   min-width: 0;
   padding-bottom: 3px;
   overflow: hidden;
 }
 
-.j-ide-toolbar__action {
-  flex-shrink: 0;
-}
-
 .j-ide__body {
-  flex: 1;
   min-height: 0;
   overflow: auto;
   background: var(--j-darkest);
@@ -2469,7 +2440,6 @@
 }
 
 .j-showcase__scroll {
-  flex: 1;
   min-height: 0;
   overflow-y: auto;
   padding: 18px 14px 10px;
@@ -2539,7 +2509,6 @@
 }
 
 .j-showcase__section-rule {
-  flex: 1;
   height: 2px;
   border-radius: 1px;
 }
@@ -2582,7 +2551,6 @@
 }
 
 .j-showcase__filter-info {
-  flex: 1;
   min-width: 0;
 }
 
@@ -2742,7 +2710,6 @@
 }
 
 .j-seed-copy__text {
-  flex: 1;
   min-width: 0;
   font-size: 16px;
   letter-spacing: 0.12em;
@@ -2790,17 +2757,14 @@
 }
 
 .j-jamlyzer__stats {
-  flex-shrink: 0;
   letter-spacing: 0.04em;
 }
 
 .j-jamlyzer__spinner {
-  flex-shrink: 0;
   width: 100%;
 }
 
 .j-jamlyzer__panel {
-  flex-shrink: 0;
   width: 100%;
 }
 
@@ -2825,7 +2789,6 @@
 }
 
 .j-jamlyzer__tallies {
-  flex-shrink: 0;
   width: 100%;
   text-align: center;
 }
@@ -2999,7 +2962,6 @@
 }
 
 .j-filter-browser__details {
-  flex-shrink: 0;
   min-height: 160px;
   justify-content: center;
 }
@@ -3017,8 +2979,6 @@
 
 .j-filter-browser__targets--details {
   justify-content: center;
-  flex-direction: row;
-  flex-wrap: wrap;
 }
 
 .j-filter-browser__actions .j-btn {
@@ -3074,7 +3034,6 @@
   gap: var(--j-space-sm);
   padding: 12px 8px 18px;
   overflow-y: auto;
-  flex: 1;
   align-content: start;
   scroll-padding: 12px 0 18px;
   mask-image: linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 18px), transparent 100%);
@@ -3689,7 +3648,6 @@
   color: #fff;
   letter-spacing: 1.5px;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
-  flex: 1;
 }
 .j-seed-row__score {
   font-family: var(--j-font-m6x11);
@@ -3767,7 +3725,6 @@
   font-size: 8px;
   color: #708386;
   width: 56px;
-  flex-shrink: 0;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -4554,3 +4511,30 @@
 .j-category-menu { display: grid; gap: 12px; padding: 12px 0; max-height: 70vh; overflow-y: auto; }
 .j-category-menu__item { display: grid; grid-auto-flow: column; grid-template-columns: auto 1fr; align-items: center; gap: 10px; width: 100%; text-align: left; }
 .j-category-menu__text { display: grid; gap: 2px; }
+
+/* ── Keyboard focus ───────────────────────────────────────────────────────
+ * Six selectors set `outline: none` and only one (.j-inline-edit) ever put a
+ * ring back, so tabbing through the app left no visible focus at all on text
+ * inputs, selects and the seed field. Buttons kept the UA default ring, which
+ * is a different shape and colour in every host — the opposite of the
+ * render-identically-everywhere goal.
+ *
+ * One gold ring for every interactive primitive. :focus-visible (not :focus)
+ * so a mouse click does not paint it. outline + offset rather than box-shadow:
+ * outline never participates in layout, so this cannot reflow a grid.
+ */
+.j-btn:focus-visible,
+.j-tab:focus-visible,
+.j-outer-tab:focus-visible,
+.j-link:focus-visible,
+.j-list-item:focus-visible,
+.j-picker:focus-visible,
+.j-seed-copy:focus-visible,
+.j-category-menu__item:focus-visible,
+.j-orbital-menu__item:focus-visible,
+.j-text-input:focus-visible,
+.j-textarea:focus-visible,
+.j-seed-input__field:focus-visible {
+  outline: 2px solid var(--j-gold);
+  outline-offset: 2px;
+}

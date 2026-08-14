@@ -1,6 +1,45 @@
-import { resolve } from "node:path";
-import { defineConfig } from "vite";
+import { readFile } from "node:fs/promises";
+import { basename, resolve } from "node:path";
+import { defineConfig, type Plugin } from "vite";
 import dts from "vite-plugin-dts";
+
+/**
+ * Emit sprite sheets and fonts as real files instead of base64.
+ *
+ * Vite's library mode inlines *every* imported asset as a data URI and ignores
+ * `build.assetsInlineLimit` while doing it — there is no reliable base path for
+ * a library, so it takes the safe route. That put 1.48 MB of base64 PNG (the
+ * eleven Balatro sprite sheets; Jokers.png alone is 479 kB) into the JS chunks,
+ * costing ~1.09 MB gzipped because base64 barely compresses, all of it parsed
+ * as string literals before a single card could draw. The same PNGs were
+ * already shipped as real files via `files: ["assets/*.png"]` and the
+ * `./assets/*` export, so consumers downloaded the artwork twice.
+ *
+ * `import.meta.ROLLUP_FILE_URL_<ref>` is the mechanism Vite's own asset plugin
+ * cannot use here: Rollup rewrites it per *containing chunk*, so a reference
+ * that ends up in `dist/chunks/spriteMapper-*.js` gets `../assets/…` while one
+ * in `dist/index.js` gets `./assets/…`. It emits as
+ * `new URL("…", import.meta.url).href`, which Vite, webpack 5 and a plain
+ * browser ESM import all resolve correctly.
+ */
+function emitAssetsAsFiles(): Plugin {
+  const ASSET = /\.(png|ttf|woff2?)$/;
+  return {
+    name: "jaml-emit-assets-as-files",
+    enforce: "pre",
+    apply: "build",
+    async load(id) {
+      const file = id.split("?")[0];
+      if (!ASSET.test(file)) return null;
+      const referenceId = this.emitFile({
+        type: "asset",
+        name: basename(file),
+        source: await readFile(file),
+      });
+      return `export default import.meta.ROLLUP_FILE_URL_${referenceId};`;
+    },
+  };
+}
 
 // Entries that really are client boundaries — they export React components and
 // call hooks. Vite's library build strips module-level directives when bundling,
@@ -34,6 +73,7 @@ const PEER_EXTERNALS = [
 
 export default defineConfig({
   plugins: [
+    emitAssetsAsFiles(),
     dts({
       entryRoot: "src",
       include: ["src"],
@@ -56,6 +96,9 @@ export default defineConfig({
     emptyOutDir: true,
     cssCodeSplit: false,
     sourcemap: true,
+    // Belt and braces with emitAssetsAsFiles() above: lib mode ignores this,
+    // but it states the intent for any non-lib build of this config.
+    assetsInlineLimit: 0,
     lib: {
       entry: {
         index: resolve(__dirname, "src/index.ts"),
