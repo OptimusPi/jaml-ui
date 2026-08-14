@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { JimboBox } from "../ui/JimboBox.js";
 import { Layer } from "../render/Layer.js";
 import { JamlCardRenderer } from "../render/CanvasRenderer.js";
 import {
@@ -400,9 +401,9 @@ export function JamlGameCard({ card, type, className = "", hoverTilt = false }: 
     }
 
     return (
-        <div className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
+        <JimboBox className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
             <JamlCardRenderer invert={edition === "Negative"} layers={layers} hoverTilt={hoverTilt} />
-        </div>
+        </JimboBox>
     );
 }
 
@@ -428,9 +429,9 @@ export function JamlVoucher({ voucherName, scale = 1, className = "", hoverTilt 
     ];
 
     return (
-        <div className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
+        <JimboBox className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
             <JamlCardRenderer layers={layers} hoverTilt={hoverTilt} />
-        </div>
+        </JimboBox>
     );
 }
 
@@ -456,9 +457,9 @@ export function JamlTag({ tagName, scale = 1, className = "", hoverTilt = false 
     ];
 
     return (
-        <div className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
+        <JimboBox className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
             <JamlCardRenderer layers={layers} hoverTilt={hoverTilt} />
-        </div>
+        </JimboBox>
     );
 }
 
@@ -484,8 +485,8 @@ export function JamlBoss({ bossName, scale = 1, className = "", hoverTilt = fals
     ];
 
     return (
-        <div className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
+        <JimboBox className={`j-game-card ${className}`.trim()} style={{ "--j-card-width": `${71 * scale}px` } as React.CSSProperties}>
             <JamlCardRenderer layers={layers} hoverTilt={hoverTilt} />
-        </div>
+        </JimboBox>
     );
 }

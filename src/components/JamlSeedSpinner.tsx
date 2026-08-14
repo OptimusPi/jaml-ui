@@ -7,6 +7,9 @@ import { JimboSeedCopyChip } from "../ui/JimboSeedCopyChip.js";
 import { JamlSeedInput, type JamlSeedInputProps } from "./JamlSeedInput.js";
 import { normalizeJamlSeed } from "./jamlSeedUtils.js";
 
+import { JimboBox } from "../ui/JimboBox.js";
+import { JimboInline } from "../ui/JimboInline.js";
+
 export interface JamlSeedSpinnerProps extends Omit<JamlSeedInputProps, "onChange"> {
   seeds?: string[];
   onChange?: (seed: string) => void;
@@ -55,15 +58,15 @@ export function JamlSeedSpinner({
   const rootClass = ["j-seed-spinner", className].filter(Boolean).join(" ");
 
   return (
-    <div className={rootClass} style={style}>
-      <div className="j-seed-spinner__meta">
-        {label ? <span className="j-seed-spinner__label">{label}</span> : <span />}
+    <JimboBox className={rootClass} style={style}>
+      <JimboBox className="j-seed-spinner__meta">
+        {label ? <JimboInline className="j-seed-spinner__label">{label}</JimboInline> : <JimboInline />}
         {normalizedSeeds.length > 0 ? (
           <JimboBadge size="sm" tone={variant === "dark" ? "grey" : "dark"}>
             {activeIndex >= 0 ? `${activeIndex + 1} of ${normalizedSeeds.length}` : `${normalizedSeeds.length} seeds`}
           </JimboBadge>
         ) : null}
-      </div>
+      </JimboBox>
 
       <JimboFlankNav
         onPrev={() => seek(-1)}
@@ -91,6 +94,6 @@ export function JamlSeedSpinner({
           />
         )}
       </JimboFlankNav>
-    </div>
+    </JimboBox>
   );
 }

@@ -4,6 +4,9 @@ import React from "react";
 import { Layer } from "./Layer.js";
 import { useJamlCardRenderer } from "./useJamlCardRenderer.js";
 
+import { JimboBox } from "../ui/JimboBox.js";
+import { JimboCanvas } from "../ui/JimboCanvas.js";
+
 export interface JamlCardRendererProps {
     layers: Layer[];
     invert?: boolean;
@@ -19,15 +22,15 @@ export function JamlCardRenderer({ layers, invert = false, className = "", hover
     });
 
     return (
-        <div
+        <JimboBox
             ref={containerRef}
             className={`j-card-renderer ${className}`.trim()}
             data-hover-tilt={hoverTilt}
             data-hovered="false"
             style={{ "--j-card-aspect": String(ratio) } as React.CSSProperties}
         >
-            <canvas ref={canvasRef} className="j-card-renderer__canvas" />
-            <div className="j-card-renderer__hit" {...handlers} />
-        </div>
+            <JimboCanvas ref={canvasRef} className="j-card-renderer__canvas" />
+            <JimboBox className="j-card-renderer__hit" {...handlers} />
+        </JimboBox>
     );
 }

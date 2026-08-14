@@ -4,9 +4,10 @@
 // no-inline-component rules. Refactor to compose from Jimbo* primitives once
 
 
-import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { MysterySlot, type SlotSelection, type JamlZone, type SlotCategory } from "./MysterySlot.js";
 import { JokerPicker } from "./JokerPicker.js";
+import { JimboBox } from "../../ui/JimboBox.js";
 import {
   CategoryPicker,
   VOUCHER_PICKER_CONFIG,
@@ -19,7 +20,6 @@ import {
 } from "./CategoryPicker.js";
 import { JimboInnerPanel, JimboModal, type JimboTone } from "../../ui/panel.js";
 import { JimboText } from "../../ui/jimboText.js";
-import { JimboColorOption } from "../../ui/tokens.js";
 import { JimboSprite } from "../../ui/sprites.js";
 import { type SpriteSheetType } from "../../sprites/spriteMapper.js";
 import { JimboTabs } from "../../ui/jimboTabs.js";
@@ -50,7 +50,6 @@ type AnteSelections = Record<string, MapSlotSelection>;
 
 // ─── Category menu items ─────────────────────────────────────────────────────
 
-const C = JimboColorOption;
 
 interface CategoryOption {
   key: SlotCategory;
@@ -166,10 +165,10 @@ export function JamlMapEditor({
   };
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "grid", gridTemplateRows: "auto 1fr" }}>
+    <JimboBox className="j-jaml-map-editor">
       {/* Zone Toggle Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 10, background: C.DARKEST, padding: "max(32px, env(safe-area-inset-top, 32px)) 0 8px 0", borderBottom: `2px solid ${C.PANEL_EDGE}` }}>
-        <JimboText size="md" tone="white" style={{ textAlign: "center", marginBottom: 12 }}>Jaml Visual Builder</JimboText>
+      <JimboBox className="j-jaml-map-editor__header">
+        <JimboText size="md" tone="white" className="j-jaml-map-editor__title">Jaml Visual Builder</JimboText>
         <JimboTabs
           tabs={[
             { id: "must", label: "Must" },
@@ -179,64 +178,54 @@ export function JamlMapEditor({
           activeTab={currentZone}
           onTabChange={(tabId) => setCurrentZone(tabId as JamlZone)}
         />
-      </div>
+      </JimboBox>
 
       {/* Map Layout - Vertical Scrolling Antes */}
-      <div ref={scrollRef} className="hide-scrollbar" style={{
-        overflowY: "auto",
-        scrollSnapType: "y mandatory",
-        scrollBehavior: "smooth"
-      }}>
+      <JimboBox ref={scrollRef} className="j-jaml-map-editor__scroll hide-scrollbar">
         {Array.from({ length: 40 }, (_, i) => i).map((a) => (
-          <div key={a} style={{
-            scrollSnapAlign: "start",
-            padding: "16px 8px 24px 8px",
-            minHeight: "100%",
-            display: "grid",
-            placeItems: "center",
-          }}>
-            <JimboInnerPanel style={{ display: "grid", gap: 16, padding: "12px 8px", width: "100%" }}>
-              <JimboText size="lg" tone="white" style={{ textAlign: "center" }}>Ante {a}</JimboText>
+          <JimboBox key={a} className="j-jaml-map-editor__ante">
+            <JimboInnerPanel className="j-jaml-map-editor__ante-panel">
+              <JimboText size="lg" tone="white" className="j-jaml-map-editor__ante-title">Ante {a}</JimboText>
 
               {/* Row 1: Blinds & Tags & Voucher */}
-              <div className="j-row j-row--justify-between j-row--align-end" style={{ padding: "0 4px" }}>
-                <div className="j-stack j-stack--align-center j-stack--gap-xs">
+              <JimboBox className="j-row j-row--justify-between j-row--align-end j-jaml-map-editor__row">
+                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
                   <JimboText size="xs" tone="grey">Voucher</JimboText>
                   {renderSlot(a, `ante_${a}_voucher`, 42, "Vouchers", "voucher")}
-                </div>
-                <div className="j-stack j-stack--align-center j-stack--gap-xs">
+                </JimboBox>
+                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
                   <JimboText size="xs" tone="grey">Small</JimboText>
                   {renderSlot(a, `ante_${a}_tag_small`, 42, "tags", "tag")}
-                </div>
-                <div className="j-stack j-stack--align-center j-stack--gap-xs">
+                </JimboBox>
+                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
                   <JimboText size="xs" tone="grey">Big</JimboText>
                   {renderSlot(a, `ante_${a}_tag_big`, 42, "tags", "tag")}
-                </div>
-                <div className="j-stack j-stack--align-center j-stack--gap-xs">
+                </JimboBox>
+                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
                   <JimboText size="xs" tone="grey">Boss</JimboText>
                   {renderSlot(a, `ante_${a}_boss`, 42, "BlindChips", "boss")}
-                </div>
-              </div>
+                </JimboBox>
+              </JimboBox>
 
               {/* Row 2: Shop Items */}
-              <div className="j-stack j-stack--gap-xs">
-                <JimboText size="sm" tone="grey" style={{ letterSpacing: 1, padding: "0 4px" }}>Shop Items</JimboText>
-                <div className="j-row hide-scrollbar j-row--gap-sm" style={{ overflowX: "auto", padding: "0 0 8px 4px" }}>
+              <JimboBox className="j-stack j-stack--gap-xs">
+                <JimboText size="sm" tone="grey" className="j-jaml-map-editor__section-title">Shop Items</JimboText>
+                <JimboBox className="j-row hide-scrollbar j-row--gap-sm j-jaml-map-editor__shop-row">
                   {[1,2,3,4,5,6,7,8].map(i => renderSlot(a, `ante_${a}_shop_${i}`, 52, "Jokers"))}
-                </div>
-              </div>
+                </JimboBox>
+              </JimboBox>
 
               {/* Row 3: Packs */}
-              <div className="j-stack j-stack--gap-xs">
-                <JimboText size="sm" tone="grey" style={{ letterSpacing: 1, padding: "0 4px" }}>Packs</JimboText>
-                <div className="j-row j-row--gap-sm" style={{ padding: "0 4px" }}>
+              <JimboBox className="j-stack j-stack--gap-xs">
+                <JimboText size="sm" tone="grey" className="j-jaml-map-editor__section-title">Packs</JimboText>
+                <JimboBox className="j-row j-row--gap-sm j-jaml-map-editor__pack-row">
                   {[1,2,3,4,5,6].map(i => renderSlot(a, `ante_${a}_pack_${i}`, 64, "Boosters", "pack"))}
-                </div>
-              </div>
+                </JimboBox>
+              </JimboBox>
             </JimboInnerPanel>
-          </div>
+          </JimboBox>
         ))}
-      </div>
+      </JimboBox>
 
       {/* Picker overlay */}
       <JimboModal
@@ -268,7 +257,7 @@ export function JamlMapEditor({
           )
         )}
       </JimboModal>
-    </div>
+    </JimboBox>
   );
 }
 
@@ -280,28 +269,22 @@ export function CategoryMenu({
   onSelect: (cat: SlotCategory) => void;
 }) {
   return (
-    <div className="hide-scrollbar" style={{
-      display: "grid",
-      gap: 12,
-      padding: "12px 0",
-      maxHeight: "70vh",
-      overflowY: "auto",
-    }}>
+    <JimboBox className="j-category-menu hide-scrollbar">
       {CATEGORIES.map((cat) => (
         <JimboListItem
           key={cat.key}
           onClick={() => onSelect(cat.key)}
         >
-          <div style={{ display: "grid", gridAutoFlow: "column", gridTemplateColumns: "auto 1fr", alignItems: "center", gap: 10, width: "100%", textAlign: "left" }}>
+          <JimboBox className="j-category-menu__item">
             <JimboSprite name={cat.sprite} sheet={cat.sheet} width={32} />
-            <div style={{ display: "grid", gap: 2 }}>
+            <JimboBox className="j-category-menu__text">
               <JimboText size="sm" tone="white">{cat.label}</JimboText>
               <JimboText size="micro" tone="grey">{cat.hint}</JimboText>
-            </div>
-          </div>
+            </JimboBox>
+          </JimboBox>
         </JimboListItem>
       ))}
-    </div>
+    </JimboBox>
   );
 }
 

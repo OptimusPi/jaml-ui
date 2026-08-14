@@ -1,10 +1,6 @@
 "use client";
 
-// TODO(jimbo-primitives): pre-dates no-inline-style / no-token-in-jsx-style /
-// no-inline-component rules. Refactor to compose from Jimbo* primitives once
-// screenshot-driven primitive design lands. Remove the disable as each
-// section is rewritten. `git grep TODO(jimbo-primitives)` to see the queue.
-/* eslint-disable jaml-design/no-inline-style, jaml-design/no-token-in-jsx-style, jaml-design/no-inline-component */
+
 
 import React, { useState } from "react";
 import { JamlMapPreview } from "./JamlMapPreview.js";
@@ -28,9 +24,11 @@ import { JamlIdeVisual, type JamlVisualFilter, type JamlZone, type JamlVisualCla
 import { JamlCodeEditor } from "./JamlCodeEditor.js";
 import { Jamlyzer } from "./Jamlyzer.js";
 import { normalizeJamlSeed } from "./jamlSeedUtils.js";
-import { JimboColorOption } from "../ui/tokens.js";
+
 import { JimboButton, JimboModal } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
+import { JimboBox } from "../ui/JimboBox.js";
+import { JimboInline } from "../ui/JimboInline.js";
 import { mergeSeedsIntoJaml } from "../lib/jaml/jamlSeeds.js";
 import { jamlTextToVisualFilter, visualFilterToJamlText } from "../utils/jamlVisualFilter.js";
 const CATEGORY_CONFIG_MAP = {
@@ -86,24 +84,22 @@ export interface JamlIdeProps {
 export type { JamlVisualFilter } from "./JamlIdeVisual.js";
 export type { JamlVisualClause, JamlZone } from "./JamlIdeVisual.js";
 
-function TallyBar({ value, max }: { value: number; max: number }) {
+export function TallyBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.min(1, value / max) : 0;
   return (
-    <div style={{ flex: 1, height: 4, borderRadius: 999, background: `${JimboColorOption.DARK_GREY}88`, overflow: "hidden" }}>
-      <div
+    <JimboBox className="j-ide-tally-bar">
+      <JimboBox
+        className="j-ide-tally-bar__fill"
         style={{
-          height: "100%",
-          width: `${pct * 100}%`,
-          borderRadius: 999,
-          background: value > 0 ? JimboColorOption.GREEN : JimboColorOption.GREY,
-          transition: "width 200ms ease",
-        }}
+          "--j-tally-width": `${pct * 100}%`,
+          "--j-tally-bg": value > 0 ? "var(--j-green)" : "var(--j-grey)",
+        } as React.CSSProperties}
       />
-    </div>
+    </JimboBox>
   );
 }
 
-function ResultsView({
+export function ResultsView({
   results,
   jaml,
   onVerify,
@@ -116,54 +112,42 @@ function ResultsView({
 
   if (results.length === 0) {
     return (
-      <div
-        style={{
-          border: `1px dashed ${JimboColorOption.DARK_GREY}`,
-          borderRadius: 10,
-          padding: 16,
-          fontSize: 13,
-          color: JimboColorOption.GREY,
-          background: `${JimboColorOption.DARKEST}88`,
-          textAlign: "center",
-        }}
-      >
+      <JimboBox className="j-ide-results__empty">
         No results yet. Run a search to find seeds.
-      </div>
+      </JimboBox>
     );
   }
 
   const maxScore = Math.max(...results.map((r) => r.score ?? 0));
 
   return (
-    <div className="j-ide-results">
+    <JimboBox className="j-ide-results">
       {onVerify ? (
-        <div className="j-ide-results__bridge">
+        <JimboBox className="j-ide-results__bridge">
           <JimboButton tone="green" size="sm" onClick={onVerify}>
             Verify seeds
           </JimboButton>
           <JimboText size="xs" tone="white" className="j-ide-results__bridge-hint">
             Writes {results.length} hit{results.length === 1 ? "" : "s"} to seeds: and opens Test
           </JimboText>
-        </div>
+        </JimboBox>
       ) : null}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <JimboBox className="j-ide-results__list">
       {results.map((result) => {
         const isOpen = expanded === result.seed;
         const hasTally = result.tallyColumns && result.tallyColumns.length > 0;
 
         return (
-          <div
+          <JimboBox
             key={result.seed}
+            className="j-ide-result"
             style={{
-              borderRadius: 10,
-              border: `1px solid ${isOpen ? JimboColorOption.GOLD + "55" : JimboColorOption.PANEL_EDGE}`,
-              background: isOpen ? `${JimboColorOption.GOLD}0a` : `${JimboColorOption.DARKEST}cc`,
-              overflow: "hidden",
-              transition: "border-color 120ms",
-            }}
+              "--j-result-border": isOpen ? "color-mix(in srgb, var(--j-gold) 33.3%, transparent)" : "var(--j-panel-edge)",
+              "--j-result-bg": isOpen ? "color-mix(in srgb, var(--j-gold) 3.9%, transparent)" : "color-mix(in srgb, var(--j-darkest) 80%, transparent)",
+            } as React.CSSProperties}
           >
-            <div
+            <JimboBox
               role={hasTally ? "button" : undefined}
               tabIndex={hasTally ? 0 : -1}
               onClick={() => hasTally && setExpanded(isOpen ? null : result.seed)}
@@ -174,63 +158,38 @@ function ResultsView({
                   setExpanded(isOpen ? null : result.seed);
                 }
               }}
+              className="j-ide-result__header"
               style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "9px 12px",
-                cursor: hasTally ? "pointer" : "default",
-                color: "inherit",
-                textAlign: "left",
-              }}
+                "--j-result-cursor": hasTally ? "pointer" : "default",
+              } as React.CSSProperties}
             >
-              <span
-                style={{
-                  fontFamily: "var(--j-font-code)",
-                  fontWeight: "normal",
-                  fontSize: 14,
-                  letterSpacing: 1,
-                  color: JimboColorOption.GOLD_TEXT,
-                  minWidth: 80,
-                }}
-              >
+              <JimboInline className="j-ide-result__seed">
                 {result.seed}
-              </span>
+              </JimboInline>
 
               {result.score !== undefined ? (
                 <>
                   <TallyBar value={result.score} max={maxScore} />
-                  <span
+                  <JimboInline
+                    className="j-ide-result__score"
                     style={{
-                      fontSize: 12,
-                      color: result.score > 0 ? JimboColorOption.GREEN_TEXT : JimboColorOption.GREY,
-                      minWidth: 36,
-                      textAlign: "right",
-                    }}
+                      "--j-score-color": result.score > 0 ? "var(--j-green-text)" : "var(--j-grey)",
+                    } as React.CSSProperties}
                   >
                     {result.score}
-                  </span>
+                  </JimboInline>
                 </>
               ) : null}
 
               {hasTally ? (
-                <span style={{ fontSize: 11, color: JimboColorOption.GREY, marginLeft: 2 }}>
+                <JimboInline className="j-ide-result__toggle">
                   {isOpen ? "▲" : "▼"}
-                </span>
+                </JimboInline>
               ) : null}
-            </div>
+            </JimboBox>
 
             {isOpen && hasTally ? (
-              <div
-                style={{
-                  borderTop: `1px solid ${JimboColorOption.PANEL_EDGE}`,
-                  padding: "4px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                }}
-              >
+              <JimboBox className="j-ide-result__body">
                 <JamlMapPreview
                   jaml={jaml}
                   tallyColumns={result.tallyColumns}
@@ -238,26 +197,26 @@ function ResultsView({
                 />
 
                 {/* Fallback/Detailed tally list for debugging or non-visual clauses */}
-                <div style={{ padding: "6px 0 10px", display: "flex", flexDirection: "column", gap: 6 }}>
-                  <span style={{ fontSize: 10, color: JimboColorOption.WHITE, opacity: 0.8 }}>Raw Tally Data</span>
+                <JimboBox className="j-ide-result__raw-tally">
+                  <JimboInline className="j-ide-result__raw-title">Raw Tally Data</JimboInline>
                   {(result.tallyLabels ?? []).map((label, i) => {
                     const val = result.tallyColumns![i] ?? 0;
                     if (val === 0) return null;
                     return (
-                      <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 11, color: JimboColorOption.WHITE, flex: 1 }}>{label}</span>
-                        <span style={{ fontSize: 11, color: JimboColorOption.GREEN_TEXT }}>{val}</span>
-                      </div>
+                      <JimboBox key={label} className="j-ide-result__raw-item">
+                        <JimboInline className="j-ide-result__raw-label">{label}</JimboInline>
+                        <JimboInline className="j-ide-result__raw-val">{val}</JimboInline>
+                      </JimboBox>
                     );
                   })}
-                </div>
-              </div>
+                </JimboBox>
+              </JimboBox>
             ) : null}
-          </div>
+          </JimboBox>
         );
       })}
-      </div>
-    </div>
+      </JimboBox>
+    </JimboBox>
   );
 }
 
@@ -450,22 +409,22 @@ export function JamlIde({
   };
 
   return (
-    <div
+    <JimboBox
       className={`j-ide ${className}`.trim()}
       style={style}
     >
       {headerVisible ? (
-        <div className={`j-ide__header ${compactHeader ? "j-ide__header--compact" : ""}`.trim()}>
-          <div className="j-ide__header-copy">
-            {title ? <div className="j-ide__title">{title}</div> : null}
-            {subtitle ? <div className="j-ide__subtitle">{subtitle}</div> : null}
-          </div>
+        <JimboBox className={`j-ide__header ${compactHeader ? "j-ide__header--compact" : ""}`.trim()}>
+          <JimboBox className="j-ide__header-copy">
+            {title ? <JimboBox className="j-ide__title">{title}</JimboBox> : null}
+            {subtitle ? <JimboBox className="j-ide__subtitle">{subtitle}</JimboBox> : null}
+          </JimboBox>
           {actions && (
-            <div className="j-ide__actions">
+            <JimboBox className="j-ide__actions">
               {actions}
-            </div>
+            </JimboBox>
           )}
-        </div>
+        </JimboBox>
       ) : null}
 
       <JamlIdeToolbar
@@ -480,7 +439,7 @@ export function JamlIde({
         isLoadingFile={isLoadingFile}
       />
 
-      <div className={`j-ide__body ${mode === "map" ? "j-ide__body--map" : ""}`.trim()}>
+      <JimboBox className={`j-ide__body ${mode === "map" ? "j-ide__body--map" : ""}`.trim()}>
         {mode === "visual" ? (
           <JamlIdeVisual filter={activeFilter} onChange={handleVisualFilterChange} onAddClause={handleAddClause} />
         ) : null}
@@ -496,17 +455,17 @@ export function JamlIde({
         {mode === "map" ? <JamlMapEditor onChange={handleTextChange} /> : null}
 
         {mode === "results" ? (
-          <div className="j-ide__results">
+          <JimboBox className="j-ide__results">
             <ResultsView results={searchResults} jaml={text} onVerify={handleVerifyInJamlyzer} />
-          </div>
+          </JimboBox>
         ) : null}
 
         {mode === "jamlyzer" ? (
-          <div className="j-ide__jamlyzer">
+          <JimboBox className="j-ide__jamlyzer">
             <Jamlyzer jaml={text} />
-          </div>
+          </JimboBox>
         ) : null}
-      </div>
+      </JimboBox>
 
       <JimboModal
         open={addZone !== null}
@@ -533,6 +492,6 @@ export function JamlIde({
           )
         )}
       </JimboModal>
-    </div>
+    </JimboBox>
   );
 }

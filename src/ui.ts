@@ -50,3 +50,7 @@ export { JimboInnerPanel, type JimboInnerPanelProps, JimboModal, type JimboModal
 import "./ui/jimbo.css";
 export { JimboOuterTab, type JimboOuterTabProps, type JimboOuterTabTone } from "./ui/JimboOuterTab.js";
 export { JimboSwipeDeck, type JimboSwipeDeckProps } from "./ui/JimboSwipeDeck.js";
+export { JimboBox, type JimboBoxProps } from "./ui/JimboBox.js";
+export { JimboInline, type JimboInlineProps } from "./ui/JimboInline.js";
+export { JimboCanvas, type JimboCanvasProps } from "./ui/JimboCanvas.js";
+export { JimboLink, type JimboLinkProps } from "./ui/JimboLink.js";

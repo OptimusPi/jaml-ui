@@ -3,15 +3,14 @@
 // TODO(jimbo-primitives): pre-dates no-inline-style / no-token-in-jsx-style /
 // no-inline-component rules. Refactor to compose from Jimbo* primitives once
 // screenshot-driven primitive design lands. `git grep TODO(jimbo-primitives)`.
-/* eslint-disable jaml-design/no-inline-style, jaml-design/no-inline-component */
-
 import React, { useRef } from "react";
 import { FiX } from "react-icons/fi";
 import { useJamlIdeDrag } from "../ui/hooks.js";
-import { JimboColorOption } from "../ui/tokens.js";
 import { JimboSprite } from "../ui/sprites.js";
 import { JimboIconButton } from "../ui/JimboIconButton.js";
 import { JimboInlineEdit } from "../ui/JimboInlineEdit.js";
+import { JimboBox } from "../ui/JimboBox.js";
+import { JimboInline } from "../ui/JimboInline.js";
 import type { SpriteSheetType } from "../sprites/spriteMapper.js";
 
 export type JamlZone = "must" | "should" | "mustnot";
@@ -47,7 +46,6 @@ export interface JamlIdeVisualProps {
     onAddClause?: (zone: JamlZone) => void;
 }
 
-const C = JimboColorOption;
 
 const ZONE_META: Record<JamlZone, { label: string; hint: string; color: string; accent: string }> = {
     must: { label: "Must", hint: "Seed must contain all of these.", color: "#429f79", accent: "#35bd86" },
@@ -55,7 +53,7 @@ const ZONE_META: Record<JamlZone, { label: string; hint: string; color: string; 
     mustnot: { label: "Must Not", hint: "Rejected if any appear.", color: "#fe5148", accent: "#fe5148" },
 };
 
-function clauseSpriteSheet(type: string): SpriteSheetType | undefined {
+export function clauseSpriteSheet(type: string): SpriteSheetType | undefined {
     if (
         type === "joker" ||
         type === "jokers" ||
@@ -88,13 +86,13 @@ function clauseSpriteSheet(type: string): SpriteSheetType | undefined {
     return undefined;
 }
 
-function ClauseSprite({ clause, size = 40 }: { clause: JamlVisualClause; size?: number }) {
+export function ClauseSprite({ clause, size = 40 }: { clause: JamlVisualClause; size?: number }) {
     const sheet = clauseSpriteSheet(clause.type);
     if (!sheet) return null;
     return <JimboSprite name={clause.value} sheet={sheet} width={size} />;
 }
 
-function ClauseCard({
+export function ClauseCard({
     clause,
     zone,
     onRemove,
@@ -109,85 +107,42 @@ function ClauseCard({
 }) {
     const z = ZONE_META[zone];
     return (
-        <div
+        <JimboBox
             onClick={onEdit}
             onMouseDown={(e) => onDragStart(e, clause, zone)}
             onTouchStart={(e) => onDragStart(e, clause, zone)}
-            style={{
-                position: "relative",
-                background: C.DARK_GREY,
-                border: `2px solid ${z.color}`,
-                borderRadius: 6,
-                padding: "8px 8px 8px 6px",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                minWidth: 0,
-                cursor: "pointer",
-                userSelect: "none",
-                touchAction: "none",
-                boxShadow: `0 2px 0 ${C.BLACK}`,
-            }}
+            className="j-jaml-ide-visual__clause-card"
+            style={{ "--j-zone-color": z.color } as React.CSSProperties}
         >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 50, flexShrink: 0 }}>
+            <JimboBox className="j-jaml-ide-visual__clause-card-icon">
                 <ClauseSprite clause={clause} size={40} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                    style={{
-                        fontFamily: "var(--j-font-code)",
-                        fontSize: 13,
-                        color: C.WHITE,
-                        letterSpacing: 0.5,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                    }}
-                >
+            </JimboBox>
+            <JimboBox className="j-jaml-ide-visual__clause-card-content">
+                <JimboBox className="j-jaml-ide-visual__clause-card-label">
                     {clause.label || clause.value}
-                </div>
-                <div style={{ display: "flex", gap: 3, marginTop: 3, alignItems: "center", flexWrap: "wrap" }}>
+                </JimboBox>
+                <JimboBox className="j-jaml-ide-visual__clause-card-antes">
                     {clause.antes && clause.antes.length > 0 && (
                         <>
-                            <div style={{ fontFamily: "var(--j-font-code)", fontSize: 8, color: C.GREY, letterSpacing: 1 }}>A</div>
+                            <JimboBox className="j-jaml-ide-visual__clause-card-ante-label">A</JimboBox>
                             {clause.antes.map((a) => (
-                                <div
+                                <JimboBox
                                     key={a}
-                                    style={{
-                                        fontFamily: "var(--j-font-code)",
-                                        fontSize: 9,
-                                        padding: "1px 4px",
-                                        background: C.DARKEST,
-                                        color: z.accent,
-                                        borderRadius: 3,
-                                        letterSpacing: 0.5,
-                                        lineHeight: 1,
-                                    }}
+                                    className="j-jaml-ide-visual__clause-card-ante"
+                                    style={{ "--j-zone-accent": z.accent } as React.CSSProperties}
                                 >
                                     {a}
-                                </div>
+                                </JimboBox>
                             ))}
                         </>
                     )}
                     {zone === "should" && clause.score != null && (
-                        <div
-                            style={{
-                                marginLeft: 4,
-                                fontFamily: "var(--j-font-code)",
-                                fontSize: 9,
-                                padding: "1px 5px",
-                                background: C.RED,
-                                color: C.WHITE,
-                                borderRadius: 3,
-                                letterSpacing: 0.5,
-                                lineHeight: 1,
-                            }}
-                        >
+                        <JimboBox className="j-jaml-ide-visual__clause-card-score">
                             +{clause.score}
-                        </div>
+                        </JimboBox>
                     )}
-                </div>
-            </div>
+                </JimboBox>
+            </JimboBox>
             <JimboIconButton
                 size="xs"
                 tone="destructive"
@@ -201,60 +156,29 @@ function ClauseCard({
             >
                 <FiX />
             </JimboIconButton>
-        </div>
+        </JimboBox>
     );
 }
 
-function MysteryAddTile({ zone, onTap }: { zone: JamlZone; onTap?: () => void }) {
+export function MysteryAddTile({ zone, onTap }: { zone: JamlZone; onTap?: () => void }) {
     const z = ZONE_META[zone];
     return (
-        <div
+        <JimboBox
             onClick={onTap}
-            style={{
-                cursor: onTap ? "pointer" : "default",
-                opacity: onTap ? 1 : 0.55,
-                border: `2px dashed ${z.color}`,
-                borderRadius: 6,
-                padding: "12px 8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 10,
-                background: `${z.color}0d`,
-                minHeight: 60,
-            }}
+            className={`j-jaml-ide-visual__mystery-tile ${onTap ? "j-jaml-ide-visual__mystery-tile--tappable" : ""}`}
+            style={{ "--j-zone-color": z.color, "--j-zone-accent": z.accent } as React.CSSProperties}
         >
-            <div
-                style={{
-                    width: 40,
-                    height: 40,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: C.DARKEST,
-                    border: `2px solid ${z.color}`,
-                    borderRadius: 6,
-                    fontFamily: "var(--j-font-code)",
-                    fontSize: 24,
-                    color: z.color,
-                }}
-            >
+            <JimboBox className="j-jaml-ide-visual__mystery-tile-icon">
                 ?
-            </div>
-            <div
-                style={{
-                    fontFamily: "var(--j-font-code)",
-                    fontSize: 12,
-                    color: z.accent,
-                }}
-            >
+            </JimboBox>
+            <JimboBox className="j-jaml-ide-visual__mystery-tile-label">
                 Add to {z.label}
-            </div>
-        </div>
+            </JimboBox>
+        </JimboBox>
     );
 }
 
-function ZoneRail({
+export function ZoneRail({
     zone,
     clauses,
     onAdd,
@@ -271,40 +195,25 @@ function ZoneRail({
 }) {
     const z = ZONE_META[zone];
     return (
-        <div
+        <JimboBox
             data-zone={zone}
-            style={{
-                border: `3px solid ${z.color}`,
-                borderRadius: 8,
-                padding: 12,
-                background: `${z.color}15`,
-                boxShadow: `0 3px 0 rgba(0, 0, 0, 0.4)`,
-            }}
+            className="j-jaml-ide-visual__zone-rail"
+            style={{ "--j-zone-color": z.color } as React.CSSProperties}
         >
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                <div
-                    style={{
-                        fontFamily: "var(--j-font-code)",
-                        fontSize: 12,
-                        padding: "2px 6px",
-                        background: z.color,
-                        color: C.WHITE,
-                        borderRadius: 3,
-                        boxShadow: `0 2px 0 ${C.BLACK}`,
-                    }}
-                >
+            <JimboBox className="j-jaml-ide-visual__zone-header">
+                <JimboBox className="j-jaml-ide-visual__zone-label">
                     {z.label}
-                </div>
-                <div style={{ flex: 1, height: 2, background: `${z.color}55`, borderRadius: 1 }} />
-                <div style={{ fontFamily: "var(--j-font-code)", fontSize: 8, color: C.GREY }}>
+                </JimboBox>
+                <JimboBox className="j-jaml-ide-visual__zone-divider" />
+                <JimboBox className="j-jaml-ide-visual__zone-count">
                     {clauses.length}
-                </div>
-            </div>
-            <div style={{ fontFamily: "var(--j-font-code)", fontSize: 9, color: C.GREY, letterSpacing: 0.5, marginBottom: 8 }}>
+                </JimboBox>
+            </JimboBox>
+            <JimboBox className="j-jaml-ide-visual__zone-hint">
                 {z.hint}
-            </div>
+            </JimboBox>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <JimboBox className="j-jaml-ide-visual__zone-clauses">
                 {clauses.map((c) => (
                     <ClauseCard
                         key={c.id}
@@ -316,12 +225,12 @@ function ZoneRail({
                     />
                 ))}
                 <MysteryAddTile zone={zone} onTap={onAdd} />
-            </div>
-        </div>
+            </JimboBox>
+        </JimboBox>
     );
 }
 
-function TopMatter({
+export function TopMatter({
     filter,
     onChange,
 }: {
@@ -329,7 +238,7 @@ function TopMatter({
     onChange: (filter: JamlVisualFilter) => void;
 }) {
     return (
-        <div className="j-inner-panel j-jaml-ide-visual__top-matter">
+        <JimboBox className="j-inner-panel j-jaml-ide-visual__top-matter">
             <JimboInlineEdit
                 size="lg"
                 tone="white"
@@ -337,8 +246,8 @@ function TopMatter({
                 placeholder="Untitled"
                 onChange={(e) => onChange({ ...filter, name: e.target.value })}
             />
-            <div className="j-jaml-ide-visual__byline">
-                <span className="j-jaml-ide-visual__by-label">By</span>
+            <JimboBox className="j-jaml-ide-visual__byline">
+                <JimboInline className="j-jaml-ide-visual__by-label">By</JimboInline>
                 <JimboInlineEdit
                     size="sm"
                     tone="gold"
@@ -346,7 +255,7 @@ function TopMatter({
                     placeholder="anonymous"
                     onChange={(e) => onChange({ ...filter, author: e.target.value })}
                 />
-            </div>
+            </JimboBox>
             <JimboInlineEdit
                 size="xs"
                 tone="white"
@@ -355,7 +264,7 @@ function TopMatter({
                 placeholder="description"
                 onChange={(e) => onChange({ ...filter, description: e.target.value })}
             />
-        </div>
+        </JimboBox>
     );
 }
 
@@ -368,21 +277,14 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
     };
 
     return (
-        <div
+        <JimboBox
             ref={rootRef}
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 14,
-                padding: 10,
-                background: C.DARKEST,
-                color: C.WHITE,
-            }}
+            className="j-jaml-ide-visual"
         >
             <TopMatter filter={filter} onChange={onChange} />
 
-            <div style={{ display: "flex", gap: 10 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
+            <JimboBox className="j-jaml-ide-visual__top-zones">
+                <JimboBox className="j-jaml-ide-visual__top-zone-must">
                     <ZoneRail
                         zone="must"
                         clauses={filter.must}
@@ -391,8 +293,8 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
                         onEdit={(c) => onEditClause?.("must", c)}
                         onDragStart={onDragStart}
                     />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                </JimboBox>
+                <JimboBox className="j-jaml-ide-visual__top-zone-mustnot">
                     <ZoneRail
                         zone="mustnot"
                         clauses={filter.mustnot}
@@ -401,8 +303,8 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
                         onEdit={(c) => onEditClause?.("mustnot", c)}
                         onDragStart={onDragStart}
                     />
-                </div>
-            </div>
+                </JimboBox>
+            </JimboBox>
             <ZoneRail
                 zone="should"
                 clauses={filter.should}
@@ -413,16 +315,14 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
             />
 
             {drag && (
-                <div
-                    style={{
-                        position: "fixed",
-                        left: drag.x - drag.offX,
-                        top: drag.y - drag.offY,
-                        pointerEvents: "none",
-                        zIndex: 999,
-                        filter: `drop-shadow(0 4px 6px ${C.BLACK}99)`,
-                        opacity: 0.92,
-                    }}
+                <JimboBox
+                    className="j-jaml-ide-visual__drag-ghost"
+                    style={
+                        {
+                            "--j-drag-left": `${drag.x - drag.offX}px`,
+                            "--j-drag-top": `${drag.y - drag.offY}px`,
+                        } as React.CSSProperties
+                    }
                 >
                     <ClauseCard
                         clause={drag.clause}
@@ -431,8 +331,8 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
                         onEdit={() => { }}
                         onDragStart={() => { }}
                     />
-                </div>
+                </JimboBox>
             )}
-        </div>
+        </JimboBox>
     );
 }

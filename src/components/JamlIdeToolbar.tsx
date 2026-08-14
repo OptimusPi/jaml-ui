@@ -4,6 +4,8 @@ import React from "react";
 import { JimboButton } from "../ui/panel.js";
 import { JimboTabs } from "../ui/jimboTabs.js";
 
+import { JimboBox } from "../ui/JimboBox.js";
+
 export type JamlIdeMode = "visual" | "code" | "map" | "results" | "jamlyzer";
 
 export interface JamlIdeToolbarProps {
@@ -46,30 +48,30 @@ export function JamlIdeToolbar({
   }
 
   return (
-    <div className={`j-ide-toolbar ${className}`.trim()}>
-      <div className="j-ide-toolbar__tabs">
+    <JimboBox className={`j-ide-toolbar ${className}`.trim()}>
+      <JimboBox className="j-ide-toolbar__tabs">
         <JimboTabs
           tabs={tabs}
           activeTab={mode}
           onTabChange={(id) => onModeChange(id as JamlIdeMode)}
         />
-      </div>
+      </JimboBox>
 
       {onSearch && (
-        <div className="j-ide-toolbar__action">
+        <JimboBox className="j-ide-toolbar__action">
           <JimboButton tone="red" size="sm" onClick={onSearch}>
             {isSearching ? "Stop" : "Search"}
           </JimboButton>
-        </div>
+        </JimboBox>
       )}
 
       {onLoadFile && (
-        <div className="j-ide-toolbar__action">
+        <JimboBox className="j-ide-toolbar__action">
           <JimboButton tone="blue" size="sm" onClick={onLoadFile} disabled={isLoadingFile}>
             {isLoadingFile ? "Loading..." : "Load File"}
           </JimboButton>
-        </div>
+        </JimboBox>
       )}
-    </div>
+    </JimboBox>
   );
 }

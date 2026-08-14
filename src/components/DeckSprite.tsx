@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { JimboBox } from '../ui/JimboBox.js'
 import { resolveJamlAssetUrl } from '../assets.js'
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -69,39 +70,32 @@ export function DeckSprite({ deck, stake, size = 50, className = '', style }: De
   const displayHeight = SPRITE_HEIGHT * scale
 
   return (
-    <div
-      className={className}
+    <JimboBox
+      className={`j-deck-sprite ${className}`.trim()}
       style={{
-        position: 'relative',
-        width: size,
-        height: displayHeight,
+        '--j-deck-w': `${size}px`,
+        '--j-deck-h': `${displayHeight}px`,
         ...style,
-      }}
+      } as React.CSSProperties}
     >
-      <div
+      <JimboBox
+        className="j-deck-sprite__layer"
         style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `url(${resolveJamlAssetUrl('enhancers')})`,
-          backgroundSize: `${DECK_COLS * 100}% ${DECK_ROWS * 100}%`,
-          backgroundPosition: `${(deckPos.x / (DECK_COLS - 1)) * 100}% ${(deckPos.y / (DECK_ROWS - 1)) * 100}%`,
-          backgroundRepeat: 'no-repeat',
-          imageRendering: 'pixelated',
-        }}
+          '--j-layer-bg-url': `url(${resolveJamlAssetUrl('enhancers')})`,
+          '--j-layer-bg-size': `${DECK_COLS * 100}% ${DECK_ROWS * 100}%`,
+          '--j-layer-bg-pos': `${(deckPos.x / (DECK_COLS - 1)) * 100}% ${(deckPos.y / (DECK_ROWS - 1)) * 100}%`,
+        } as React.CSSProperties}
       />
       {stakePos ? (
-        <div
+        <JimboBox
+          className="j-deck-sprite__layer"
           style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url(${resolveJamlAssetUrl('stickers')})`,
-            backgroundSize: `${STICKER_COLS * 100}% ${STICKER_ROWS * 100}%`,
-            backgroundPosition: `${(stakePos.x / (STICKER_COLS - 1)) * 100}% ${(stakePos.y / (STICKER_ROWS - 1)) * 100}%`,
-            backgroundRepeat: 'no-repeat',
-            imageRendering: 'pixelated',
-          }}
+            '--j-layer-bg-url': `url(${resolveJamlAssetUrl('stickers')})`,
+            '--j-layer-bg-size': `${STICKER_COLS * 100}% ${STICKER_ROWS * 100}%`,
+            '--j-layer-bg-pos': `${(stakePos.x / (STICKER_COLS - 1)) * 100}% ${(stakePos.y / (STICKER_ROWS - 1)) * 100}%`,
+          } as React.CSSProperties}
         />
       ) : null}
-    </div>
+    </JimboBox>
   )
 }

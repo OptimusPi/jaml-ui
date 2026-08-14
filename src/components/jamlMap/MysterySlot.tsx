@@ -58,6 +58,8 @@ const ZONE_BORDER: Record<JamlZone, string> = {
   mustnot: C.ORANGE,
 };
 
+import { JimboBox } from "../../ui/JimboBox.js";
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function MysterySlot({
@@ -113,7 +115,7 @@ export function MysterySlot({
   };
 
   return (
-    <div
+    <JimboBox
       ref={cardRef}
       onClick={onTap}
       onMouseEnter={() => setHover(true)}
@@ -129,7 +131,7 @@ export function MysterySlot({
         ...style,
       } as React.CSSProperties}
     >
-      <div
+      <JimboBox
         className="j-mystery-slot__card"
         style={{
           "--j-mystery-slot-border": isEmpty
@@ -161,27 +163,27 @@ export function MysterySlot({
 
         {/* Clear button (×) when selected */}
         {selection && onClear && (
-          <div
+          <JimboBox
             onClick={(e) => { e.stopPropagation(); onClear(); }}
             className="j-mystery-slot__clear"
           >
             ×
-          </div>
+          </JimboBox>
         )}
 
         {/* Zone label on hover for empty slots */}
         {isEmpty && hover && (
-          <div
+          <JimboBox
             className="j-mystery-slot__label"
             style={{
               "--j-mystery-slot-label-color": borderColor,
             } as React.CSSProperties}
           >
             + tap
-          </div>
+          </JimboBox>
         )}
-      </div>
-    </div>
+      </JimboBox>
+    </JimboBox>
   );
 }
 

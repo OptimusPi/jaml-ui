@@ -5,6 +5,8 @@ import { JimboText } from "../ui/jimboText.js";
 import { JimboTextInput } from "../ui/JimboTextInput.js";
 import { normalizeJamlSeed } from "./jamlSeedUtils.js";
 
+import { JimboBox } from "../ui/JimboBox.js";
+
 export type JamlSeedInputVariant = "normal" | "dark" | "alt";
 
 export interface JamlSeedInputProps {
@@ -71,9 +73,9 @@ export const JamlSeedInput = React.forwardRef<HTMLInputElement, JamlSeedInputPro
   };
 
   return (
-    <div className={`j-seed-input j-seed-input--${variant} ${className ?? ""}`.trim()} style={style}>
+    <JimboBox className={`j-seed-input j-seed-input--${variant} ${className ?? ""}`.trim()} style={style}>
       {label ? <JimboText size="xs" tone="grey">{label}</JimboText> : null}
-      <div
+      <JimboBox
         className="j-seed-input__shell"
         data-valid={validState}
         onClick={() => inputRef.current?.focus()}
@@ -102,7 +104,7 @@ export const JamlSeedInput = React.forwardRef<HTMLInputElement, JamlSeedInputPro
           id={id}
           aria-label={ariaLabel ?? (typeof label === "string" ? label : "Seed")}
         />
-      </div>
-    </div>
+      </JimboBox>
+    </JimboBox>
   );
 });

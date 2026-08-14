@@ -3,14 +3,18 @@
 import React from 'react'
 import { BsSuitClubFill, BsSuitDiamondFill, BsSuitHeartFill, BsSuitSpadeFill } from 'react-icons/bs'
 
+import { JimboBox } from "../ui/JimboBox.js";
+import { JimboInline } from "../ui/JimboInline.js";
+import { JimboLink } from "../ui/JimboLink.js";
+
 // react-icons, not glyphs: the bare unicode suits render text-presentation
 // (monochrome), which is how the red heart kept getting silently bleached.
 // Icons take color from CSS, so the reds stay red forever.
 const SUITS = [
-  { key: 'heart', Icon: BsSuitHeartFill, kf: 'jaml-heart', tone: 'j-footer__suit-char--red' },
-  { key: 'spade', Icon: BsSuitSpadeFill, kf: 'jaml-spade', tone: 'j-footer__suit-char--black' },
-  { key: 'diamond', Icon: BsSuitDiamondFill, kf: 'jaml-diamond', tone: 'j-footer__suit-char--red' },
-  { key: 'club', Icon: BsSuitClubFill, kf: 'jaml-club', tone: 'j-footer__suit-char--black' },
+  { key: 'heart', Icon: BsSuitHeartFill, tone: 'j-footer__suit-char--red j-footer__suit--heart' },
+  { key: 'spade', Icon: BsSuitSpadeFill, tone: 'j-footer__suit-char--black j-footer__suit--spade' },
+  { key: 'diamond', Icon: BsSuitDiamondFill, tone: 'j-footer__suit-char--red j-footer__suit--diamond' },
+  { key: 'club', Icon: BsSuitClubFill, tone: 'j-footer__suit-char--black j-footer__suit--club' },
 ] as const
 
 export interface JimboBalatroFooterProps {
@@ -38,32 +42,26 @@ export function JimboBalatroFooter({ hidden = false, className = '', style, chil
   }
 
   return (
-    <div className={["j-footer", className].filter(Boolean).join(" ")} style={style}>
-      <div className="j-footer__bar">
-        <p className="j-footer__line j-footer__line--wrap">
-          <span className="j-footer__chunk">Not affiliated with LocalThunk or Playstack</span>
-          <span className="j-footer__chunk j-footer__chunk--credit">
+    <JimboBox className={["j-footer", className].filter(Boolean).join(" ")} style={style}>
+      <JimboBox className="j-footer__bar">
+        <JimboBox className="j-footer__line j-footer__line--wrap">
+          <JimboInline className="j-footer__chunk">Not affiliated with LocalThunk or Playstack</JimboInline>
+          <JimboInline className="j-footer__chunk j-footer__chunk--credit">
             Made with{' '}
-            <span className="j-footer__suits">
-              <span className="j-footer__suit-stage">
-                {SUITS.map(({ key, Icon, kf, tone }) => (
-                  <span key={key} className={`j-footer__suit-char ${tone}`} style={{ animationName: kf }}>
+            <JimboInline className="j-footer__suits">
+              <JimboInline className="j-footer__suit-stage">
+                {SUITS.map(({ key, Icon, tone }) => (
+                  <JimboInline key={key} className={`j-footer__suit-char ${tone}`}>
                     <Icon />
-                  </span>
+                  </JimboInline>
                 ))}
-              </span>
-            </span>{' '}
-            for the <a className="j-link" href="https://playbalatro.com" target="_blank" rel="noreferrer">Balatro</a> community
-          </span>
-          {children ? <span className="j-footer__extra">{children}</span> : null}
-        </p>
-      </div>
-      <style>{`
-        @keyframes jaml-heart   { 0%{opacity:0;transform:scale(1)} 1%{opacity:1;transform:scale(1.45)} 3.5%{opacity:1;transform:scale(1)} 61.5%{opacity:1;transform:scale(1)} 62%{opacity:0} 100%{opacity:0} }
-        @keyframes jaml-spade   { 0%,61.5%{opacity:0} 62%{opacity:1;transform:scale(1.45)} 64.5%{opacity:1;transform:scale(1)} 71.5%{opacity:1} 72%{opacity:0} 100%{opacity:0} }
-        @keyframes jaml-diamond { 0%,71.5%{opacity:0} 72%{opacity:1;transform:scale(1.45)} 74.5%{opacity:1;transform:scale(1)} 81.5%{opacity:1} 82%{opacity:0} 100%{opacity:0} }
-        @keyframes jaml-club    { 0%,81.5%{opacity:0} 82%{opacity:1;transform:scale(1.45)} 84.5%{opacity:1;transform:scale(1)} 99.5%{opacity:1} 100%{opacity:0} }
-      `}</style>
-    </div>
+              </JimboInline>
+            </JimboInline>{' '}
+            for the <JimboLink className="j-link" href="https://playbalatro.com" target="_blank" rel="noreferrer">Balatro</JimboLink> community
+          </JimboInline>
+          {children ? <JimboInline className="j-footer__extra">{children}</JimboInline> : null}
+        </JimboBox>
+      </JimboBox>
+    </JimboBox>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { JimboBox } from '../ui/JimboBox.js'
 import { resolveJamlAssetUrl } from '../assets.js'
 import { RANK_MAP, SUIT_MAP, ENHANCER_MAP, SEAL_MAP, EDITION_MAP, type SpritePos } from '../sprites/spriteData.js'
 import { CardEdition, type CardSuit, type CardRank, type CardEnhancement, type CardSeal } from './cardEnums.js'
@@ -76,93 +77,78 @@ export function StandardCard({
   const deckUrl = resolveJamlAssetUrl('deck')
   const editionsUrl = resolveJamlAssetUrl('editions')
 
-  const layerBase: React.CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    transform: `scale(${scale})`,
-    transformOrigin: 'top left',
-    backgroundRepeat: 'no-repeat',
-  }
-
   return (
-    <div
-      className={className}
+    <JimboBox
+      className={`j-standard-card ${className || ''}`.trim()}
       style={{
-        position: 'relative',
-        display: 'inline-block',
-        overflow: 'hidden',
-        userSelect: 'none',
-        width: size,
-        height: finalH,
-        imageRendering: 'pixelated',
+        '--j-card-w': `${size}px`,
+        '--j-card-h': `${finalH}px`,
         ...style,
-      }}
+      } as React.CSSProperties}
       title={`${rank} of ${suit}${enhancement ? ` (${enhancement})` : ''}${seal ? ` [${seal} seal]` : ''}${edition ? ` {${edition}}` : ''}`}
     >
       {/* Card base — plain blank card body from cell (1,0) of the enhancer
           sheet, replaced by the mapped sprite when an enhancement is set. */}
-      <div
+      <JimboBox
+        className="j-standard-card__layer"
         style={{
-          ...layerBase,
-          zIndex: 0,
-          backgroundImage: `url(${enhancersUrl})`,
-          backgroundPosition: `${-enhPos.x * CARD_WIDTH}px ${-enhPos.y * CARD_HEIGHT}px`,
-        }}
+          '--j-layer-z': 0,
+          '--j-layer-w': `${CARD_WIDTH}px`,
+          '--j-layer-h': `${CARD_HEIGHT}px`,
+          '--j-layer-transform': `scale(${scale})`,
+          '--j-layer-bg-url': `url(${enhancersUrl})`,
+          '--j-layer-bg-pos': `${-enhPos.x * CARD_WIDTH}px ${-enhPos.y * CARD_HEIGHT}px`,
+        } as React.CSSProperties}
       />
 
       {/* Card face */}
-      <div
+      <JimboBox
+        className="j-standard-card__layer j-standard-card__layer--face"
         style={{
-          ...layerBase,
-          zIndex: 1,
-          backgroundImage: `url(${deckUrl})`,
-          backgroundPosition: `${bgX}px ${bgY}px`,
-          filter: baseFilter,
-        }}
+          '--j-layer-z': 1,
+          '--j-layer-w': `${CARD_WIDTH}px`,
+          '--j-layer-h': `${CARD_HEIGHT}px`,
+          '--j-layer-transform': `scale(${scale})`,
+          '--j-layer-bg-url': `url(${deckUrl})`,
+          '--j-layer-bg-pos': `${bgX}px ${bgY}px`,
+          '--j-layer-filter': baseFilter,
+        } as React.CSSProperties}
       />
 
       {/* Edition overlay */}
       {edition && edition !== CardEdition.Negative && editionCol !== undefined && (
-        <div
+        <JimboBox
+          className="j-standard-card__layer j-standard-card__layer--edition"
           style={{
-            ...layerBase,
-            zIndex: 2,
-            mixBlendMode: 'screen',
-            opacity: 0.6,
-            backgroundImage: `url(${editionsUrl})`,
-            backgroundPosition: `${-editionCol * CARD_WIDTH}px 0px`,
-          }}
+            '--j-layer-z': 2,
+            '--j-layer-w': `${CARD_WIDTH}px`,
+            '--j-layer-h': `${CARD_HEIGHT}px`,
+            '--j-layer-transform': `scale(${scale})`,
+            '--j-layer-bg-url': `url(${editionsUrl})`,
+            '--j-layer-bg-pos': `${-editionCol * CARD_WIDTH}px 0px`,
+          } as React.CSSProperties}
         />
       )}
 
       {/* Seal overlay */}
       {sealPos && (
-        <div
+        <JimboBox
+          className="j-standard-card__layer"
           style={{
-            ...layerBase,
-            zIndex: 3,
-            backgroundImage: `url(${enhancersUrl})`,
-            backgroundPosition: `${-sealPos.x * CARD_WIDTH}px ${-sealPos.y * CARD_HEIGHT}px`,
-          }}
+            '--j-layer-z': 3,
+            '--j-layer-w': `${CARD_WIDTH}px`,
+            '--j-layer-h': `${CARD_HEIGHT}px`,
+            '--j-layer-transform': `scale(${scale})`,
+            '--j-layer-bg-url': `url(${enhancersUrl})`,
+            '--j-layer-bg-pos': `${-sealPos.x * CARD_WIDTH}px ${-sealPos.y * CARD_HEIGHT}px`,
+          } as React.CSSProperties}
         />
       )}
 
       {/* Negative tint */}
       {isNegative && (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 4,
-            background: 'rgba(239, 68, 68, 0.1)',
-            mixBlendMode: 'overlay',
-            pointerEvents: 'none',
-          }}
-        />
+        <JimboBox className="j-standard-card__negative-tint" />
       )}
-    </div>
+    </JimboBox>
   )
 }
