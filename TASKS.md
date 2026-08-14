@@ -3,9 +3,12 @@
 The previous version of this file was a component-by-component Storybook
 backlog (Jimbo*, JamlMapEditor, CategoryPicker/JokerPicker, the r3f card
 table…) against a design system deleted wholesale in commit `92cc8c2`
-("kimi revival", 2026-07-03). None of those files exist anymore — see
-`HANDOFF.md` for what replaced them. Re-filing tasks against the old file
-map wastes a session; this list starts fresh from what's actually here.
+("kimi revival", 2026-07-03). None of those files exist anymore. What
+replaced it is the Jimbo layer in `src/ui/` — its rules are in `CLAUDE.md`
+and its enforcement in `.claude/hooks/check-design.mjs`,
+`eslint-rules/jaml-design.js` and `scripts/check-css-design.mjs`.
+Re-filing tasks against the old file map wastes a session; this list starts
+fresh from what's actually here.
 
 ## Open
 
