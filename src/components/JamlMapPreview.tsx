@@ -1,9 +1,5 @@
 "use client";
 
-// TODO(jimbo-primitives): pre-dates no-inline-style / no-token-in-jsx-style /
-// no-inline-component rules. Refactor to compose from Jimbo* primitives once
-// screenshot-driven primitive design lands. `git grep TODO(jimbo-primitives)`.
-
 import React, { useMemo } from "react";
 import { JimboSprite } from "../ui/sprites.js";
 import { JimboColorOption } from "../ui/tokens.js";

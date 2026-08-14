@@ -1,9 +1,5 @@
 "use client";
 
-// TODO(jimbo-primitives): pre-dates no-inline-style / no-token-in-jsx-style /
-// no-inline-component rules. Refactor to compose from Jimbo* primitives once
-
-
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { MysterySlot, type SlotSelection, type JamlZone, type SlotCategory } from "./MysterySlot.js";
 import { JokerPicker } from "./JokerPicker.js";
