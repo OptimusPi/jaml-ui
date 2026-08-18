@@ -1,0 +1,24 @@
+/* JetBrains Mono (OFL — see OFL.txt beside this file). jaml-ui's
+   --j-font-code prefers it but the repo never shipped the face; designs
+   rendered system monospace. Vendored for the design-sync bundle. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("./JetBrainsMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("./JetBrainsMono-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("./JetBrainsMono-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}

@@ -1,5 +1,87 @@
 {
-  "projectId": "785da941-c654-40ec-aca7-418c5a478c95",
+  "projectId": "962430e1-2a75-4ad3-9486-5f8b75037fc5",
   "shape": "storybook",
-  "storybookConfigDir": "."
+  "storybookConfigDir": ".storybook",
+  "pkg": "jaml-ui",
+  "storybookStatic": ".design-sync/sb-reference",
+  "buildCmd": "pnpm build && node .design-sync/make-ds-dist.mjs",
+  "entry": ".design-sync/.cache/ds-dist/index.js",
+  "cssEntry": ".design-sync/.cache/ds-dist/ui/jimbo.css",
+  "titleMap": {
+    "Background": "JimboBackground",
+    "Balatro Footer": "JimboBalatroFooter",
+    "Wordmark": "JimboWordmark",
+    "GameCard": "JamlGameCard",
+    "Jammy": "JimboMascot",
+    "OrbitalMenu": "JimboOrbitalMenu",
+    "Error Block": "JimboErrorBlock",
+    "Status Pill": "JimboStatusPill",
+    "Divider & Spacer": "JimboDivider",
+    "JimboLayout": "JimboStack",
+    "IDE Shell": "JamlIde",
+    "Visual Builder": "JamlIdeVisual",
+    "Bulk": "JamlyzerBulk",
+    "View": "JamlyzerView",
+    "Editor": "JamlMapEditor",
+    "Mascot": "JammyMascot",
+    "Colors": null,
+    "Spacing & Radius": null,
+    "Typography": null,
+    "Game": null,
+    "Layout": null,
+    "Reference": null,
+    "SwipeDeck": null,
+    "Code Editor": null,
+    "BalatroFooter": "JimboBalatroFooter",
+    "IDEShell": "JamlIde",
+    "VisualBuilder": "JamlIdeVisual",
+    "ErrorBlock": "JimboErrorBlock",
+    "StatusPill": "JimboStatusPill",
+    "Divider&Spacer": "JimboDivider",
+    "Spacing&Radius": null,
+    "CodeEditor": null
+  },
+  "extraFonts": [
+    ".design-sync/fonts/jetbrains-mono.css",
+    ".design-sync/fonts/JetBrainsMono-Regular.woff2",
+    ".design-sync/fonts/JetBrainsMono-Bold.woff2",
+    ".design-sync/fonts/JetBrainsMono-Italic.woff2"
+  ],
+  "overrides": {
+    "JimboButton": {
+      "cardMode": "column"
+    },
+    "DeckSprite": {
+      "cardMode": "column"
+    },
+    "JamlIde": {
+      "cardMode": "column"
+    },
+    "JamlyzerView": {
+      "cardMode": "column"
+    },
+    "JimboInnerPanel": {
+      "cardMode": "column"
+    },
+    "JimboPanel": {
+      "cardMode": "column"
+    },
+    "JimboStack": {
+      "cardMode": "column"
+    },
+    "JimboBackground": {
+      "cardMode": "single",
+      "primaryStory": "Swirl"
+    }
+  },
+  "provider": {
+    "component": "JimboBox",
+    "props": {
+      "style": {
+        "background": "#0c1818",
+        "padding": 16,
+        "minHeight": "100%"
+      }
+    }
+  }
 }

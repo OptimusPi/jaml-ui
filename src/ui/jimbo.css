@@ -17,6 +17,18 @@
 }
 
 
+/* ── Jimbo context roots ──────────────────────────────────────────────── */
+/* Every container that says "you are inside the Jimbo world" declares the
+   pixel font at zero specificity, so raw text dropped into a panel/picker
+   renders in-brand even on a bare page (storybook, design previews) instead
+   of falling back to the UA default. `:where()` keeps specificity at 0 —
+   any explicit family (e.g. --j-font-code surfaces) still wins untouched.
+   Inside the app nothing changes: these containers already inherited the
+   same font from .j-app/.j-page. */
+:where(.j-app, .j-page, .j-panel, .j-inner-panel, .j-modal, .j-picker, .j-inset) {
+  font-family: var(--j-font);
+}
+
 /* ── Base Text ─────────────────────────────────────────────────────────── */
 
 .j-text {
@@ -277,6 +289,15 @@
   width: 100%;
 }
 
+/* A full-width button shows a full-width FACE (Balatro's own modal "Back"
+   convention). Without this the face is an inline span that shrink-wraps to
+   its label and floats centered in a stretched-but-invisible button box —
+   measured 74px of visible face inside a 320px hit target. */
+.j-btn--full .j-btn__face {
+  display: block;
+  width: 100%;
+}
+
 .j-btn--disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -284,6 +305,12 @@
 
 .j-btn__face {
   position: relative;
+  /* Self-sufficient type: the face was tuned for the pixel font (see the
+     overflow note below), but nothing on .j-btn ever DECLARED it — the font
+     arrived by inheritance from .j-app/.j-page, so a button rendered outside
+     the shell (storybook, design previews, any bare page) silently fell back
+     to the UA default. Measured: Arial in both storybook and design previews. */
+  font-family: var(--j-font);
   border-radius: var(--j-radius-md);
   background: var(--j-btn-face-color, var(--j-orange));
   color: var(--j-white);
