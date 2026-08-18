@@ -72,6 +72,18 @@
     "JimboBackground": {
       "cardMode": "single",
       "primaryStory": "Swirl"
+    },
+    "JamlGameCard": {
+      "cardMode": "column"
+    },
+    "JimboPicker": {
+      "cardMode": "column"
+    },
+    "JimboMascot": {
+      "cardMode": "column"
+    },
+    "JimboOuterTab": {
+      "cardMode": "column"
     }
   },
   "provider": {
@@ -83,5 +95,6 @@
         "minHeight": "100%"
       }
     }
-  }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
 }
