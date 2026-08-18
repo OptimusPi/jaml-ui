@@ -113,6 +113,7 @@ export function useJamlCardRenderer({
     let cancelled = false;
     let frame: number | null = null;
     let startTime: number | undefined;
+    const pendingLoads = new Set<string>();
 
     const drawOnce = (animTime?: number) => {
       context.clearRect(0, 0, canvas.width, canvas.height);
@@ -125,13 +126,18 @@ export function useJamlCardRenderer({
             if (layer.order === 0) setRatio(imageRatio);
             return;
           }
+          if (pendingLoads.has(layer.source)) return;
+          pendingLoads.add(layer.source);
           loadImage(layer.source).then((img) => {
+            pendingLoads.delete(layer.source);
             if (cancelled || !img) return;
             imageCacheRef.current.set(layer.source, img);
-            if (!hasAnimatedLayer) {
-              const imageRatio = renderImage(canvas, context, img, layer);
-              if (layer.order === 0) setRatio(imageRatio);
-            }
+            // Redraw the WHOLE stack, never this layer alone: sheet loads
+            // resolve in arbitrary order, and the order-0 layer resizes —
+            // which clears — the canvas when it lands, wiping any layer
+            // painted before it. A full ordered pass sizes the canvas first
+            // and repaints every cached layer on top.
+            if (!hasAnimatedLayer) drawOnce();
             forceUpdate((prev) => prev + 1);
           });
         });

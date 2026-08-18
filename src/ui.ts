@@ -54,3 +54,31 @@ export { JimboBox, type JimboBoxProps } from "./ui/JimboBox.js";
 export { JimboInline, type JimboInlineProps } from "./ui/JimboInline.js";
 export { JimboCanvas, type JimboCanvasProps } from "./ui/JimboCanvas.js";
 export { JimboLink, type JimboLinkProps } from "./ui/JimboLink.js";
+
+// Storied primitives that never made the barrel — every one of these has a
+// Storybook story and shipped inside the bundle, but consumers (and the
+// design sync) couldn't import them until now.
+export { JimboListItem, type JimboListItemProps } from "./ui/JimboListItem.js";
+export {
+  JimboInlineEdit,
+  type JimboInlineEditProps,
+  type JimboInlineEditSize,
+  type JimboInlineEditTone,
+} from "./ui/JimboInlineEdit.js";
+export {
+  JimboPicker,
+  JimboPickerSection,
+  JimboPickerSearch,
+  JimboPickerHint,
+  JimboPickerGrid,
+  type JimboPickerGridProps,
+  JimboPickerItem,
+  type JimboPickerItemProps,
+  JimboPickerPair,
+  JimboPickerEmpty,
+} from "./ui/JimboPicker.js";
+export { JimboCodeSurface, type JimboCodeSurfaceProps } from "./ui/JimboCodeSurface.js";
+export { JimboFlankNav, type JimboFlankNavProps } from "./ui/jimboFlankNav.js";
+export { JimboTabs, type JimboTabsProps, type JimboTabDef } from "./ui/jimboTabs.js";
+export { JimboSprite, type JimboSpriteProps } from "./ui/sprites.js";
+export { type JimboTone } from "./ui/panel.js";
