@@ -45,6 +45,19 @@ export {
 } from "./lib/jaml/parseClauses.js";
 
 export {
+  estimateJamlRarity,
+  estimateEtaSeconds,
+  formatOneIn,
+  formatEta,
+  type JamlRarityEstimate,
+  type ClauseRarityEstimate,
+  type RarityFlag,
+  type RaritySeverity,
+  type RarityClauseKind,
+} from "./lib/jaml/rarity.js";
+export { RARITY_DATA, type RarityData } from "./lib/jaml/rarityData.generated.js";
+
+export {
   DeckSprite,
   DECK_SPRITE_POS,
   STAKE_SPRITE_POS,
