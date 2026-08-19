@@ -518,7 +518,7 @@
   grid-auto-flow: column;
   grid-auto-columns: max-content;
   justify-content: center;
-  align-items: flex-end;
+  align-items: end;
 }
 
 .j-tab__indicator svg {
@@ -530,7 +530,7 @@
   /* Arrow rests on top of the tab for ~30% of the cycle, then pops up and
      falls back. Per-keyframe easing gives it gravity (fast off the rest,
      slow at apex, fast on the fall) instead of a sleepy linear sine. */
-  animation: jimbo-bounce 0.55s infinite;
+  animation: jimbo-tab-indicator 0.55s infinite;
 }
 
 .j-tab__indicator[data-active="false"] {
@@ -541,7 +541,7 @@
    button. The selected tab is marked only by the bouncing arrow above it;
    the buttons themselves hold still so the row reads as a fixed baseline. */
 
-@keyframes jimbo-bounce {
+@keyframes jimbo-tab-indicator {
 
   /* Rest on top of the tab for the first ~30% of the cycle. */
   0%,
@@ -1027,7 +1027,7 @@
   padding: 14px 16px 14px 48px;
   background-color: var(--j-darkest);
   border: none;
-  border-bottom: 4px solid var(--j-panel-edge);
+  box-shadow: 0 4px 0 var(--j-panel-edge);
   border-radius: var(--j-radius-lg);
   color: var(--j-white);
   font-family: var(--j-font);
@@ -1059,7 +1059,7 @@
   background-color: var(--j-orange);
   color: var(--j-white);
   border: none;
-  border-bottom: 4px solid var(--j-dark-orange);
+  box-shadow: 0 4px 0 var(--j-dark-orange);
   border-radius: var(--j-radius-lg);
   cursor: pointer;
   font-family: var(--j-font);
@@ -1110,7 +1110,7 @@
   grid-auto-rows: max-content;
   overflow: hidden;
   border-radius: var(--j-radius-lg);
-  animation: jimbo-modal-in 140ms cubic-bezier(0.2, 0, 0.2, 1.4) both;
+  animation: jimbo-modal-in 140ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .j-modal .j-panel__body {
@@ -3170,7 +3170,7 @@
 }
 
 .j-juice-hover {
-  transition: transform 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .j-juice-hover:hover {
@@ -3250,7 +3250,7 @@
   padding: 4px 14px 6px;
   background: var(--j-red);
   border: none;
-  border-bottom: 3px solid var(--j-dark-red);
+  box-shadow: 0 3px 0 var(--j-dark-red);
   border-radius: var(--j-radius-md);
   color: var(--j-white);
   font-family: var(--j-font);
@@ -3276,7 +3276,7 @@
 .j-row--lg { gap: 12px; }
 .j-row--xl { gap: 16px; }
 .j-row--center { justify-content: center; }
-.j-row--end { justify-content: flex-end; }
+.j-row--end { justify-content: end; }
 .j-row--between { justify-content: space-between; }
 
 .j-divider {
@@ -3583,7 +3583,6 @@
 .j-progress__fill {
   height: 100%;
   background: var(--j-blue);
-  transition: width 200ms ease;
 }
 .j-progress__fill--red    { background: var(--j-red); }
 .j-progress__fill--green  { background: var(--j-green); }
@@ -3859,7 +3858,7 @@
   50% { transform: translateY(-4px) rotate(1deg); }
 }
 
-@keyframes jammy-bounce {
+@keyframes jammy-happy {
   0%, 100% { transform: translateY(0) scale(1); }
   40% { transform: translateY(-16px) scale(1.08); }
   60% { transform: translateY(4px) scale(0.96); }
@@ -3874,7 +3873,7 @@
 }
 
 .jammy-idle { animation: jammy-idle 2.5s ease-in-out infinite; }
-.jammy-bounce { animation: jammy-bounce 0.6s ease-out; }
+.jammy-happy { animation: jammy-happy 0.6s ease-out; }
 .jammy-shake { animation: jammy-shake 0.4s ease-in-out; }
 
 .j-mystery-slot__sprite--empty {
@@ -4262,7 +4261,6 @@
   width: var(--j-tally-width);
   border-radius: 999px;
   background: var(--j-tally-bg);
-  transition: width 200ms ease;
 }
 
 .j-ide-result__score {

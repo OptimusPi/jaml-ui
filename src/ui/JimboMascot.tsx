@@ -39,7 +39,7 @@ export function JimboMascot({
   };
 
   const animation =
-    mood === "happy" ? "jammy-bounce" : mood === "surprised" ? "jammy-shake" : "jammy-idle";
+    mood === "happy" ? "jammy-happy" : mood === "surprised" ? "jammy-shake" : "jammy-idle";
 
   return (
     <div

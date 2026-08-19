@@ -70,7 +70,7 @@ export const JIMBO_ANIMATIONS = {
   /** Lua juice_up end_time ≈ start + 0.4s */
   JUICE_DURATION: 400,
   JUICE_AMOUNT: 0.4,
-  JUICE_EASING: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  JUICE_EASING: 'cubic-bezier(0.16, 1, 0.3, 1)',
   /** Lua zoom hover bonus */
   HOVER_SCALE: 1.05,
   SWAY_AMOUNT: 1.5,
