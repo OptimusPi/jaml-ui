@@ -18,6 +18,16 @@ export interface JimboOuterTabProps extends HTMLAttributes<HTMLDivElement> {
   onToggleFullscreen?: () => void;
 }
 
+// Spelled out, not interpolated — see the note in JimboBadge.tsx.
+const TONE_CLASS = {
+  blue: "j-outer-tab--blue",
+  red: "j-outer-tab--red",
+  orange: "j-outer-tab--orange",
+  green: "j-outer-tab--green",
+  purple: "j-outer-tab--purple",
+  gold: "j-outer-tab--gold",
+} as const satisfies Record<JimboOuterTabTone, string>;
+
 /**
  * Grabbable chrome strip that sits on the OUTER top edge of a pane — the
  * handle a user drags to tear panes around a layout. Drag semantics live with
@@ -36,7 +46,7 @@ export function JimboOuterTab({
 }: JimboOuterTabProps) {
   const classes = [
     "j-outer-tab",
-    tone ? `j-outer-tab--${tone}` : "",
+    tone ? TONE_CLASS[tone] : "",
     active ? "j-outer-tab--active" : "",
     className,
   ]

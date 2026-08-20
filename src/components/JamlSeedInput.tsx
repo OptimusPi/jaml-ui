@@ -73,7 +73,7 @@ export const JamlSeedInput = React.forwardRef<HTMLInputElement, JamlSeedInputPro
   };
 
   return (
-    <JimboBox className={`j-seed-input j-seed-input--${variant} ${className ?? ""}`.trim()} style={style}>
+    <JimboBox className={`j-seed-input ${VARIANT_CLASS[variant]} ${className ?? ""}`.trim()} style={style}>
       {label ? <JimboText size="xs" tone="grey">{label}</JimboText> : null}
       <JimboBox
         className="j-seed-input__shell"

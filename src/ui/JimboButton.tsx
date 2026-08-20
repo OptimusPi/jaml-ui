@@ -9,6 +9,21 @@ export interface JimboButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
   label?: string;
 }
 
+// Spelled out, not interpolated — see the note in JimboLayout.tsx.
+const SIZE_CLASS = {
+  xs: "j-btn--xs",
+  sm: "j-btn--sm",
+  md: "j-btn--md",
+  lg: "j-btn--lg",
+} as const satisfies Record<NonNullable<JimboButtonProps["size"]>, string>;
+
+const TONE_CLASS = {
+  orange: "j-btn--orange",
+  red: "j-btn--red",
+  blue: "j-btn--blue",
+  green: "j-btn--green",
+} as const satisfies Record<NonNullable<JimboButtonProps["tone"]>, string>;
+
 export function JimboButton({
   size = "md",
   tone = "orange",
@@ -21,8 +36,8 @@ export function JimboButton({
 }: JimboButtonProps) {
   const classes = [
     "j-btn",
-    `j-btn--${size}`,
-    `j-btn--${tone}`,
+    SIZE_CLASS[size],
+    TONE_CLASS[tone],
     fullWidth ? "j-btn--full" : "",
     disabled ? "j-btn--disabled" : "",
     className,

@@ -14,6 +14,20 @@ export interface JimboInlineEditProps
   dim?: boolean
 }
 
+// Spelled out, not interpolated — see the note in JimboLayout.tsx.
+const SIZE_CLASS = {
+  xs: 'j-inline-edit--xs',
+  sm: 'j-inline-edit--sm',
+  md: 'j-inline-edit--md',
+  lg: 'j-inline-edit--lg',
+} as const satisfies Record<JimboInlineEditSize, string>
+
+const TONE_CLASS = {
+  white: 'j-inline-edit--white',
+  gold: 'j-inline-edit--gold',
+  grey: 'j-inline-edit--grey',
+} as const satisfies Record<JimboInlineEditTone, string>
+
 /**
  * Borderless transparent input that reads as inline text until focused —
  * for editable titles, bylines, or descriptions inside cards/panels.
@@ -26,8 +40,8 @@ export const JimboInlineEdit = React.forwardRef<HTMLInputElement, JimboInlineEdi
   ) {
     const classes = [
       'j-inline-edit',
-      `j-inline-edit--${size}`,
-      `j-inline-edit--${tone}`,
+      SIZE_CLASS[size],
+      TONE_CLASS[tone],
       dim ? 'j-inline-edit--dim' : null,
       className || null,
     ]
