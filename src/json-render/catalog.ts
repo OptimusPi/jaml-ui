@@ -1,214 +1,185 @@
-import { defineCatalog } from "./engine";
-import type { BadgeTone } from "./components/layout.js";
+import { schema } from "@json-render/react";
+import { z } from "zod";
 
 /**
- * Balatro Catalog — Component vocabulary for AI-generated UI.
+ * Jimbo generative-UI catalog for Vercel Labs' `@json-render`.
  *
- * Type-safe at compile time. Zero runtime overhead.
- * The AI sees these names + descriptions + prop shapes.
+ * Defines the type-safe catalog of Jimbo design system components and
+ * Balatro card sprites that an AI model may emit specs against.
  */
-export const balatroCatalog = defineCatalog({
-  // ── Layout ──
-  Panel: {
-    props: {} as {
-      title?: string;
-      subtitle?: string;
-      variant?: "default" | "accent" | "muted";
-      className?: string;
+export const jimboCatalog = schema.createCatalog({
+  components: {
+    // ── Layout & Containers ───────────────────────────────────────────────
+    JimboPanel: {
+      props: z.object({
+        title: z.string().optional(),
+        tone: z.enum(["dark", "blue", "red", "green", "gold", "orange", "purple"]).optional(),
+      }),
+      slots: ["default"],
+      description: "Outer arcade container panel with Balatro solid south drop shadow and header.",
+      example: { title: "Ante 1 Shop", tone: "gold" },
     },
-    description:
-      "A framed panel with optional title. Use for grouping related content.",
-  },
-  Stack: {
-    props: {} as {
-      gap?: number; // default 12
-      align?: "start" | "center" | "end" | "stretch"; // default stretch
-      className?: string;
+
+    JimboInnerPanel: {
+      props: z.object({
+        className: z.string().optional(),
+      }),
+      slots: ["default"],
+      description: "Recessed inset card/panel inside a JimboPanel.",
+      example: {},
     },
-    description: "Vertical stack with configurable gap. The default layout primitive.",
-  },
-  Grid: {
-    props: {} as {
-      columns?: number; // 1-4, default 3
-      gap?: number; // default 16
-      className?: string;
+
+    JimboRow: {
+      props: z.object({
+        gap: z.enum(["xs", "sm", "md", "lg"]).optional(),
+        wrap: z.boolean().optional(),
+        align: z.enum(["start", "center", "end", "stretch"]).optional(),
+        justify: z.enum(["start", "center", "end", "between"]).optional(),
+      }),
+      slots: ["default"],
+      description: "Horizontal CSS Grid row layout.",
+      example: { gap: "sm", align: "center" },
     },
-    description:
-      "Grid layout for cards and results. Responsive: 1 col mobile, 2 tablet, 3+ desktop.",
-  },
-  Text: {
-    props: {} as {
-      body: string;
-      variant?: "title" | "body" | "muted" | "accent" | "error";
-      className?: string;
+
+    JimboStack: {
+      props: z.object({
+        gap: z.enum(["xs", "sm", "md", "lg"]).optional(),
+        align: z.enum(["start", "center", "end", "stretch"]).optional(),
+      }),
+      slots: ["default"],
+      description: "Vertical CSS Grid stack layout.",
+      example: { gap: "sm", align: "start" },
     },
-    description: "Styled text. Use variant for semantic color, not manual color.",
-  },
-  Spacer: {
-    props: {} as { size?: number },
-    description: "Vertical spacer. Use instead of empty divs with margin.",
-  },
-  Divider: {
-    props: {} as { className?: string },
-    description: "Horizontal divider line.",
-  },
-  Badge: {
-    props: {} as {
-      label: string;
-      tone?: "red" | "blue" | "green" | "orange" | "gold" | "purple" | "grey";
-      className?: string;
+
+    JimboBox: {
+      props: z.object({
+        className: z.string().optional(),
+      }),
+      slots: ["default"],
+      description: "Generic CSS Grid box container.",
+      example: {},
     },
-    description: "Small colored badge / pill.",
+
+    // ── Game & Balatro Sprites ────────────────────────────────────────────
+    JamlGameCard: {
+      props: z.object({
+        name: z.string(),
+        type: z.enum(["joker", "consumable", "playing"]).default("joker"),
+        scale: z.number().optional(),
+      }),
+      slots: [],
+      description: "Authentic pixel-art Balatro card (Joker, Consumable, or Playing Card).",
+      example: { name: "WeeJoker", type: "joker", scale: 0.8 },
+    },
+
+    StandardCard: {
+      props: z.object({
+        rank: z.string(),
+        suit: z.enum(["Spades", "Hearts", "Clubs", "Diamonds"]).default("Spades"),
+        enhancement: z.string().optional(),
+        edition: z.string().optional(),
+        seal: z.string().optional(),
+        size: z.number().optional(),
+      }),
+      slots: [],
+      description: "Authentic Balatro playing card with suit, rank, and enhancements.",
+      example: { rank: "Two", suit: "Spades", size: 52 },
+    },
+
+    DeckSprite: {
+      props: z.object({
+        deck: z.string().default("Erratic"),
+        stake: z.string().optional(),
+        size: z.number().optional(),
+      }),
+      slots: [],
+      description: "Balatro deck card sprite with optional stake chip.",
+      example: { deck: "Erratic", stake: "White", size: 50 },
+    },
+
+    // ── JAMLyzer ──────────────────────────────────────────────────────────
+    JamlyzerSeedCard: {
+      props: z.object({
+        seed: z.string(),
+        score: z.number().optional(),
+        pinned: z.boolean().optional(),
+      }),
+      slots: [],
+      description: "Interactive candidate seed card with score pill, copy button, and milestone chips.",
+      example: {
+        seed: "18Z47K9Q",
+        score: 120,
+        pinned: true,
+      },
+    },
+
+    // ── Atoms & Primitives ────────────────────────────────────────────────
+    JimboButton: {
+      props: z.object({
+        label: z.string(),
+        tone: z.enum(["blue", "red", "green", "orange"]).default("blue"),
+        size: z.enum(["xs", "sm", "md", "lg"]).default("sm"),
+        action: z.string().optional(),
+      }),
+      slots: [],
+      description: "Tactile Balatro button with press-down spring feel.",
+      example: { label: "Analyze Seed", tone: "green", size: "sm" },
+    },
+
+    JimboBadge: {
+      props: z.object({
+        text: z.string(),
+        tone: z.enum(["dark", "blue", "red", "green", "grey", "orange", "purple"]).default("dark"),
+        size: z.enum(["sm", "md"]).default("sm"),
+      }),
+      slots: [],
+      description: "Arcade badge chip pill.",
+      example: { text: "Ante 1", tone: "orange", size: "sm" },
+    },
+
+    JimboText: {
+      props: z.object({
+        text: z.string(),
+        size: z.enum(["micro", "xs", "sm", "md", "lg", "title"]).default("sm"),
+        tone: z.enum(["white", "gold", "blue", "red", "green", "grey"]).default("white"),
+      }),
+      slots: [],
+      description: "Pixel-crisp arcade typography text.",
+      example: { text: "Rare Joker Guaranteed", tone: "gold", size: "sm" },
+    },
+
+    JimboSeedCopyChip: {
+      props: z.object({
+        value: z.string(),
+      }),
+      slots: [],
+      description: "1-click Balatro seed copy pill with clipboard feedback.",
+      example: { value: "WEEJ0KER" },
+    },
+
+    JimboStatusPill: {
+      props: z.object({
+        label: z.string(),
+        status: z.enum(["idle", "running", "ok", "error", "paused"]).default("idle"),
+      }),
+      slots: [],
+      description: "Key-value status metric pill.",
+      example: { label: "Score: 245", status: "ok" },
+    },
   },
 
-  // ── Status & Feedback ──
-  SearchStats: {
-    props: {} as {
-      status: "idle" | "running" | "completed" | "error";
-      seedsSearched?: string;
-      matchesFound?: number;
-      seedsPerSecond?: number;
-      elapsed?: string;
+  actions: {
+    copySeed: {
+      params: z.object({ seed: z.string() }),
+      description: "Copy a Balatro seed to the user's clipboard.",
     },
-    description: "Live search metrics panel. Shows seeds/sec, matches, status.",
-  },
-  ErrorBanner: {
-    props: {} as {
-      message: string;
-      onDismiss?: boolean; // if true, show X button
+    selectSeed: {
+      params: z.object({ seed: z.string() }),
+      description: "Select a seed for deep Ante inspection.",
     },
-    description: "Error state banner. Dismissible if onDismiss is true.",
-  },
-  LoadingPulse: {
-    props: {} as { text?: string },
-    description: "Loading skeleton with optional text.",
-  },
-
-  // ── Results ──
-  SeedCard: {
-    props: {} as {
-      seed: string;
-      score?: number;
-      rank?: number;
-      highlights?: string[];
-      jokers?: string[];
-      edition?: string;
-      onClick?: boolean; // if true, seed is clickable
+    loadJaml: {
+      params: z.object({ jaml: z.string() }),
+      description: "Load a JAML filter into the editor.",
     },
-    description:
-      "A seed result card. Shows seed code, score, jokers, highlights. Tap to expand.",
-  },
-  SeedList: {
-    props: {} as {
-      seeds: string[];
-      scores?: number[];
-      total?: number;
-      pageSize?: number;
-    },
-    description: "Paginated list of seed results. Use when results > 20.",
-  },
-  JokerBadge: {
-    props: {} as {
-      name: string;
-      edition?: "Foil" | "Holographic" | "Polychrome" | "Negative";
-      rarity?: "Common" | "Uncommon" | "Rare" | "Legendary";
-    },
-    description: "Small joker name pill with rarity color.",
-  },
-  EditionBadge: {
-    props: {} as {
-      edition: "Foil" | "Holographic" | "Polychrome" | "Negative";
-    },
-    description: "Edition badge with appropriate color (blue, green, purple, red).",
-  },
-
-  // ── Game Cards (via jaml-ui) ──
-  JamlGameCard: {
-    props: {} as {
-      type: "joker" | "consumable" | "playing";
-      card: {
-        name: string;
-        edition?: string;
-        seal?: string;
-        isEternal?: boolean;
-        isPerishable?: boolean;
-        isRental?: boolean;
-        scale?: number;
-      };
-    },
-    description: "Renders a real Balatro card using jaml-ui's sprite system.",
-  },
-
-  // ── Mascot ──
-  JammyMascot: {
-    props: {} as {
-      mood?: "idle" | "happy" | "surprised";
-      size?: number;
-      menuItems?: { label: string; action: string; tone?: BadgeTone }[];
-      onMenuAction?: boolean; // if true, the mascot emits actions
-    },
-    description:
-      "Jammy — the whimsical seed-mascot. Tap to open an orbital menu of actions.",
-  },
-  JammyOrbitalMenu: {
-    props: {} as {
-      items: { label: string; action: string; tone?: BadgeTone }[];
-      radius?: number;
-    },
-    description: "Radial menu orbiting a center point. Used by JammyMascot.",
-  },
-
-  // ── Encyclopedia / Reference ──
-  JokerCard: {
-    props: {} as {
-      name: string;
-      showSynergies?: boolean;
-    },
-    description:
-      "Full joker info card: name, rarity, cost, effect, strategy, synergies. Queries the knowledge base.",
-  },
-  SynergyCard: {
-    props: {} as {
-      name: string;
-    },
-    description:
-      "Synergy guide card: jokers involved, setup steps, math breakdown, boss counters, difficulty rating.",
-  },
-  BossBlindCard: {
-    props: {} as {
-      name: string;
-    },
-    description:
-      "Boss blind info card: effect, category, threat level, counters, JAML filter string.",
-  },
-  DeckCard: {
-    props: {} as {
-      name: string;
-    },
-    description:
-      "Deck info card: effect, strategy, synergies, difficulty rating.",
-  },
-  StakeCard: {
-    props: {} as {
-      name: string;
-    },
-    description:
-      "Stake difficulty card: effect, strategy, difficulty rating.",
-  },
-  StrategyAdvisor: {
-    props: {} as {
-      jokers: string[];
-    },
-    description:
-      "Takes a list of joker names and recommends strategies, warns about boss blinds, and suggests synergies.",
   },
 });
-
-export type BalatroCatalog = typeof balatroCatalog;
-export type BalatroComponentName = keyof BalatroCatalog;
-
-/**
- * Extract the props type for a given catalog component.
- */
-export type CatalogProps<K extends BalatroComponentName> =
-  BalatroCatalog[K] extends { props: infer P } ? P : never;

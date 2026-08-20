@@ -1,4 +1,4 @@
-import { parse as parseYaml } from "yaml";
+import { parseJamlDocument } from "./parseClauses.js";
 import { Vocab } from "jaml-lang";
 import { RARITY_DATA } from "./rarityData.generated.js";
 
@@ -683,9 +683,9 @@ function clauseLambda(c: RawClause, deck?: string): LambdaResult {
 export function estimateJamlRarity(jaml: string): JamlRarityEstimate {
   let doc: Record<string, unknown> = {};
   try {
-    doc = (parseYaml(jaml) as Record<string, unknown>) ?? {};
+    doc = parseJamlDocument(jaml);
   } catch {
-    // Unparseable YAML → no clauses; the engine's validate() owns syntax errors.
+    // Unparseable JAML → no clauses; the engine's validate() owns syntax errors.
   }
   const deck = typeof doc.deck === "string" ? doc.deck : undefined;
   const stake = typeof doc.stake === "string" ? doc.stake : undefined;

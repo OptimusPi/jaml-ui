@@ -42,24 +42,6 @@ export {
 } from "./components/jamlyzer/JamlyzerSeedCard.js";
 
 export {
-  DailyRitualView,
-  type DailyRitualViewProps,
-} from "./components/DailyRitualView.js";
-
-export {
-  JamlGenieBar,
-  type JamlGenieBarProps,
-} from "./components/JamlGenieBar.js";
-
-export {
-  getDailyChallenge,
-  getDayNumber,
-  DAILY_CHALLENGE_TEMPLATES,
-  type DailyChallenge,
-  type DailyChallengeTemplate,
-} from "./lib/daily/dailyChallenges.js";
-
-export {
   JamlyzerBulk,
   type JamlyzerBulkProps,
 } from "./components/JamlyzerBulk.js";
@@ -146,5 +128,5 @@ export * from "./ui.js";
 // "is on the client" even though dist/motely.js itself is clean. Server callers
 // import from "jaml-ui/motely", which is what that subpath export is for.
 
-// ── json-render v2 — zero-dep JSON-to-React engine ──
+// ── Generative UI: catalog/registry/renderer for Vercel Labs' @json-render ──
 export * from "./json-render/index.js";

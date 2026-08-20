@@ -1,7 +1,7 @@
 {
   "name": "jaml-ui",
   "version": "4.5.1",
-  "description": "json-render engine + Balatro card sprites and the Jimbo design system for MCP Apps.",
+  "description": "Balatro card sprites and the Jimbo design system for MCP Apps, with a @json-render (Vercel Labs) catalog.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -87,9 +87,11 @@
   "author": "pifreak",
   "license": "MIT",
   "dependencies": {
+    "@json-render/core": "^0.20.0",
+    "@json-render/react": "^0.20.0",
     "jaml-lang": "^3.14.2",
     "react-icons": "^5.7.0",
-    "yaml": "^2.9.0"
+    "zod": "^4.4.3"
   },
   "peerDependencies": {
     "motely-wasm": "^25.0.0",

@@ -1,5 +1,3 @@
-import { parse as parseYaml } from "yaml";
-
 export type JamlClauseKind = "must" | "should" | "mustNot";
 
 export type JamlItemType =
@@ -106,12 +104,99 @@ export interface ParsedJamlFilters {
   all: ParsedJamlClause[];
 }
 
+function parseValue(val: string): unknown {
+  const trimmed = val.trim();
+  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+    return trimmed
+      .slice(1, -1)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((s) => (!isNaN(Number(s)) ? Number(s) : s.replace(/^["']|["']$/g, "")));
+  }
+  if (!isNaN(Number(trimmed)) && trimmed !== "") return Number(trimmed);
+  if (trimmed.toLowerCase() === "true") return true;
+  if (trimmed.toLowerCase() === "false") return false;
+  return trimmed.replace(/^["']|["']$/g, "");
+}
+
+/** Pure line-based JAML parser without generic YAML library dependencies */
+export function parseJamlDocument(jamlText: string): Record<string, unknown> {
+  const lines = jamlText.split(/\r?\n/);
+  const doc: Record<string, unknown> = {};
+  let currentSection: "must" | "should" | "mustNot" | null = null;
+  let currentList: Record<string, unknown>[] = [];
+  let currentItem: Record<string, unknown> | null = null;
+
+  for (let rawLine of lines) {
+    const commentIdx = rawLine.indexOf("#");
+    if (commentIdx >= 0) rawLine = rawLine.slice(0, commentIdx);
+    const line = rawLine.trimEnd();
+    if (!line.trim()) continue;
+
+    const trimmed = line.trim();
+    if (trimmed.startsWith("deck:")) {
+      doc.deck = trimmed.slice(5).trim();
+      currentSection = null;
+      continue;
+    }
+    if (trimmed.startsWith("stake:")) {
+      doc.stake = trimmed.slice(6).trim();
+      currentSection = null;
+      continue;
+    }
+    if (trimmed.startsWith("must:")) {
+      currentSection = "must";
+      currentList = [];
+      doc.must = currentList;
+      continue;
+    }
+    if (trimmed.startsWith("should:")) {
+      currentSection = "should";
+      currentList = [];
+      doc.should = currentList;
+      continue;
+    }
+    if (trimmed.startsWith("mustNot:") || trimmed.startsWith("must_not:")) {
+      currentSection = "mustNot";
+      currentList = [];
+      doc.mustNot = currentList;
+      continue;
+    }
+
+    if (currentSection) {
+      if (trimmed.startsWith("- ")) {
+        currentItem = {};
+        currentList.push(currentItem);
+        const rest = trimmed.slice(2).trim();
+        if (rest) {
+          const colon = rest.indexOf(":");
+          if (colon >= 0) {
+            const k = rest.slice(0, colon).trim();
+            const v = rest.slice(colon + 1).trim();
+            currentItem[k] = parseValue(v);
+          }
+        }
+      } else if (currentItem && (line.startsWith("    ") || (line.startsWith("  ") && !trimmed.startsWith("- ")))) {
+        const colon = trimmed.indexOf(":");
+        if (colon >= 0) {
+          const k = trimmed.slice(0, colon).trim();
+          const v = trimmed.slice(colon + 1).trim();
+          currentItem[k] = parseValue(v);
+        }
+      }
+    }
+  }
+
+  return doc;
+}
+
 export function parseJamlClauses(jamlText: string): ParsedJamlFilters {
   let doc: Record<string, unknown> = {};
   try {
-    doc = parseYaml(jamlText) as Record<string, unknown> || {};
+    doc = parseJamlDocument(jamlText);
   } catch {
-    // Invalid YAML is handled gracefully; the engine will reject it later.
+    // Graceful fallback for empty / malformed text
   }
 
   const must = parseClauseList("must", doc.must);
@@ -128,6 +213,17 @@ export function parseJamlClauses(jamlText: string): ParsedJamlFilters {
   };
 }
 
+export function highlightClassForKind(kind: JamlClauseKind): string {
+  switch (kind) {
+    case "must":
+      return "j-highlight--must";
+    case "should":
+      return "j-highlight--should";
+    case "mustNot":
+      return "j-highlight--must-not";
+  }
+}
+
 export function splitCamelCase(key: string): string {
   return key.replace(/([A-Z])/g, " $1").trim();
 }
@@ -138,13 +234,30 @@ export function normalizeName(name: string): string {
 
 export function matchClauseToItem(
   clause: ParsedJamlClause,
-  itemType: JamlItemType,
+  itemType: string,
   itemName: string
 ): boolean {
-  if (clause.itemType !== "any" && clause.itemType !== itemType) return false;
-  if (clause.names.length === 0) return clause.itemType === "any";
-  const needle = normalizeName(itemName);
-  return clause.names.some((n) => normalizeName(n) === needle);
+  if (clause.itemType === "any") return true;
+
+  const normalizedTargetType = itemType.toLowerCase().replace(/[^a-z]/g, "");
+  const normalizedClauseType = clause.itemType.toLowerCase().replace(/[^a-z]/g, "");
+
+  if (normalizedTargetType !== normalizedClauseType) {
+    // Treat general consumable matches (tarot/planet/spectral under consumable)
+    if (
+      normalizedClauseType === "consumable" &&
+      ["tarot", "planet", "spectral"].includes(normalizedTargetType)
+    ) {
+      // Continue to name check
+    } else {
+      return false;
+    }
+  }
+
+  if (clause.names.length === 0) return true;
+
+  const normalizedTargetName = normalizeName(itemName);
+  return clause.names.some((n) => normalizeName(n) === normalizedTargetName);
 }
 
 export function matchClauseToAnte(clause: ParsedJamlClause, ante: number): boolean {
@@ -152,26 +265,17 @@ export function matchClauseToAnte(clause: ParsedJamlClause, ante: number): boole
   return clause.antes.includes(ante);
 }
 
-export function highlightClassForKind(kind: JamlClauseKind): string {
-  switch (kind) {
-    case "must":
-      return "j-glow--must";
-    case "should":
-      return "j-glow--should";
-    case "mustNot":
-      return "j-glow--match";
-    default:
-      return "";
-  }
-}
-
-/** Convenience matcher that maps the coarse decoder category to a JAML item type. */
 export function matchMotelyItemToClause(
-  item: { category?: string; displayName?: string },
+  decodedItem: {
+    category?: string;
+    kind?: string;
+    displayName?: string;
+    name?: string;
+    enumKey?: string;
+  },
   clause: ParsedJamlClause
 ): boolean {
-  if (!item.category || !item.displayName) return false;
-  const category = item.category as JamlItemType | "playing" | "consumable" | "unknown";
-  const itemType: JamlItemType = category === "playing" ? "standardcard" : category === "unknown" ? "unknown" : category;
-  return matchClauseToItem(clause, itemType, item.displayName);
+  const itemType = decodedItem.category || decodedItem.kind || "";
+  const name = decodedItem.displayName || decodedItem.name || decodedItem.enumKey || "";
+  return matchClauseToItem(clause, itemType, name);
 }

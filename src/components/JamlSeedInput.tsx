@@ -9,6 +9,12 @@ import { JimboBox } from "../ui/JimboBox.js";
 
 export type JamlSeedInputVariant = "normal" | "dark" | "alt";
 
+const VARIANT_CLASS: Record<JamlSeedInputVariant, string> = {
+  normal: "",
+  dark: "j-seed-input--dark",
+  alt: "j-seed-input--alt",
+};
+
 export interface JamlSeedInputProps {
   value?: string;
   onChange?: (seed: string) => void;
