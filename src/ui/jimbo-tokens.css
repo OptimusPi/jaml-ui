@@ -99,3 +99,27 @@
   --j-transition: 0.15s ease-out;
   --j-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
 }
+
+/*
+ * Motion setting — a real, user-settable preference, not a silent OS override.
+ * Default follows prefers-reduced-motion, but [data-j-motion] always wins when
+ * present: "full" keeps tactile motion even if the OS asks for less; "reduced"
+ * turns it off even if the OS doesn't. Call useMotionPreference() (src/ui/useMotionPreference.ts)
+ * to read/write it from a real toggle instead of leaving it to the media query alone.
+ *
+ * --j-press-speed isn't touched here: it only eases box-shadow/background-color
+ * on button press now (see jimbo.css), never transform — a press snaps instantly
+ * by design, not as a motion-preference accommodation, so there's no glide there
+ * to reduce. --j-transition is the real target: it drives the seed-card hover
+ * lift (translateY), the one token-based transform glide left in the system.
+ * Per WCAG 2.3.3: preserve the state change and hierarchy, don't kill feedback
+ * outright — the card still visibly highlights on hover, it just stops moving.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-j-motion="full"]) {
+    --j-transition: 1ms linear;
+  }
+}
+[data-j-motion="reduced"] {
+  --j-transition: 1ms linear;
+}

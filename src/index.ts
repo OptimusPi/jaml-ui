@@ -29,6 +29,19 @@ export {
 } from "./components/JimboBalatroFooter.js";
 
 export {
+  Jamlyzer,
+  type JamlyzerProps,
+  type JamlyzerSortMode,
+  type JamlyzerFilterMode,
+} from "./components/Jamlyzer.js";
+
+export {
+  JamlyzerSeedCard,
+  type JamlyzerSeedCardProps,
+  type SeedMilestoneHit,
+} from "./components/jamlyzer/JamlyzerSeedCard.js";
+
+export {
   JamlyzerBulk,
   type JamlyzerBulkProps,
 } from "./components/JamlyzerBulk.js";

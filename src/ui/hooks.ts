@@ -3,6 +3,7 @@ import { JamlVisualClause, JamlVisualFilter, JamlZone } from '../components/Jaml
 import { JIMBO_ANIMATIONS } from './tokens.js'
 import { Layer } from '../render/Layer.js'
 import { SPRITE_SHEETS } from '../sprites/spriteData.js'
+import { useMotionPreference } from './useMotionPreference.js'
 
 function loadImage(url: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
@@ -56,9 +57,10 @@ function renderImage(
  */
 export function useSway(active: boolean) {
   const ref = useRef<HTMLDivElement>(null)
+  const { effectiveReducedMotion } = useMotionPreference()
 
   useEffect(() => {
-    if (!active || !ref.current) return
+    if (!active || effectiveReducedMotion || !ref.current) return
     let frame: number
     const start = Date.now()
     const el = ref.current
@@ -72,7 +74,7 @@ export function useSway(active: boolean) {
       cancelAnimationFrame(frame)
       if (el) el.style.transform = ''
     }
-  }, [active])
+  }, [active, effectiveReducedMotion])
 
   return ref
 }
@@ -875,9 +877,14 @@ export function useJamlIdeDrag(
  * Provides a magnetic 3D tilt effect for DOM elements, replicating the hover-follow
  * of Balatro cards. Continuous (tracks the cursor). Pure CSS transform — no 3D deps.
  */
-export function useDOMMagneticTilt(enabled: boolean = true) {
+export function useDOMMagneticTilt(enabledProp: boolean = true) {
   const [isHovered, setIsHovered] = useState(false)
   const [transform, setTransform] = useState('none')
+  const { effectiveReducedMotion } = useMotionPreference()
+  // rotateX/rotateY/scale/translateY tilt is exactly the kind of motion
+  // prefers-reduced-motion exists for — it's JS-driven inline style, invisible to
+  // any CSS media query, so it has to check the setting itself.
+  const enabled = enabledProp && !effectiveReducedMotion
 
   const onPointerEnter = (event: React.PointerEvent) => {
     if (!enabled || event.pointerType === 'touch') return

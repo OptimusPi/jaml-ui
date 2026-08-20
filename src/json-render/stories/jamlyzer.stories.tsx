@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Jamlyzer } from "../../components/Jamlyzer.js";
 import { JamlyzerView } from "../../components/JamlyzerView.js";
 import { JimboApp } from "../../ui/JimboApp.js";
 import fixture from "./fixtures/jamlyzer-aaaaaaaa.json";
 
-const meta: Meta<typeof JamlyzerView> = {
-  title: "Screens/Jamlyzer/View",
-  component: JamlyzerView,
+const meta: Meta<typeof Jamlyzer> = {
+  title: "Screens/Jamlyzer/Triage",
+  component: Jamlyzer,
   parameters: {
     layout: "fullscreen",
   },
@@ -19,22 +20,71 @@ const meta: Meta<typeof JamlyzerView> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof JamlyzerView>;
+type Story = StoryObj<typeof Jamlyzer>;
 
-export const Default: Story = {
+const sampleJaml = `deck: Red
+stake: White
+should:
+  - joker: WeeJoker
+    score: 2
+  - tarot: The Fool
+    score: 1
+  - joker: Blueprint
+    score: 5
+must:
+  - boss: The Hook
+mustNot:
+  - voucher: Overstock
+`;
+
+// Helper to generate N mock seed results based on fixture
+function generateMockSeedResults(count: number) {
+  const base = fixture as unknown as Parameters<typeof JamlyzerView>[0]["result"];
+  const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+  return Array.from({ length: count }, (_, idx) => {
+    let seed = "";
+    for (let c = 0; c < 8; c++) {
+      seed += chars[(idx * 7 + c * 13 + (idx % 11)) % chars.length];
+    }
+    const score = (idx * 3 + 7) % 15;
+    return {
+      ...base,
+      seed,
+      score,
+    };
+  });
+}
+
+export const FullTriage100Seeds: Story = {
   args: {
-    result: fixture as unknown as Parameters<typeof JamlyzerView>[0]["result"],
+    jaml: sampleJaml,
+    results: generateMockSeedResults(100),
     deck: 0,
     stake: 0,
   },
 };
 
-export const WithClauseHighlighting: Story = {
+export const TenThousandSeedStressTest: Story = {
   args: {
-    result: fixture as unknown as Parameters<typeof JamlyzerView>[0]["result"],
+    jaml: sampleJaml,
+    results: generateMockSeedResults(10000),
     deck: 0,
     stake: 0,
-    jamlText: `deck: Red\nstake: White\nshould:\n  - joker: WeeJoker\n    score: 1\n  - tarot: The Fool\n    score: 1\nmust:\n  - boss: The Hook\nmustNot:\n  - voucher: Overstock\n`,
-    tallies: [2, 1],
+  },
+};
+
+export const SingleSeedView: Story = {
+  args: {
+    jaml: sampleJaml,
+    results: [
+      {
+        ...(fixture as unknown as Parameters<typeof JamlyzerView>[0]["result"]),
+        seed: "18Z47K9Q",
+        score: 12,
+      },
+    ],
+    deck: 0,
+    stake: 0,
   },
 };

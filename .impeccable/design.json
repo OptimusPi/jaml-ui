@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-19T15:51:30.000Z",
+  "title": "Design System: Jimbo UI",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Jimbo Red", "canonical": "#fe5148", "tonalRamp": ["#3f1412", "#66201d", "#8c2c28", "#a02721", "#fe5148", "#ff746d", "#ff9791", "#ffbab6"] },
+      "primary-dark": { "role": "primary", "displayName": "Jimbo Dark Red", "canonical": "#a02721", "tonalRamp": ["#290a08", "#47110e", "#661814", "#851f1a", "#a02721", "#b8423c", "#d05d57", "#e87872"] },
+      "blue": { "role": "secondary", "displayName": "Jimbo Blue", "canonical": "#0093ff", "tonalRamp": ["#002540", "#003c66", "#00538c", "#0057a1", "#0093ff", "#33a9ff", "#66bfff", "#99d4ff"] },
+      "dark-blue": { "role": "secondary", "displayName": "Jimbo Dark Blue", "canonical": "#0057a1", "tonalRamp": ["#001629", "#002b52", "#00417a", "#0057a1", "#006dc7", "#1a85ed", "#479ef0", "#75b7f3"] },
+      "orange": { "role": "secondary", "displayName": "Jimbo Orange", "canonical": "#ff9800", "tonalRamp": ["#402600", "#663d00", "#8c5400", "#a05b00", "#ff9800", "#ffad33", "#ffc266", "#ffd699"] },
+      "dark-orange": { "role": "secondary", "displayName": "Jimbo Dark Orange", "canonical": "#a05b00", "tonalRamp": ["#291700", "#472800", "#663a00", "#854b00", "#a05b00", "#b8721a", "#d08a33", "#e8a14d"] },
+      "green": { "role": "secondary", "displayName": "Jimbo Green", "canonical": "#429f79", "tonalRamp": ["#10281e", "#1b4031", "#255743", "#215f46", "#429f79", "#68b294", "#8ec6ae", "#b3d9c9"] },
+      "dark-green": { "role": "secondary", "displayName": "Jimbo Dark Green", "canonical": "#215f46", "tonalRamp": ["#081812", "#0f2b1f", "#153d2d", "#1c503b", "#215f46", "#37775e", "#4d8f75", "#63a78d"] },
+      "gold": { "role": "secondary", "displayName": "Jimbo Gold", "canonical": "#e4b643", "tonalRamp": ["#392d11", "#5b491b", "#7e6425", "#a1802f", "#e4b643", "#ecc569", "#f1d38e", "#f7e2b4"] },
+      "purple": { "role": "secondary", "displayName": "Jimbo Purple", "canonical": "#9e74ce", "tonalRamp": ["#281d34", "#402f53", "#584172", "#705291", "#9e74ce", "#b190d8", "#c5ace2", "#d8c7ec"] },
+      "darkest": { "role": "neutral", "displayName": "Jimbo Darkest Canvas", "canonical": "#1e2b2d", "tonalRamp": ["#070b0b", "#0d1314", "#141c1d", "#1a2527", "#1e2b2d", "#364649", "#4f6265", "#697e81"] },
+      "dark": { "role": "neutral", "displayName": "Jimbo Dark Container", "canonical": "#1c252a", "tonalRamp": ["#07090a", "#0d1012", "#13181c", "#182025", "#1c252a", "#333f46", "#4b5a61", "#64747d"] },
+      "dark-grey": { "role": "neutral", "displayName": "Jimbo Dark Grey", "canonical": "#3a5055", "tonalRamp": ["#0e1415", "#172022", "#212e31", "#2a3b3f", "#3a5055", "#516b71", "#68878e", "#81a2aa"] },
+      "grey": { "role": "neutral", "displayName": "Jimbo Grey", "canonical": "#a8bcbf", "tonalRamp": ["#2a2f30", "#434b4c", "#5c6769", "#758385", "#a8bcbf", "#bac9cb", "#ccd7d8", "#dee4e5"] },
+      "white": { "role": "neutral", "displayName": "Jimbo White", "canonical": "#ffffff", "tonalRamp": ["#404040", "#666666", "#8c8c8c", "#b3b3b3", "#ffffff", "#ffffff", "#ffffff", "#ffffff"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (28px)", "purpose": "Hero ante indicators, modal titles, and big banner headings." },
+      "headline": { "displayName": "Headline (20px)", "purpose": "Section headers, major card categories, and primary inputs." },
+      "body": { "displayName": "Body (14px)", "purpose": "Standard game card text, item descriptions, and editor lines." },
+      "label": { "displayName": "Label (12px)", "purpose": "Button badges, tooltips, keyboard shortcuts, and metadata captions." }
+    },
+    "shadows": [
+      { "name": "button-lip-red", "value": "0 4px 0 var(--j-dark-red)", "purpose": "Solid south edge on primary red buttons." },
+      { "name": "button-lip-blue", "value": "0 4px 0 var(--j-dark-blue)", "purpose": "Solid south edge on secondary blue buttons." },
+      { "name": "button-lip-orange", "value": "0 4px 0 var(--j-dark-orange)", "purpose": "Solid south edge on warning/filter buttons." },
+      { "name": "badge-lip", "value": "0 2px 0 rgba(0, 0, 0, 0.4)", "purpose": "Subtle tactile depth on chips and spinner value badges." },
+      { "name": "modal-backdrop", "value": "rgba(8, 18, 22, 0.55)", "purpose": "Dark chalkboard backdrop for modal focus." }
+    ],
+    "motion": [
+      { "name": "juice-easing", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Exponential deceleration curve for crisp, tactile interactions without rubbery overshoot." },
+      { "name": "press-lip", "value": "55ms ease-out", "purpose": "Instant responsive mechanical depression on click/tap." }
+    ],
+    "breakpoints": [
+      { "name": "canvas-fixed", "value": "320px" },
+      { "name": "narrow-iframe", "value": "560px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Jimbo Button Primary",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary tactile arcade action button with south edge lip.",
+      "html": "<button class=\"ds-btn-primary\">RUN FILTER</button>",
+      "css": ".ds-btn-primary { background: #fe5148; color: #ffffff; padding: 8px 16px; font-family: m6x11plus, monospace; font-size: 14px; border: none; border-radius: 6px; box-shadow: 0 4px 0 #a02721; cursor: pointer; transition: transform 55ms ease-out, box-shadow 55ms ease-out; } .ds-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #a02721; } .ds-btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #a02721; }"
+    },
+    {
+      "name": "Jimbo Filter Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Inset dark search input with solid bottom shadow.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search cards, seeds...\" />",
+      "css": ".ds-input { background: #1e2b2d; color: #ffffff; padding: 12px 16px; font-family: m6x11plus, monospace; font-size: 16px; border: none; border-radius: 10px; box-shadow: 0 4px 0 #1e2e32; outline: none; width: 100%; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Arcade Tactile Terminal",
+    "overview": "Jimbo UI brings the vibrant, chunky, tactile feel of Balatro directly into developer tools and MCP host environments. It is uncompromisingly mechanical: flat color fills, crisp pixel typography, solid south-edge drop shadows, and CRT scanlines create an authentic retro-arcade presence.\n\nThere are no blurry ambient glows, no generic gradient text, and no rounded SaaS cards masquerading as modern design. The interface prioritizes rock-solid deterministic layout (pure CSS Grid and absolute coordinates) so that every modal, card rail, and seed editor renders with exact precision inside host iframes.",
+    "keyCharacteristics": [
+      "Deterministic Grid Composition: Zero flex layout ensures identical rendering across varied host container widths.",
+      "Physical 3D Lips: Depth is conveyed through solid south-edge box shadows (box-shadow: 0 4px 0 ...), not soft atmospheric blurs.",
+      "Authentic Pixel Typography: Powered by m6x11plus with standard weights (no artificial bolding or ALL CAPS shouting).",
+      "High-Contrast Arcade Palette: Distinctive saturated game tokens set against deep dark slate backgrounds."
+    ],
+    "rules": [
+      { "name": "The South-Edge Rule", "body": "Every interactive button and active badge carries a solid south lip in its corresponding dark token. Flat surfaces stay flat at rest; interactive elements convey physical elevation through solid pixel extrusion.", "section": "elevation" },
+      { "name": "The No-Shouting Rule", "body": "Jimbo UI communicates hierarchy through font size and token color, never through fontWeight: bold, 700+, or ALL CAPS text.", "section": "typography" },
+      { "name": "The Zero-Flex Iframe Rule", "body": "display: flex and all flex-* rules are strictly forbidden in src/. Layouts must use display: grid or absolute positioning so iframes render identically across all host environments.", "section": "layout" },
+      { "name": "The Zero-Blur Depth Rule", "body": "Soft atmospheric gaussian blurs belong to generic web apps. Jimbo depth uses zero-blur solid offsets that feel like molded plastic arcade components.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use display: grid for all container layouts and button alignment.",
+      "Do compose reusable Jimbo* primitives from src/ui/.",
+      "Do use react-icons (preferably react-icons/fi) for all iconography.",
+      "Do use exponential deceleration (cubic-bezier(0.16, 1, 0.3, 1)) for UI state transitions."
+    ],
+    "donts": [
+      "Don't use display: flex or any flex-* property anywhere in src/.",
+      "Don't use fontWeight: bold or uppercase shouting text.",
+      "Don't use single-side thick borders on rounded containers; use box-shadow: 0 Npx 0 ....",
+      "Don't use rubber-band bounce overshoots (> 1.0 bezier values).",
+      "Don't use emojis in UI controls."
+    ]
+  }
+}

@@ -320,7 +320,9 @@
   /* Drop shadow at 30% opacity per design. Stacked solid offset, no blur. */
   box-shadow: 0 calc(var(--j-press-y) + 2px) 0 0 rgba(0, 0, 0, 0.3);
   transform: translate(0, 0);
-  transition: transform var(--j-press-speed) linear, box-shadow var(--j-press-speed) linear, background-color var(--j-press-speed) linear;
+  /* Press position snaps — a real button doesn't glide into the pressed state,
+     it just is pressed. Only the color/shadow feedback eases. */
+  transition: box-shadow var(--j-press-speed) linear, background-color var(--j-press-speed) linear;
   /* No overflow:hidden — it sheared pixel-font ascenders whenever padding ran
      tight. Nothing inside the face bleeds, so clipping bought nothing. */
   overflow: visible;
@@ -839,8 +841,8 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 var(--j-press-y) 0 0 var(--j-dark-red);
-  transition: transform var(--j-press-speed) ease,
-    box-shadow var(--j-press-speed) ease,
+  /* Same rule as .j-btn__face: press snaps, only color/shadow ease. */
+  transition: box-shadow var(--j-press-speed) ease,
     background-color var(--j-press-speed) ease;
 }
 
@@ -2331,7 +2333,7 @@
   min-width: calc(8ch + 16px);
   max-width: calc(8ch + 16px);
   padding: 6px 8px 8px;
-  border-radius: calc(var(--j-radius-md) - 2px);
+  border-radius: var(--j-radius-sm);
   border: var(--j-panel-border-width) solid var(--j-panel-edge);
   background: var(--j-seed-field-bg);
   color: var(--j-gold-text);
@@ -2394,16 +2396,29 @@
   width: 100%;
 }
 
+/* Ambient @keyframes animations (CRT/chrome pulses) are a separate concern from
+ * the --j-press-speed/--j-transition tokens in jimbo-tokens.css: those glide on
+ * user interaction, these loop on their own. Same rule either way: explicit
+ * [data-j-motion] wins over the OS default, never a silent one-way override. */
 @media (prefers-reduced-motion: reduce) {
-  .j-panel::before,
-  .j-inner-panel::before,
-  .j-btn__face::before,
-  .j-tab__btn::before,
-  .j-footer__bar::before,
-  .j-seed-input__shell::before,
-  .j-tab__btn[data-active="true"] {
+  :root:not([data-j-motion="full"]) .j-panel::before,
+  :root:not([data-j-motion="full"]) .j-inner-panel::before,
+  :root:not([data-j-motion="full"]) .j-btn__face::before,
+  :root:not([data-j-motion="full"]) .j-tab__btn::before,
+  :root:not([data-j-motion="full"]) .j-footer__bar::before,
+  :root:not([data-j-motion="full"]) .j-seed-input__shell::before,
+  :root:not([data-j-motion="full"]) .j-tab__btn[data-active="true"] {
     animation: none;
   }
+}
+[data-j-motion="reduced"] .j-panel::before,
+[data-j-motion="reduced"] .j-inner-panel::before,
+[data-j-motion="reduced"] .j-btn__face::before,
+[data-j-motion="reduced"] .j-tab__btn::before,
+[data-j-motion="reduced"] .j-footer__bar::before,
+[data-j-motion="reduced"] .j-seed-input__shell::before,
+[data-j-motion="reduced"] .j-tab__btn[data-active="true"] {
+  animation: none;
 }
 
 
@@ -3647,8 +3662,8 @@
   align-items: center;
   gap: 6px;
   padding: 4px 6px;
-  background: #1e2b2d;
-  border: 2px solid #334461;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-inner-border);
   border-radius: 4px;
   cursor: pointer;
   appearance: none;
@@ -3661,8 +3676,8 @@
   text-decoration: none;
 }
 .j-seed-row:hover {
-  background: #3a5055;
-  border-color: #b9c2d2;
+  background: var(--j-dark-grey);
+  border-color: var(--j-border-silver);
 }
 @keyframes j-row-in {
   from { opacity: 0; transform: translateY(-4px); }
@@ -3678,7 +3693,7 @@
 .j-seed-row__score {
   font-family: var(--j-font-m6x11);
   font-size: 16px;
-  color: #e4b643;
+  color: var(--j-gold);
 }
 .j-results-scroll {
   min-height: 0;
@@ -3709,8 +3724,8 @@
 }
 .j-ante-section {
   scroll-snap-align: start;
-  background: #1e2b2d;
-  border: 2px solid #334461;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-inner-border);
   border-radius: 6px;
   padding: 6px 8px;
   display: grid;
@@ -3729,7 +3744,7 @@
 .j-ante-section__title {
   font-family: var(--j-font-m6x11);
   font-size: 16px;
-  color: #e4b643;
+  color: var(--j-gold);
   text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
 }
 .j-stream {
@@ -3761,18 +3776,18 @@
 }
 .j-stream-item {
   background: #0b1416;
-  border: 1px solid #334461;
+  border: 1px solid var(--j-inner-border);
   border-radius: 3px;
   padding: 2px 5px;
   font-family: var(--j-font-m6x11);
   font-size: 8px;
-  color: #b9c2d2;
+  color: var(--j-border-silver);
   white-space: nowrap;
 }
 .j-stream-item--hit {
   background: rgba(228, 182, 67, 0.25);
   color: #fff;
-  border-color: #e4b643;
+  border-color: var(--j-gold);
   box-shadow: 0 0 4px rgba(228, 182, 67, 0.5);
 }
 .j-stream-item--must-hit {
@@ -3905,6 +3920,207 @@
     max-height: 12rem;
     min-width: 0;
   }
+}
+
+/* ── Jamlyzer 10k-Seed Triage Architecture ────────────────────────────── */
+
+.j-jamlyzer {
+  width: 100%;
+  min-width: 0;
+}
+
+.j-jamlyzer-header {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
+  padding: var(--j-space-sm) var(--j-space-md);
+  background: var(--j-dark);
+}
+
+.j-jamlyzer-toolbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: var(--j-space-sm);
+  align-items: center;
+}
+
+@media (max-width: 680px) {
+  .j-jamlyzer-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.j-jamlyzer-search-wrap {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+.j-jamlyzer-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--j-grey);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.j-jamlyzer-search-input {
+  width: 100%;
+  padding: 6px 28px 6px 30px;
+  background: var(--j-darkest);
+  border: 1px solid var(--j-panel-edge);
+  border-radius: var(--j-radius-md);
+  color: var(--j-white);
+  font-family: var(--j-font);
+  font-size: 12px;
+  outline: none;
+}
+
+.j-jamlyzer-search-input:focus {
+  border-color: var(--j-gold);
+}
+
+.j-jamlyzer-search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--j-grey);
+  cursor: pointer;
+  padding: 2px;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.j-jamlyzer-filter-chips {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: var(--j-space-xs);
+  align-items: center;
+}
+
+.j-jamlyzer-sort-select {
+  background: var(--j-darkest);
+  color: var(--j-white);
+  border: 1px solid var(--j-panel-edge);
+  border-radius: var(--j-radius-sm);
+  font-family: var(--j-font);
+  font-size: 11px;
+  padding: 4px 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.j-jamlyzer-split {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: var(--j-space-md);
+  align-items: start;
+  min-height: 480px;
+}
+
+@media (max-width: 760px) {
+  .j-jamlyzer-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.j-jamlyzer-candidate-pane {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-xs);
+}
+
+.j-jamlyzer-candidate-header {
+  padding: 6px 10px;
+}
+
+.j-jamlyzer-candidate-list {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-xs);
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.j-jamlyzer-inspector-pane {
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.j-jamlyzer-seed-card {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--j-dark);
+  border: 1px solid var(--j-panel-edge);
+  border-radius: var(--j-radius-md);
+  box-shadow: 0 2px 0 var(--j-panel-edge);
+  cursor: pointer;
+  transition: transform 55ms ease-out, box-shadow 55ms ease-out, border-color 55ms ease-out;
+}
+
+.j-jamlyzer-seed-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--j-panel-edge);
+  border-color: var(--j-blue);
+}
+
+.j-jamlyzer-seed-card--selected {
+  border-color: var(--j-gold);
+  background: color-mix(in srgb, var(--j-gold) 6%, var(--j-dark));
+  box-shadow: 0 2px 0 var(--j-gold);
+}
+
+.j-jamlyzer-seed-card--pinned {
+  border-color: var(--j-gold);
+}
+
+.j-jamlyzer-seed-card__header {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.j-jamlyzer-pin-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--j-grey);
+  cursor: pointer;
+  border-radius: var(--j-radius-sm);
+  font-size: 13px;
+  transition: color 55ms ease-out;
+}
+
+.j-jamlyzer-pin-btn:hover {
+  color: var(--j-gold);
+}
+
+.j-jamlyzer-pin-btn--pinned {
+  color: var(--j-gold);
+}
+
+.j-jamlyzer-seed-card__milestones {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fill, max-content);
+  gap: 4px;
 }
 
 
@@ -4196,7 +4412,7 @@
   position: absolute;
   inset: 0;
   z-index: 4;
-  background: rgba(239, 68, 68, 0.1);
+  background: color-mix(in srgb, var(--j-red) 10%, transparent);
   mix-blend-mode: overlay;
   pointer-events: none;
 }

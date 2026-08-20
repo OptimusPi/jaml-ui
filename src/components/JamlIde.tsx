@@ -462,7 +462,10 @@ export function JamlIde({
 
         {mode === "jamlyzer" ? (
           <JimboBox className="j-ide__jamlyzer">
-            <Jamlyzer jaml={text} />
+            <Jamlyzer
+              jaml={text}
+              seeds={searchResults.length > 0 ? searchResults.map((r) => r.seed) : undefined}
+            />
           </JimboBox>
         ) : null}
       </JimboBox>

@@ -30,3 +30,6 @@ storybook-static
 .design-sync/node_modules
 .ds-sync/
 ds-bundle/
+/.agents/skills/impeccable
+/.agents/skills
+/.claude/skills/impeccable
