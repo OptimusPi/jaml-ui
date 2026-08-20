@@ -42,6 +42,24 @@ export {
 } from "./components/jamlyzer/JamlyzerSeedCard.js";
 
 export {
+  DailyRitualView,
+  type DailyRitualViewProps,
+} from "./components/DailyRitualView.js";
+
+export {
+  JamlGenieBar,
+  type JamlGenieBarProps,
+} from "./components/JamlGenieBar.js";
+
+export {
+  getDailyChallenge,
+  getDayNumber,
+  DAILY_CHALLENGE_TEMPLATES,
+  type DailyChallenge,
+  type DailyChallengeTemplate,
+} from "./lib/daily/dailyChallenges.js";
+
+export {
   JamlyzerBulk,
   type JamlyzerBulkProps,
 } from "./components/JamlyzerBulk.js";
