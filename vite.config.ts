@@ -104,7 +104,6 @@ export default defineConfig({
         index: resolve(__dirname, "src/index.ts"),
         ui: resolve(__dirname, "src/ui.ts"),
         core: resolve(__dirname, "src/core.ts"),
-        motely: resolve(__dirname, "src/motely.ts"),
       },
       formats: ["es"],
     },

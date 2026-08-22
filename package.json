@@ -18,10 +18,6 @@
       "types": "./dist/core.d.ts",
       "default": "./dist/core.js"
     },
-    "./motely": {
-      "types": "./dist/motely.d.ts",
-      "default": "./dist/motely.js"
-    },
     "./jimbo.css": "./dist/ui/jimbo.css",
     "./fonts.css": "./fonts.css",
     "./assets/*": "./assets/*"
