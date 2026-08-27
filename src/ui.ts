@@ -5,7 +5,7 @@ export { useMotionPreference, type JimboMotionSetting } from "./ui/useMotionPref
 export { JimboButton, type JimboButtonProps } from "./ui/JimboButton.js";
 export { JimboTextArea, type JimboTextAreaProps } from "./ui/JimboTextArea.js";
 export { JimboPanel, type JimboPanelProps } from "./ui/JimboPanel.js";
-export { JimboBackground } from "./ui/JimboBackground.js";
+export { JimboBackground, type JimboBackgroundConfig } from "./ui/JimboBackground.js";
 export { JimboApp, type JimboAppProps, type JimboAppVariant } from "./ui/JimboApp.js";
 export { JimboInset, type JimboInsetProps } from "./ui/JimboInset.js";
 export { JimboWordmark, type JimboWordmarkProps } from "./ui/JimboWordmark.js";
