@@ -182,6 +182,7 @@ export function ZoneRail({
     onRemove,
     onEdit,
     onDragStart,
+    dropTarget,
 }: {
     zone: JamlZone;
     clauses: JamlVisualClause[];
@@ -189,12 +190,13 @@ export function ZoneRail({
     onRemove: (id: string) => void;
     onEdit: (clause: JamlVisualClause) => void;
     onDragStart: (e: React.MouseEvent | React.TouchEvent, clause: JamlVisualClause, zone: JamlZone) => void;
+    dropTarget?: boolean;
 }) {
     const z = ZONE_META[zone];
     return (
         <JimboBox
             data-zone={zone}
-            className="j-jaml-ide-visual__zone-rail"
+            className={`j-jaml-ide-visual__zone-rail${dropTarget ? " j-jaml-ide-visual__zone-rail--drop" : ""}`}
             style={{ "--j-zone-color": z.color } as React.CSSProperties}
         >
             <JimboBox className="j-jaml-ide-visual__zone-header">
@@ -267,7 +269,7 @@ export function TopMatter({
 
 export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: JamlIdeVisualProps) {
     const rootRef = useRef<HTMLDivElement>(null);
-    const { drag, onDragStart } = useJamlIdeDrag(filter, onChange, rootRef);
+    const { drag, hoverZone, onDragStart } = useJamlIdeDrag(filter, onChange, rootRef);
 
     const removeClause = (zone: JamlZone, id: string) => {
         onChange({ ...filter, [zone]: filter[zone].filter((c) => c.id !== id) });
@@ -289,6 +291,7 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
                         onRemove={(id) => removeClause("must", id)}
                         onEdit={(c) => onEditClause?.("must", c)}
                         onDragStart={onDragStart}
+                        dropTarget={hoverZone === "must"}
                     />
                 </JimboBox>
                 <JimboBox className="j-jaml-ide-visual__top-zone-mustnot">
@@ -299,6 +302,7 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
                         onRemove={(id) => removeClause("mustnot", id)}
                         onEdit={(c) => onEditClause?.("mustnot", c)}
                         onDragStart={onDragStart}
+                        dropTarget={hoverZone === "mustnot"}
                     />
                 </JimboBox>
             </JimboBox>
@@ -309,6 +313,7 @@ export function JamlIdeVisual({ filter, onChange, onEditClause, onAddClause }: J
                 onRemove={(id) => removeClause("should", id)}
                 onEdit={(c) => onEditClause?.("should", c)}
                 onDragStart={onDragStart}
+                dropTarget={hoverZone === "should"}
             />
 
             {drag && (

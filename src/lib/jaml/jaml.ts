@@ -16,7 +16,7 @@ export type JamlItemType =
   | "any"
   | "unknown";
 
-export interface ParsedJamlClause {
+export interface JamlClause {
   kind: JamlClauseKind;
   itemType: JamlItemType;
   /** Exact names as written in JAML (e.g. "WeeJoker"). */
@@ -67,7 +67,7 @@ function extractNames(clause: Record<string, unknown>): { itemType: JamlItemType
   return { itemType: "unknown", names: [] };
 }
 
-function parseClauseList(kind: JamlClauseKind, list: unknown): ParsedJamlClause[] {
+function parseClauseList(kind: JamlClauseKind, list: unknown): JamlClause[] {
   if (!Array.isArray(list)) return [];
   return list
     .filter((c): c is Record<string, unknown> => c !== null && typeof c === "object")
@@ -95,13 +95,13 @@ function parseClauseList(kind: JamlClauseKind, list: unknown): ParsedJamlClause[
     .filter((c) => c.itemType !== "unknown" || c.raw.label);
 }
 
-export interface ParsedJamlFilters {
+export interface JamlFilter {
   deck?: string;
   stake?: string;
-  must: ParsedJamlClause[];
-  should: ParsedJamlClause[];
-  mustNot: ParsedJamlClause[];
-  all: ParsedJamlClause[];
+  must: JamlClause[];
+  should: JamlClause[];
+  mustNot: JamlClause[];
+  all: JamlClause[];
 }
 
 function parseValue(val: string): unknown {
@@ -191,7 +191,7 @@ export function parseJamlDocument(jamlText: string): Record<string, unknown> {
   return doc;
 }
 
-export function parseJamlClauses(jamlText: string): ParsedJamlFilters {
+export function parseJaml(jamlText: string): JamlFilter {
   let doc: Record<string, unknown> = {};
   try {
     doc = parseJamlDocument(jamlText);
@@ -233,7 +233,7 @@ export function normalizeName(name: string): string {
 }
 
 export function matchClauseToItem(
-  clause: ParsedJamlClause,
+  clause: JamlClause,
   itemType: string,
   itemName: string
 ): boolean {
@@ -260,7 +260,7 @@ export function matchClauseToItem(
   return clause.names.some((n) => normalizeName(n) === normalizedTargetName);
 }
 
-export function matchClauseToAnte(clause: ParsedJamlClause, ante: number): boolean {
+export function matchClauseToAnte(clause: JamlClause, ante: number): boolean {
   if (!clause.antes || clause.antes.length === 0) return true;
   return clause.antes.includes(ante);
 }
@@ -273,7 +273,7 @@ export function matchMotelyItemToClause(
     name?: string;
     enumKey?: string;
   },
-  clause: ParsedJamlClause
+  clause: JamlClause
 ): boolean {
   const itemType = decodedItem.category || decodedItem.kind || "";
   const name = decodedItem.displayName || decodedItem.name || decodedItem.enumKey || "";

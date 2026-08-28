@@ -3,7 +3,7 @@ import { JimboGrid } from './JimboGrid';
 import { JimboBadge } from './JimboBadge';
 
 const meta = {
-  title: 'Jimbo/Layout/Grid',
+  title: "Primitives/Layout/JimboGrid",
   component: JimboGrid,
 } satisfies Meta<typeof JimboGrid>;
 export default meta;

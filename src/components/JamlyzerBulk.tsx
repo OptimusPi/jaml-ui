@@ -12,18 +12,18 @@ import { JimboButton } from "../ui/JimboButton.js";
 import { JimboRow, JimboStack } from "../ui/JimboLayout.js";
 import { JimboSeedCopyChip } from "../ui/JimboSeedCopyChip.js";
 import {
-  parseJamlClauses,
-  type ParsedJamlClause,
+  parseJaml,
+  type JamlClause,
   matchMotelyItemToClause,
   matchClauseToAnte,
-} from "../lib/jaml/parseClauses.js";
+} from "../lib/jaml/jaml.js";
 
 export interface JamlyzerBulkProps {
   results: MotelyJamlyzerSeedResult[];
   /** Raw JAML text; used to derive clause identities if `clauses` is not provided. */
   jamlText?: string;
   /** Pre-parsed clauses (alternative to `jamlText`). */
-  clauses?: ParsedJamlClause[];
+  clauses?: JamlClause[];
   /** Per-seed per-should-clause tally values, in JAML order. */
   tallies?: (number[] | Int32Array)[];
   /** Optional deck/stake applied to every seed in the bulk view. */
@@ -49,9 +49,9 @@ function pullItems(ante: MotelyJamlyzerAnteResult): MotelyJamlyzerAnteResult["pu
 
 function seedClauseMatches(
   seedResult: MotelyJamlyzerSeedResult,
-  clauses: ParsedJamlClause[]
-): Map<ParsedJamlClause, number[]> {
-  const map = new Map<ParsedJamlClause, number[]>();
+  clauses: JamlClause[]
+): Map<JamlClause, number[]> {
+  const map = new Map<JamlClause, number[]>();
   for (const clause of clauses) {
     const antes: number[] = [];
     for (const ante of seedResult.antes) {
@@ -77,7 +77,7 @@ export function ClauseHitPanel({
   hitAntes,
   tally,
 }: {
-  clause: ParsedJamlClause;
+  clause: JamlClause;
   hitAntes: number[];
   tally?: number;
 }) {
@@ -122,7 +122,7 @@ export function JamlyzerBulk({
 
   const clauses = useMemo(() => {
     if (clausesProp) return clausesProp;
-    if (jamlText) return parseJamlClauses(jamlText).all;
+    if (jamlText) return parseJaml(jamlText).all;
     return [];
   }, [clausesProp, jamlText]);
 

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { JimboErrorBlock } from './JimboErrorBlock';
 
 const meta = {
-  title: 'Jimbo/Feedback/Error Block',
+  title: "Primitives/Feedback/JimboErrorBlock",
   component: JimboErrorBlock,
 } satisfies Meta<typeof JimboErrorBlock>;
 export default meta;

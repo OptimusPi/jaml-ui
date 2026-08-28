@@ -50,6 +50,12 @@ export { JimboInnerPanel, type JimboInnerPanelProps, JimboModal, type JimboModal
 // Side-effect: design system CSS custom properties + component classes
 import "./ui/jimbo.css";
 export { JimboOuterTab, type JimboOuterTabProps, type JimboOuterTabTone } from "./ui/JimboOuterTab.js";
+export { JimboDock, type JimboDockProps, type JimboDockPane } from "./ui/JimboDock.js";
+export {
+  defaultPyramidDock,
+  dockActivate,
+  type DockNode,
+} from "./ui/jimboDock.js";
 export { JimboBox, type JimboBoxProps } from "./ui/JimboBox.js";
 export { JimboInline, type JimboInlineProps } from "./ui/JimboInline.js";
 export { JimboCanvas, type JimboCanvasProps } from "./ui/JimboCanvas.js";

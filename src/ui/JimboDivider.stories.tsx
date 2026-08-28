@@ -5,7 +5,7 @@ import { JimboText } from './jimboText';
 import { JimboRow, JimboStack } from './JimboLayout';
 
 const meta = {
-  title: 'Jimbo/Layout/Divider & Spacer',
+  title: "Primitives/Layout/JimboDivider",
   component: JimboDivider,
 } satisfies Meta<typeof JimboDivider>;
 export default meta;

@@ -29,8 +29,8 @@ The rule is the requirement; if one blocks you, your approach is the thing that 
 
 ## Where things live
 
-- **Foundations** — the `--j-*` tokens made visible: colors, type scale, spacing, the shader.
-- **Primitives** — every `Jimbo*` control, grouped by role. Sidebar name matches the import name.
+- **Foundations** — the `--j-*` tokens made visible: colors, type scale, spacing, the shader playground. Swirl + footer are the Storybook decorator, not stories.
+- **Primitives** — every `Jimbo*` control, grouped by role (`Actions`, `Display`, `Feedback`, `Inputs`, `Layout`, `Interaction`, `Menus`). Sidebar leaf matches the import name. `JimboDock` is the SeedLab tab panel (Filter / Search / Results / Jamlyze). Cards stay pixel-sized; do not stretch controls into long skinny buttons.
 - **Cards & Sprites** — the sprite-sheet surfaces (`DeckSprite`, `GameCard`, `JimboSprite`).
 - **Screens** — the composed app surfaces (JAML IDE, Jamlyzer, Ante Map).
 - **JsonRender** — `JimboJsonRenderer` rendering Vercel Labs `@json-render` specs against the Jimbo catalog.

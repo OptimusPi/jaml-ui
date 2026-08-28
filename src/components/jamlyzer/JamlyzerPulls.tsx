@@ -7,14 +7,14 @@ import { JimboText } from "../../ui/jimboText.js";
 import { JimboRow } from "../../ui/JimboLayout.js";
 import { JamlVoucher } from "../GameCard.js";
 import { decodeMotelyItem } from "../../decode/motelyItemDecoder.js";
-import type { ParsedJamlClause } from "../../lib/jaml/parseClauses.js";
+import type { JamlClause } from "../../lib/jaml/jaml.js";
 import { voucherDisplayName } from "./names.js";
 import { itemTypeOfCategory, selectHighlight } from "./highlight.js";
 import { JamlyzerItemCard } from "./JamlyzerItemCard.js";
 
 export interface JamlyzerPullsProps {
   ante: MotelyJamlyzerAnteResult;
-  matches: Map<string, ParsedJamlClause[]>;
+  matches: Map<string, JamlClause[]>;
 }
 
 /** Extra-card pulls (Judgement, Wraith, tags, …) and the voucher sequence. */

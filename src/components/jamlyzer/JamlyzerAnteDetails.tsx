@@ -5,6 +5,7 @@ import { JimboInnerPanel } from "../../ui/panel.js";
 import { JimboText } from "../../ui/jimboText.js";
 import { JimboBadge } from "../../ui/JimboBadge.js";
 import { JimboStack, JimboRow } from "../../ui/JimboLayout.js";
+import { JimboBox } from "../../ui/JimboBox.js";
 import { JimboSpinner } from "../../ui/JimboSpinner.js";
 import { MOTELY_ITEM_FORMATS_BY_VALUE } from "../../decode/motelyItemFormats.js";
 import {
@@ -35,6 +36,22 @@ function getResolvedItem(value: number, scale = 0.5): AnalyzerResolvedItem {
     );
   }
   return { kind: "unknown", label: `Unknown #${value}` };
+}
+
+function itemCaption(value: number): string {
+  const format = MOTELY_ITEM_FORMATS_BY_VALUE[value as keyof typeof MOTELY_ITEM_FORMATS_BY_VALUE];
+  return format?.displayName ?? `#${value}`;
+}
+
+export function LabeledItem({ value, scale }: { value: number; scale: number }) {
+  return (
+    <JimboStack gap="xs" align="center">
+      <ResolvedItem value={value} scale={scale} />
+      <JimboText size="micro" tone="white" className="j-text-center">
+        {itemCaption(value)}
+      </JimboText>
+    </JimboStack>
+  );
 }
 
 export function ResolvedItem({ value, scale }: { value: number; scale: number }) {
@@ -90,89 +107,70 @@ export function JamlyzerAnteDetails({
           No analysis for Ante {selectedAnte}
         </JimboText>
       ) : (
-        <JimboStack gap="sm" align="stretch">
-          <JimboInnerPanel className="j-jamlyzer__details-section">
-            <JimboText size="xs" tone="gold" className="j-text-center">
-              Boss & voucher
-            </JimboText>
-            <JimboRow gap="md" justify="center" align="center">
-              <JimboStack gap="xs" align="center">
-                <JamlBoss bossName={bossDisplayName(ante.boss)} scale={0.5} />
-                <JimboText size="micro" className="j-text-center">
-                  {bossDisplayName(ante.boss)}
-                </JimboText>
-              </JimboStack>
-              <JimboStack gap="xs" align="center">
-                <JamlVoucher voucherName={voucherDisplayName(ante.voucher)} scale={0.5} />
-                <JimboText size="micro" className="j-text-center">
-                  {voucherDisplayName(ante.voucher)}
-                </JimboText>
-              </JimboStack>
-            </JimboRow>
-          </JimboInnerPanel>
-
-          <JimboInnerPanel className="j-jamlyzer__details-section">
-            <JimboText size="xs" tone="gold" className="j-text-center">
-              Tags
-            </JimboText>
-            <JimboRow gap="md" justify="center" align="center">
-              <JimboStack gap="xs" align="center">
-                <JamlTag tagName={tagDisplayName(ante.smallBlindTag)} scale={0.5} />
-                <JimboText size="micro" className="j-text-center">
-                  Small: {tagDisplayName(ante.smallBlindTag)}
-                </JimboText>
-              </JimboStack>
-              <JimboStack gap="xs" align="center">
-                <JamlTag tagName={tagDisplayName(ante.bigBlindTag)} scale={0.5} />
-                <JimboText size="micro" className="j-text-center">
-                  Big: {tagDisplayName(ante.bigBlindTag)}
-                </JimboText>
-              </JimboStack>
-            </JimboRow>
-          </JimboInnerPanel>
-
-          <JimboInnerPanel className="j-jamlyzer__details-section">
-            <JimboText size="xs" tone="gold" className="j-text-center">
-              Shop queue
-            </JimboText>
-            {ante.shopItems && ante.shopItems.length > 0 ? (
-              <JimboRow wrap gap="xs" justify="center" align="start">
-                {ante.shopItems.map((item, idx) => (
-                  <ResolvedItem key={idx} value={item.value} scale={0.45} />
-                ))}
+        <JimboStack gap="md" align="stretch">
+          <JimboBox className="j-jamlyzer-ante-head">
+            <JimboStack gap="xs" align="center">
+              <JimboText size="micro" tone="grey">Voucher</JimboText>
+              <JamlVoucher voucherName={voucherDisplayName(ante.voucher)} scale={0.7} />
+              <JimboText size="micro" className="j-text-center">
+                {voucherDisplayName(ante.voucher)}
+              </JimboText>
+            </JimboStack>
+            <JimboStack gap="xs" align="center">
+              <JimboText size="micro" tone="grey">Boss</JimboText>
+              <JamlBoss bossName={bossDisplayName(ante.boss)} scale={0.55} />
+              <JimboText size="micro" className="j-text-center">
+                {bossDisplayName(ante.boss)}
+              </JimboText>
+            </JimboStack>
+            <JimboStack gap="xs" align="center">
+              <JimboText size="micro" tone="grey">Tags</JimboText>
+              <JimboRow gap="sm" align="end">
+                <JimboStack gap="xs" align="center">
+                  <JamlTag tagName={tagDisplayName(ante.smallBlindTag)} scale={0.55} />
+                  <JimboText size="micro" className="j-text-center">
+                    {tagDisplayName(ante.smallBlindTag)}
+                  </JimboText>
+                </JimboStack>
+                <JimboStack gap="xs" align="center">
+                  <JamlTag tagName={tagDisplayName(ante.bigBlindTag)} scale={0.55} />
+                  <JimboText size="micro" className="j-text-center">
+                    {tagDisplayName(ante.bigBlindTag)}
+                  </JimboText>
+                </JimboStack>
               </JimboRow>
-            ) : (
-              <JimboText size="xs" tone="grey" className="j-text-center">
-                Empty
-              </JimboText>
-            )}
-          </JimboInnerPanel>
+            </JimboStack>
+          </JimboBox>
 
-          <JimboInnerPanel className="j-jamlyzer__details-section">
-            <JimboText size="xs" tone="gold" className="j-text-center">
-              Booster packs
-            </JimboText>
-            {ante.packs && ante.packs.length > 0 ? (
-              <JimboStack gap="sm" align="stretch">
-                {ante.packs.map((pack, packIdx) => (
-                  <JimboStack key={packIdx} gap="xs" align="center">
-                    <JimboText size="xs" className="j-text-center">
-                      {packDisplayName(pack.pack)}
-                    </JimboText>
-                    <JimboRow wrap gap="xs" justify="center" align="start">
-                      {pack.items.map((item, itemIdx) => (
-                        <ResolvedItem key={itemIdx} value={item.value} scale={0.45} />
-                      ))}
-                    </JimboRow>
-                  </JimboStack>
-                ))}
-              </JimboStack>
-            ) : (
-              <JimboText size="xs" tone="grey" className="j-text-center">
-                No packs opened
-              </JimboText>
-            )}
-          </JimboInnerPanel>
+          {ante.shopItems && ante.shopItems.length > 0 ? (
+            <JimboBox className="j-shop-belt hide-scrollbar">
+              {ante.shopItems.map((item, idx) => (
+                <LabeledItem key={idx} value={item.value} scale={0.85} />
+              ))}
+            </JimboBox>
+          ) : (
+            <JimboText size="xs" tone="grey">Empty shop</JimboText>
+          )}
+
+          <JimboText size="sm" tone="white">Packs</JimboText>
+          {ante.packs && ante.packs.length > 0 ? (
+            <JimboStack gap="sm" align="stretch">
+              {ante.packs.map((pack, packIdx) => (
+                <JimboBox key={packIdx} className="j-jamlyzer-pack-line">
+                  <JimboText size="xs" tone="grey">
+                    {packDisplayName(pack.pack)}:
+                  </JimboText>
+                  <JimboBox className="j-shop-belt hide-scrollbar">
+                    {pack.items.map((item, itemIdx) => (
+                      <LabeledItem key={itemIdx} value={item.value} scale={0.7} />
+                    ))}
+                  </JimboBox>
+                </JimboBox>
+              ))}
+            </JimboStack>
+          ) : (
+            <JimboText size="xs" tone="grey">No packs</JimboText>
+          )}
         </JimboStack>
       )}
     </JimboInnerPanel>

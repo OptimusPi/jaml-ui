@@ -12,6 +12,13 @@ fresh from what's actually here.
 
 ## Open
 
+- **`D:\jaml-seedfinder-mcp` is the searcher host**, not mystery. MCP App iframe:
+  `JamlIde` + `motely-wasm` `MotelySearch` in `src/mcp-app.tsx`. Pins `jaml-ui@4.3.0`.
+  The searcher UI lived there / in seedfinder SeedLab `SearchPanel.jsx`. This package
+  only gets Search if the host passes `onSearch`. Harvest next: wire searcher into
+  `JimboDock` Search pane, not another IDE tab.
+
+
 - **41% of `jimbo.css` is unreferenced.** 243 of 595 `.j-*` classes are never
   used by any `.ts`/`.tsx` in `src/`, stories included (template-built names
   like `` `j-btn--${size}` `` are counted as live, so this is the conservative

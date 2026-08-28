@@ -2845,6 +2845,21 @@
   box-sizing: border-box;
 }
 
+.j-jamlyzer-ante-head {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 16px;
+  align-items: start;
+}
+
+.j-jamlyzer-pack-line {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
 .j-jamlyzer__details-section {
   display: grid;
   grid-auto-flow: row;
@@ -3902,9 +3917,9 @@
    The rail scrolls independently; below 560px (narrow MCP host iframes)
    the view collapses to one column and the rail becomes a short strip. */
 .j-jamlyzer-view {
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: var(--j-space-lg);
-  align-items: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--j-space-md);
 }
 
 .j-jamlyzer-view__rail {
@@ -4720,12 +4735,99 @@
     min-width: 0;
 }
 
+/* ── Dock (harvested SeedLab tab panel) ───────────────────────────────── */
+.j-dock {
+  display: grid;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
+}
+.j-dock--fs {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  padding: 10px;
+  background: color-mix(in srgb, var(--j-darkest) 96%, transparent);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.j-dock-split {
+  display: grid;
+  gap: 4px;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+}
+.j-dock-split--row {
+  grid-template-columns: var(--j-dock-a) 10px var(--j-dock-b);
+}
+.j-dock-split--column {
+  grid-template-rows: var(--j-dock-a) 10px var(--j-dock-b);
+}
+.j-dock-gutter {
+  display: grid;
+  place-items: center;
+}
+.j-dock-gutter--row {
+  cursor: col-resize;
+}
+.j-dock-gutter--column {
+  cursor: row-resize;
+}
+.j-dock-pane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+}
+.j-dock-pane--drop-left { box-shadow: inset 6px 0 0 var(--j-gold); }
+.j-dock-pane--drop-right { box-shadow: inset -6px 0 0 var(--j-gold); }
+.j-dock-pane--drop-top { box-shadow: inset 0 6px 0 var(--j-gold); }
+.j-dock-pane--drop-bottom { box-shadow: inset 0 -6px 0 var(--j-gold); }
+.j-dock-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 2px;
+  align-items: end;
+  overflow-x: auto;
+}
+.j-dock-tabs--drop {
+  outline: 2px dashed var(--j-gold);
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+.j-dock-tabs .j-outer-tab__grip {
+  display: none;
+}
+.j-dock-body {
+  min-height: 0;
+  overflow: auto;
+  background: color-mix(in srgb, var(--j-dark) 92%, transparent);
+  border: 2px solid var(--j-inner-border);
+  border-radius: 0 0 8px 8px;
+}
+.j-dock-story-root {
+  height: 100vh;
+  padding: 10px;
+}
+.j-dock-story-pane {
+  padding: 12px;
+}
+
 .j-jaml-ide-visual__drag-ghost {
     position: fixed;
+    left: var(--j-drag-left);
+    top: var(--j-drag-top);
     pointer-events: none;
     z-index: 999;
     filter: drop-shadow(0 4px 6px color-mix(in srgb, var(--j-black) 60%, transparent));
     opacity: 0.92;
+}
+
+.j-jaml-ide-visual__zone-rail--drop {
+    outline: 2px solid var(--j-gold);
+    outline-offset: 2px;
 }
 
 /* ── Added via Fix ── */
@@ -4746,7 +4848,19 @@
 .j-jaml-map-editor__ante-title { text-align: center; }
 .j-jaml-map-editor__row { padding: 0 4px; }
 .j-jaml-map-editor__section-title { letter-spacing: 1px; padding: 0 4px; }
-.j-jaml-map-editor__shop-row { overflow-x: auto; padding: 0 0 8px 4px; }
+/* Shop = Blueprint belt: one row of pixel cards, scroll sideways. Never wrap. */
+.j-shop-belt,
+.j-jaml-map-editor__shop-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 8px;
+  align-items: end;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0;
+  padding: 0 0 8px 4px;
+}
 .j-jaml-map-editor__pack-row { padding: 0 4px; }
 .j-category-menu { display: grid; gap: 12px; padding: 12px 0; max-height: 70vh; overflow-y: auto; }
 .j-category-menu__item { display: grid; grid-auto-flow: column; grid-template-columns: auto 1fr; align-items: center; gap: 10px; width: 100%; text-align: left; }

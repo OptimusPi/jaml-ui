@@ -206,8 +206,10 @@ export function JamlMapEditor({
               {/* Row 2: Shop Items */}
               <JimboBox className="j-stack j-stack--gap-xs">
                 <JimboText size="sm" tone="grey" className="j-jaml-map-editor__section-title">Shop Items</JimboText>
-                <JimboBox className="j-row hide-scrollbar j-row--gap-sm j-jaml-map-editor__shop-row">
-                  {[1,2,3,4,5,6,7,8].map(i => renderSlot(a, `ante_${a}_shop_${i}`, 52, "Jokers"))}
+                <JimboBox className="j-shop-belt hide-scrollbar">
+                  {Array.from({ length: 24 }, (_, i) => i + 1).map((i) =>
+                    renderSlot(a, `ante_${a}_shop_${i}`, 52, "Jokers"),
+                  )}
                 </JimboBox>
               </JimboBox>
 

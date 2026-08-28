@@ -59,15 +59,15 @@ export {
 export { type DailyRitual, parseRitual } from "./lib/daily/ritual.js";
 
 export {
-  parseJamlClauses,
-  type ParsedJamlClause,
+  parseJaml,
+  type JamlClause,
   type JamlClauseKind,
   type JamlItemType,
-  type ParsedJamlFilters,
+  type JamlFilter,
   matchClauseToItem,
   matchClauseToAnte,
   matchMotelyItemToClause,
-} from "./lib/jaml/parseClauses.js";
+} from "./lib/jaml/jaml.js";
 
 export {
   estimateJamlRarity,

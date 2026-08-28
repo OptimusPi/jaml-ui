@@ -100,10 +100,22 @@ No top-level `function Foo()` returning JSX inside a consumer screen. If a piece
 reusable enough to extract, it is a Jimbo primitive with a story. Inline helpers are how
 design drift starts.
 
+### 9. Sizes are pixel. Width is not a personality.
+
+Balatro cards are a fixed pixel box (base 71×95). Shop in a real analyzer is a
+**row of those boxes**, not stretched slots. Stretching a control to “fill the
+column” 99% of the time makes a long skinny button that does nothing extra.
+`--j-space-*` is 2/4/8/12/16 — a gap scale, not a license to `width: 100%` every
+JimboButton. Grow a **track of cards** (`grid-auto-flow: column` + card pixel
+size). Do not grow the face of the control.
+
+Evidence: Blueprint’s Ante 1 shop belt. Our spacing-token playground looking
+like bot slop is the same failure mode — extra tokens pretending layout is fluid.
+
 ## Design tokens
 
-Tokens live in `src/ui/jimbo.css` as `--j-*` custom properties. Before adding one, check
+Tokens live in `src/ui/jimbo-tokens.css` as `--j-*` custom properties. Before adding one, check
 whether an existing token covers it. A token earns its place by being **re-themed or
 re-used**; a custom property that is set once and read once is just a variable with extra
 steps, and it makes the stylesheet harder to hold in your head. Prefer a literal value
-over a single-use token.
+over a single-use token. Do not add more space tokens to “fix” width.

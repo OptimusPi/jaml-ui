@@ -8,10 +8,10 @@ import { JimboBadge } from "../../ui/JimboBadge.js";
 import { JimboSeedCopyChip } from "../../ui/JimboSeedCopyChip.js";
 import { decodeMotelyItem } from "../../decode/motelyItemDecoder.js";
 import {
-  type ParsedJamlClause,
+  type JamlClause,
   matchMotelyItemToClause,
   matchClauseToAnte,
-} from "../../lib/jaml/parseClauses.js";
+} from "../../lib/jaml/jaml.js";
 import { voucherDisplayName, tagDisplayName } from "./names.js";
 import { FiStar } from "react-icons/fi";
 
@@ -22,7 +22,7 @@ export interface JamlyzerSeedCardProps {
   onSelect: () => void;
   onTogglePin?: (e: React.MouseEvent) => void;
   maxScore?: number;
-  clauses?: ParsedJamlClause[];
+  clauses?: JamlClause[];
   className?: string;
   style?: React.CSSProperties;
 }
@@ -35,7 +35,7 @@ export interface SeedMilestoneHit {
 
 export function extractSeedMilestones(
   result: MotelyJamlyzerSeedResult,
-  clauses?: ParsedJamlClause[],
+  clauses?: JamlClause[],
   maxMilestones = 3
 ): SeedMilestoneHit[] {
   const milestones: SeedMilestoneHit[] = [];

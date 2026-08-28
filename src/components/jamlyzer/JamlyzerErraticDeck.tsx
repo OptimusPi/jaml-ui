@@ -5,13 +5,13 @@ import { JimboPanel } from "../../ui/JimboPanel.js";
 import { JimboRow } from "../../ui/JimboLayout.js";
 import { StandardCard } from "../StandardCard.js";
 import { decodeMotelyItemToJamlCard } from "../../decode/motelyItemDecoder.js";
-import type { ParsedJamlClause } from "../../lib/jaml/parseClauses.js";
+import type { JamlClause } from "../../lib/jaml/jaml.js";
 import { selectHighlight } from "./highlight.js";
 import { JamlyzerItemCard } from "./JamlyzerItemCard.js";
 
 export interface JamlyzerErraticDeckProps {
   cards: MotelyItem[];
-  matches: Map<string, ParsedJamlClause[]>;
+  matches: Map<string, JamlClause[]>;
 }
 
 /** The randomized starting deck when playing the Erratic deck. */

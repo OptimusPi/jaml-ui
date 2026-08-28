@@ -10,7 +10,7 @@ import {
 } from "motely-wasm";
 import { ensureMotelyReady } from "../lib/motely/runtime.js";
 import { fromJaml } from "../lib/motely/jamlParse.js";
-import { parseJamlClauses } from "../lib/jaml/parseClauses.js";
+import { parseJaml } from "../lib/jaml/jaml.js";
 import { JimboPanel } from "../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
@@ -55,7 +55,7 @@ export function Jamlyzer({
   results: resultsProp,
   deck,
   stake,
-  maxAnte = 8,
+  maxAnte = 39,
   defaultSelectedSeed,
   onSelectSeed,
   className = "",
@@ -83,7 +83,7 @@ export function Jamlyzer({
   const clauses = useMemo(() => {
     if (!jaml) return [];
     try {
-      return parseJamlClauses(jaml).all;
+      return parseJaml(jaml).all;
     } catch {
       return [];
     }
@@ -481,8 +481,6 @@ export function Jamlyzer({
               deck={deck}
               stake={stake}
               maxAnte={maxAnte}
-              clauses={clauses}
-              jamlText={jaml}
             />
           ) : (
             <JimboPanel body>

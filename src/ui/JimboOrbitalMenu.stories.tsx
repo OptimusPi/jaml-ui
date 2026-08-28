@@ -13,7 +13,7 @@ import { JimboStack } from './JimboLayout';
  * reachable: tab to an item, Enter or Space to activate.
  */
 const meta = {
-  title: 'Jimbo/Menus/OrbitalMenu',
+  title: "Primitives/Menus/JimboOrbitalMenu",
   component: JimboOrbitalMenu,
 } satisfies Meta<typeof JimboOrbitalMenu>;
 export default meta;

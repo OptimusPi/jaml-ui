@@ -3,7 +3,7 @@ import { JimboStatusPill } from './JimboStatusPill';
 import { JimboRow } from './JimboLayout';
 
 const meta = {
-  title: 'Jimbo/Feedback/Status Pill',
+  title: "Primitives/Feedback/JimboStatusPill",
   component: JimboStatusPill,
 } satisfies Meta<typeof JimboStatusPill>;
 export default meta;

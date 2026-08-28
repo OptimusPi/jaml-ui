@@ -3,7 +3,7 @@ import { JimboMascot } from './JimboMascot';
 import { JimboRow } from './JimboLayout';
 
 const meta = {
-  title: 'Jimbo/Mascot/Jammy',
+  title: "Primitives/Display/JimboMascot",
   component: JimboMascot,
 } satisfies Meta<typeof JimboMascot>;
 export default meta;

@@ -1,4 +1,4 @@
-import { parseJamlDocument } from "./parseClauses.js";
+import { parseJamlDocument } from "./jaml.js";
 import { Vocab } from "jaml-lang";
 import { RARITY_DATA } from "./rarityData.generated.js";
 
