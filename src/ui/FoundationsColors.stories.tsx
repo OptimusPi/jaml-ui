@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { JimboText } from "./jimboText.js";
 
 const meta: Meta = {
-  title: "Foundations/Colors",
+  title: "Primitives/Foundations/Colors",
 };
 export default meta;
 
@@ -55,8 +55,9 @@ function Swatch({ token }: { token: string }) {
 }
 
 export const Tokens: StoryObj = {
+  name: "Paint chips — game / pressed / surfaces / chrome",
   render: () => (
-    <div style={{ display: "grid", gap: 24 }}>
+    <div className="j-panel" style={{ width: "min(920px, 100%)", padding: 16, display: "grid", gap: 24 }}>
       {GROUPS.map(({ name, tokens }) => (
         <div key={name} style={{ display: "grid", gap: 8 }}>
           <JimboText size="lg" tone="grey">

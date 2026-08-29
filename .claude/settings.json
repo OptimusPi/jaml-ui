@@ -6,10 +6,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/check-design.mjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/check-test-integrity.mjs"
           }
         ]

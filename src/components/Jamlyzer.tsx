@@ -118,8 +118,8 @@ export function Jamlyzer({
         if (jaml && jaml.trim().length > 0) {
           const trimmed = jaml.trim();
           const validation = MotelyJaml.validate(trimmed);
-          if (validation !== "valid") {
-            throw new Error(String(validation ?? "Invalid JAML"));
+          if (validation) {
+            throw new Error(validation);
           }
           analyzed = MotelyJamlyzer.analyzeSeeds(fromJaml(trimmed));
         } else if (seedsProp && seedsProp.length > 0) {

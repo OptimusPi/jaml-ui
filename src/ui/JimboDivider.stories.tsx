@@ -1,8 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { JimboDivider } from './JimboDivider';
-import { JimboSpacer } from './JimboSpacer';
-import { JimboText } from './jimboText';
-import { JimboRow, JimboStack } from './JimboLayout';
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { StoryScene } from "../../.storybook/StoryScene.js";
+import { JimboDivider } from "./JimboDivider.js";
+import { JimboRow, JimboStack } from "./JimboLayout.js";
+import { JimboSpacer } from "./JimboSpacer.js";
+import { JimboText } from "./jimboText.js";
 
 const meta = {
   title: "Primitives/Layout/JimboDivider",
@@ -10,34 +11,43 @@ const meta = {
 } satisfies Meta<typeof JimboDivider>;
 export default meta;
 
-export const Horizontal: StoryObj<typeof meta> = {
+export const BetweenZones: StoryObj<typeof meta> = {
+  name: "Rule between Must and Should",
   render: () => (
-    <JimboStack gap="sm" align="stretch">
-      <JimboText>Above the rule</JimboText>
-      <JimboDivider />
-      <JimboText>Below the rule</JimboText>
-    </JimboStack>
+    <StoryScene title="Filter" tone="blue">
+      <JimboStack gap="sm" align="stretch">
+        <JimboText tone="red">Must · Blueprint</JimboText>
+        <JimboDivider />
+        <JimboText tone="gold">Should · Telescope</JimboText>
+      </JimboStack>
+    </StoryScene>
   ),
 };
 
-export const Vertical: StoryObj<typeof meta> = {
+export const ScoreSplit: StoryObj<typeof meta> = {
+  name: "Vertical rule on a score row",
   render: () => (
-    <JimboRow gap="md" align="stretch">
-      <JimboText>Left</JimboText>
-      <JimboDivider vert />
-      <JimboText>Right</JimboText>
-    </JimboRow>
+    <StoryScene title="Results" tone="gold">
+      <JimboRow gap="md" align="center">
+        <JimboText>WEEJOKER</JimboText>
+        <JimboDivider vert />
+        <JimboText tone="gold">100</JimboText>
+      </JimboRow>
+    </StoryScene>
   ),
 };
 
 export const SpacerSizes: StoryObj<typeof meta> = {
+  name: "Breathing room in a filter stack",
   render: () => (
-    <JimboStack gap="xs" align="stretch">
-      <JimboText>Tight</JimboText>
-      <JimboSpacer size={8} />
-      <JimboText>Loose</JimboText>
-      <JimboSpacer size={32} />
-      <JimboText>Done</JimboText>
-    </JimboStack>
+    <StoryScene title="Filter" tone="blue">
+      <JimboStack gap="xs" align="stretch">
+        <JimboText>Must</JimboText>
+        <JimboSpacer size={8} />
+        <JimboText>Should</JimboText>
+        <JimboSpacer size={32} />
+        <JimboText>Must not</JimboText>
+      </JimboStack>
+    </StoryScene>
   ),
 };

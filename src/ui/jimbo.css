@@ -25,7 +25,7 @@
    any explicit family (e.g. --j-font-code surfaces) still wins untouched.
    Inside the app nothing changes: these containers already inherited the
    same font from .j-app/.j-page. */
-:where(.j-app, .j-page, .j-panel, .j-inner-panel, .j-modal, .j-picker, .j-inset) {
+:where(.j-app, .j-phone, .j-page, .j-panel, .j-inner-panel, .j-modal, .j-picker, .j-inset) {
   font-family: var(--j-font);
 }
 
@@ -1501,6 +1501,66 @@
   gap: var(--j-space-sm);
 }
 
+/* Mobile portrait — fills a locked 375×667 SE (or 100dvh on a real phone). */
+.j-phone {
+  width: 100%;
+  max-width: var(--j-phone-w);
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  background: transparent;
+  font-family: var(--j-font);
+  color: var(--j-white);
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.j-phone__content,
+.j-phone__scroll {
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.j-phone__content {
+  overflow: hidden;
+  padding: var(--j-space-lg) var(--j-space-lg) var(--j-space-md);
+}
+
+.j-phone__scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+.j-phone__scroll > *,
+.j-phone__content > *,
+.j-app__scroll > .j-ide,
+.j-app__content > .j-ide,
+.j-page--full .j-ide {
+  min-height: 0;
+  height: 100%;
+}
+
+.j-phone .j-ide,
+.j-app .j-ide,
+.j-page--full .j-ide {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  grid-auto-flow: row;
+}
+
+.j-phone__footer {
+  padding: var(--j-space-md) var(--j-space-lg);
+}
+
 /* ── Section Header ──────────────────────────────────────────────────── */
 /* Colored tag + horizontal rule — reusable section divider. */
 
@@ -1562,6 +1622,22 @@
   font-family: var(--j-font);
   color: var(--j-white);
   position: relative;
+}
+
+.j-page--full {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  grid-template-rows: 1fr auto;
+}
+
+.j-page--full > .j-page__main {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  grid-template-rows: 1fr;
 }
 
 .j-page__main {
@@ -4860,6 +4936,42 @@
   overflow-y: hidden;
   min-width: 0;
   padding: 0 0 8px 4px;
+}
+
+.j-shop-belt-wrap {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.j-shop-belt--grab {
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.j-shop-belt--grabbing {
+  cursor: grabbing;
+}
+
+.j-shop-belt--snap {
+  scroll-snap-type: x mandatory;
+}
+
+.j-shop-belt--snap > * {
+  scroll-snap-align: center;
+}
+
+.j-shop-belt-story-tile {
+  width: 71px;
+  height: 95px;
+  background: var(--j-dark);
+  border: 2px solid var(--j-inner-border);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
 }
 .j-jaml-map-editor__pack-row { padding: 0 4px; }
 .j-category-menu { display: grid; gap: 12px; padding: 12px 0; max-height: 70vh; overflow-y: auto; }

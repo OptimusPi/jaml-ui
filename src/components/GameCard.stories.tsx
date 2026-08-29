@@ -1,114 +1,107 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { JamlGameCard, JamlVoucher, JamlTag, JamlBoss } from "./GameCard.js";
+import { StoryScene } from "../../.storybook/StoryScene.js";
+import { JamlBoss, JamlGameCard, JamlTag, JamlVoucher } from "./GameCard.js";
+import { JimboRow } from "../ui/JimboLayout.js";
+import { JimboSectionHeader } from "../ui/JimboSectionHeader.js";
+import { JimboShopBelt } from "../ui/JimboShopBelt.js";
+import { JimboStack } from "../ui/JimboLayout.js";
+import { JimboText } from "../ui/jimboText.js";
 
 const meta: Meta<typeof JamlGameCard> = {
-  title: "Cards & Sprites/GameCard",
+  title: "Primitives/Cards/GameCard",
   component: JamlGameCard,
-  /* scale 2 = 142x190, the in-game look. Native cell is 71x95; keep scales
-     integer — fractional multiples resample the pixel art into mush. */
-  args: { card: { name: "Joker", scale: 2 }, type: "joker" },
 };
 export default meta;
 type Story = StoryObj<typeof JamlGameCard>;
 
-export const Joker: Story = {};
-
-export const Consumable: Story = {
-  args: { card: { name: "The Fool" }, type: "consumable" },
-};
-
-export const PlayingCard: Story = {
-  args: { card: { name: "Ace of Spades" }, type: "playing" },
-};
-
-/** All four editions on the same joker, so the overlay layer is comparable. */
-export const Editions: Story = {
+export const ShopTape: Story = {
+  name: "Ante 1 shop — the cards you actually see",
   render: () => (
-    <div style={{ display: "grid", gap: 16, gridAutoFlow: "column", justifyContent: "start" }}>
-      <JamlGameCard card={{ name: "Joker", scale: 2 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", edition: "Foil", scale: 2 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", edition: "Holographic", scale: 2 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", edition: "Polychrome", scale: 2 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", edition: "Negative", scale: 2 }} type="joker" />
-    </div>
+    <StoryScene title="Shop Queue" tone="red" variant="page">
+      <JimboText size="sm" tone="grey">
+        Drag the tape. This is a shop, not a sticker sheet.
+      </JimboText>
+      <JimboShopBelt>
+        {["Joker", "Blueprint", "Brainstorm", "Wee Joker", "Trading Card"].map((name) => (
+          <JamlGameCard key={name} type="joker" card={{ name, scale: 1 }} hoverTilt />
+        ))}
+      </JimboShopBelt>
+    </StoryScene>
   ),
 };
 
-/** Sticker layers — eternal, perishable, rental, and all three stacked. */
-export const Stickers: Story = {
+export const EditionsInShop: Story = {
+  name: "Same joker, shop editions",
   render: () => (
-    <div style={{ display: "grid", gap: 16, gridAutoFlow: "column", justifyContent: "start" }}>
-      <JamlGameCard card={{ name: "Joker", isEternal: true, scale: 2 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", isPerishable: true, scale: 2 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", isRental: true, scale: 2 }} type="joker" />
-      <JamlGameCard
-        card={{ name: "Joker", isEternal: true, isPerishable: true, isRental: true, scale: 2 }}
-        type="joker"
-      />
-    </div>
+    <StoryScene title="Shop Queue" tone="red" variant="page">
+      <JimboShopBelt>
+        <JamlGameCard type="joker" card={{ name: "Joker", scale: 1 }} />
+        <JamlGameCard type="joker" card={{ name: "Joker", edition: "Foil", scale: 1 }} />
+        <JamlGameCard type="joker" card={{ name: "Joker", edition: "Holographic", scale: 1 }} />
+        <JamlGameCard type="joker" card={{ name: "Joker", edition: "Polychrome", scale: 1 }} />
+        <JamlGameCard type="joker" card={{ name: "Joker", edition: "Negative", scale: 1 }} />
+      </JimboShopBelt>
+    </StoryScene>
   ),
 };
 
-/** Playing-card enhancements and seals stack over the rank/suit layer. */
-export const EnhancementsAndSeals: Story = {
+export const StickersOnRentals: Story = {
+  name: "Rental / eternal / perishable on a shop card",
   render: () => (
-    <div style={{ display: "grid", gap: 16, gridAutoFlow: "column", justifyContent: "start" }}>
-      <JamlGameCard card={{ name: "Ace of Hearts", rank: "Ace", suit: "Hearts", scale: 2 }} type="playing" />
-      <JamlGameCard
-        card={{ name: "Ace of Hearts", rank: "Ace", suit: "Hearts", enhancements: ["Glass"], scale: 2 }}
-        type="playing"
-      />
-      <JamlGameCard
-        card={{ name: "Ace of Hearts", rank: "Ace", suit: "Hearts", seal: "Red Seal", scale: 2 }}
-        type="playing"
-      />
-      <JamlGameCard
-        card={{ name: "Ace of Hearts", rank: "Ace", suit: "Hearts", enhancements: ["Steel"], seal: "Gold Seal", scale: 2 }}
-        type="playing"
-      />
-    </div>
+    <StoryScene title="Shop Queue" tone="red">
+      <JimboRow gap="md">
+        <JamlGameCard type="joker" card={{ name: "Joker", isEternal: true, scale: 1 }} />
+        <JamlGameCard type="joker" card={{ name: "Joker", isPerishable: true, scale: 1 }} />
+        <JamlGameCard type="joker" card={{ name: "Joker", isRental: true, scale: 1 }} />
+      </JimboRow>
+    </StoryScene>
   ),
 };
 
-/** Rank/suit parsing accepts long form, short form, and explicit props. */
-export const NameParsing: Story = {
+export const PlayingHand: Story = {
+  name: "A played hand with seals",
   render: () => (
-    <div style={{ display: "grid", gap: 16, gridAutoFlow: "column", justifyContent: "start" }}>
-      <JamlGameCard card={{ name: "King of Clubs", scale: 2 }} type="playing" />
-      <JamlGameCard card={{ name: "KC", scale: 2 }} type="playing" />
-      <JamlGameCard card={{ name: "10 of Diamonds", scale: 2 }} type="playing" />
-      <JamlGameCard card={{ name: "ignored", rank: "Queen", suit: "Spades", scale: 2 }} type="playing" />
-    </div>
+    <StoryScene title="Inspect" tone="blue" variant="page">
+      <JimboText size="sm" tone="grey">
+        Glass Ace, steel Queen, gold-seal 10
+      </JimboText>
+      <JimboRow gap="sm">
+        <JamlGameCard
+          type="playing"
+          card={{ name: "Ace of Hearts", rank: "Ace", suit: "Hearts", enhancements: ["Glass"], scale: 1 }}
+        />
+        <JamlGameCard
+          type="playing"
+          card={{ name: "Queen of Spades", rank: "Queen", suit: "Spades", enhancements: ["Steel"], scale: 1 }}
+        />
+        <JamlGameCard
+          type="playing"
+          card={{
+            name: "10 of Diamonds",
+            rank: "10",
+            suit: "Diamonds",
+            seal: "Gold Seal",
+            scale: 1,
+          }}
+        />
+      </JimboRow>
+    </StoryScene>
   ),
 };
 
-export const Scales: Story = {
+export const AnteChrome: Story = {
+  name: "Boss, voucher, tag on an ante card",
   render: () => (
-    <div style={{ display: "grid", gap: 16, gridAutoFlow: "column", justifyContent: "start", alignItems: "end" }}>
-      <JamlGameCard card={{ name: "Joker", scale: 1 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", scale: 2 }} type="joker" />
-      <JamlGameCard card={{ name: "Joker", scale: 3 }} type="joker" />
-    </div>
+    <StoryScene title="Jamlyze" tone="purple">
+      <JimboStack gap="md">
+        <JimboSectionHeader label="Boss & Voucher" tone="gold" />
+        <JimboRow gap="md">
+          <JamlBoss bossName="The Wall" scale={1} />
+          <JamlVoucher voucherName="Overstock" scale={1} />
+        </JimboRow>
+        <JimboSectionHeader label="Tags" tone="green" />
+        <JamlTag tagName="Rare Tag" scale={1} />
+      </JimboStack>
+    </StoryScene>
   ),
-};
-
-export const HoverTilt: Story = {
-  args: { card: { name: "Joker", scale: 2 }, type: "joker", hoverTilt: true },
-};
-
-/** An unrecognized name renders no sprite layers — the card comes back empty. */
-export const UnknownName: Story = {
-  args: { card: { name: "Not A Real Joker", scale: 2 }, type: "joker" },
-};
-
-export const Voucher: StoryObj<typeof JamlVoucher> = {
-  render: () => <JamlVoucher voucherName="Overstock" scale={2} />,
-};
-
-export const Tag: StoryObj<typeof JamlTag> = {
-  render: () => <JamlTag tagName="Rare Tag" scale={2} />,
-};
-
-export const Boss: StoryObj<typeof JamlBoss> = {
-  render: () => <JamlBoss bossName="The Wall" scale={2} />,
 };

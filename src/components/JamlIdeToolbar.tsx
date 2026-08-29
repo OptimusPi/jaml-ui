@@ -6,14 +6,11 @@ import { JimboTabs } from "../ui/jimboTabs.js";
 
 import { JimboBox } from "../ui/JimboBox.js";
 
-export type JamlIdeMode = "visual" | "code" | "map" | "results" | "jamlyzer";
+export type JamlIdeMode = "visual" | "code" | "inspect";
 
 export interface JamlIdeToolbarProps {
   mode: JamlIdeMode;
   onModeChange: (mode: JamlIdeMode) => void;
-  resultCount?: number;
-  showResultsTab?: boolean;
-  showJamlyzerTab?: boolean;
   className?: string;
   onSearch?: () => void;
   isSearching?: boolean;
@@ -24,9 +21,6 @@ export interface JamlIdeToolbarProps {
 export function JamlIdeToolbar({
   mode,
   onModeChange,
-  resultCount = 0,
-  showResultsTab = false,
-  showJamlyzerTab = false,
   className = "",
   onSearch,
   isSearching = false,
@@ -36,16 +30,8 @@ export function JamlIdeToolbar({
   const tabs: Array<{ id: JamlIdeMode; label: string }> = [
     { id: "visual", label: "Visual" },
     { id: "code", label: "JAML" },
-    { id: "map", label: "Map" },
+    { id: "inspect", label: "Inspect" },
   ];
-
-  if (showResultsTab) {
-    tabs.push({ id: "results", label: resultCount > 0 ? `Results (${resultCount})` : "Results" });
-  }
-
-  if (showJamlyzerTab) {
-    tabs.push({ id: "jamlyzer", label: "Test" });
-  }
 
   return (
     <JimboBox className={`j-ide-toolbar ${className}`.trim()}>

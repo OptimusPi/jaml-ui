@@ -1,0 +1,696 @@
+/* Jammy Orbital — excavated stylesheet.
+ *
+ * Merges two files from the original repo:
+ *   - components/jimbo-ui/RadialNavigation/radial-navigation.css  (orbit + labels)
+ *   - the `jammy-jimbo-*` keyframe block from app/globals.css      (mascot motion)
+ *
+ * Requires one CSS variable from the host app:
+ *   --font-game   the m6x11 pixel font (or any pixel face). Falls back to monospace.
+ *
+ * SELF-SUFFICIENT BY DESIGN. The excavated subtree was written against Tailwind,
+ * and the one place it actually mounts — the MCP app iframe — is bundled by
+ * esbuild (scripts/build-mcp-app.mjs), which never runs Tailwind. So the pill
+ * geometry those class names describe is defined here in plain CSS, in the
+ * "utility layer" section at the bottom. Every class name the components emit
+ * resolves from this file alone, on any host, with or without Tailwind.
+ */
+
+:root {
+    --jammy-font-game: var(--font-game, ui-monospace, monospace);
+}
+
+/* ── Orbit positioning ─────────────────────────────────────────────────────────
+ * The outer pill owns orbit position + open/close; the inner span is left free
+ * for idle "life" motion so the two never fight over `transform`.
+ *
+ * cubic-bezier(0.16, 1, 0.3, 1) is the whole trick — near-instant departure with
+ * a long settle. Paired with even angular slots (see radialLayout.ts) it reads
+ * as magnetic snapping. Change this curve and you lose the feel. */
+.orbital-pill {
+    position: absolute;
+    pointer-events: auto;
+    -webkit-user-select: none;
+    user-select: none;
+    z-index: 10;
+
+    left: var(--orbital-x, 0px);
+    top: var(--orbital-y, 0px);
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    transition:
+        left 220ms cubic-bezier(0.16, 1, 0.3, 1),
+        top 220ms cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 220ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hiding state — collapse to center. Used for both close and submenu push/pop,
+ * which is why a submenu transition looks like the pills "sink" and return. */
+.orbital-pill[data-hiding="true"] {
+    left: 0px;
+    top: 0px;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+}
+
+.orbital-pill-inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center;
+}
+
+/* Idle sway on orbital pills was removed on purpose — it kept the orbit from
+ * reading as predictable. Re-add via a class here if you want it back. */
+
+/* ── Labels ────────────────────────────────────────────────────────────────────
+ * m6x11, white, 1px drop shadow. The third text-shadow value must stay 0: any
+ * blur turns the pixel font muddy at these sizes.
+ *
+ * Weight 400 only. 500 synthesizes bold on many engines and renders as a fat
+ * second outline right next to the shadow. */
+.jimbo-radial-label {
+    font-family: var(--jammy-font-game);
+    font-weight: 400;
+    font-synthesis: none;
+    color: #ffffff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.72);
+    white-space: nowrap;
+    text-decoration: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+.jimbo-radial-label--action {
+    font-size: 12px;
+    line-height: 1.15;
+}
+
+.jimbo-radial-label--badge {
+    font-size: 11.5px;
+    line-height: 1.15;
+}
+
+/* ── Mascot motion ─────────────────────────────────────────────────────────────
+ * Jimbo-adjacent bob / talk / boing. Amplitudes are ~20% softer than the first
+ * pass so it feels alive rather than "humpy".
+ *
+ * transform-origin: 50% 80% on every one of these — pivoting near the base is
+ * what makes it read as a character standing on the ground instead of a sprite
+ * spinning around its middle. */
+@keyframes jammy-jimbo-idle {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1.2deg) scale(1);
+    }
+    35% {
+        transform: translateY(-3px) rotate(1deg) scale(1.016);
+    }
+    70% {
+        transform: translateY(0.8px) rotate(-0.65deg) scale(0.992);
+    }
+}
+
+@keyframes jammy-jimbo-talk {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1deg) scale(1);
+    }
+    22% {
+        transform: translateY(-4px) rotate(1.8deg) scale(1.018);
+    }
+    44% {
+        transform: translateY(0.6px) rotate(-0.6deg) scale(0.997);
+    }
+    66% {
+        transform: translateY(-3px) rotate(2deg) scale(1.013);
+    }
+    85% {
+        transform: translateY(0.4px) rotate(-1.2deg) scale(1.004);
+    }
+}
+
+/* Squash-and-stretch: note the non-uniform scale pairs — wide+short on the way
+ * up, narrow+tall at the apex. Uniform scale here looks like a bouncing ball,
+ * not a character. */
+@keyframes jammy-jimbo-boing {
+    0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+    22% {
+        transform: translateY(-14px) scale(1.1, 0.936) rotate(-4.8deg);
+    }
+    48% {
+        transform: translateY(3px) scale(0.952, 1.064) rotate(4deg);
+    }
+    72% {
+        transform: translateY(-5px) scale(1.04, 0.984) rotate(-1.6deg);
+    }
+    100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+}
+
+@keyframes jammy-jimbo-dance {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+    15% {
+        transform: translateY(-8px) rotate(-6.4deg) scale(1.048);
+    }
+    30% {
+        transform: translateY(1.6px) rotate(8deg) scale(0.96, 1.04);
+    }
+    50% {
+        transform: translateY(-11px) rotate(-4.8deg) scale(1.064, 0.952);
+    }
+    70% {
+        transform: translateY(3px) rotate(5.6deg) scale(0.968);
+    }
+    100% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+}
+
+.jammy-jimbo-idle {
+    animation: jammy-jimbo-idle 3.2s ease-in-out infinite;
+    transform-origin: 50% 80%;
+}
+
+.jammy-jimbo-talking {
+    animation: jammy-jimbo-talk 2.2s ease-in-out infinite;
+    transform-origin: 50% 80%;
+}
+
+.jammy-jimbo-boing-once {
+    animation: jammy-jimbo-boing 0.62s cubic-bezier(0.22, 0.92, 0.2, 1.08) both;
+    transform-origin: 50% 80%;
+}
+
+.jammy-jimbo-dance-once {
+    animation: jammy-jimbo-dance 0.95s cubic-bezier(0.25, 0.9, 0.25, 1.15) both;
+    transform-origin: 50% 80%;
+}
+
+/* Not in the original — added on excavation. The mascot is decorative motion;
+ * users who ask for reduced motion should get a still character that still works. */
+@media (prefers-reduced-motion: reduce) {
+    .orbital-pill {
+        transition-duration: 1ms;
+    }
+
+    .jammy-jimbo-idle,
+    .jammy-jimbo-talking,
+    .jammy-jimbo-boing-once,
+    .jammy-jimbo-dance-once {
+        animation: none;
+    }
+}
+
+/* ══ Utility layer ═════════════════════════════════════════════════════════════
+ *
+ * Plain-CSS definitions for the Tailwind class names the excavated components
+ * emit. This is what makes the pills pills: without `px-[10px]`, `py-[3px]`,
+ * `rounded-[10px]`, `min-w-[54px]` and `gap-1.5` the buttons render as bare
+ * colored rectangles with the label jammed against the edge, and `h-[9px]
+ * w-[9px]` toggle dots collapse to nothing.
+ *
+ * Scoping: every rule is a descendant of `.jammy-orbital` (the root class on
+ * Mascot's and SeedCarousel's outermost element), so these generic names cannot
+ * leak into a host app's own `.flex` / `.absolute` / `.text-white`. The two root
+ * elements carry their own layout below, since a descendant selector cannot
+ * match the element that establishes the scope.
+ *
+ * Values track Tailwind v4 defaults (rem-based spacing, `sm:` at 40rem) so a
+ * host that DOES ship Tailwind renders identically — twMerge already guarantees
+ * the emitted class list is conflict-free, and equal specificity plus identical
+ * declarations makes source order irrelevant. */
+
+/* ── Scope roots ─────────────────────────────────────────────────────────────── */
+
+/* Mascot root: `relative flex w-full flex-col items-center justify-center`. */
+.jammy-orbital {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* SeedCarousel root adds: `h-full p-6 select-none`. */
+.jammy-orbital--carousel {
+    height: 100%;
+    padding: 1.5rem;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* ── Display & flexbox ───────────────────────────────────────────────────────── */
+
+.jammy-orbital .flex {
+    display: flex;
+}
+.jammy-orbital .inline-flex {
+    display: inline-flex;
+}
+.jammy-orbital .block {
+    display: block;
+}
+.jammy-orbital .flex-col {
+    flex-direction: column;
+}
+.jammy-orbital .items-center {
+    align-items: center;
+}
+.jammy-orbital .justify-center {
+    justify-content: center;
+}
+.jammy-orbital .shrink-0 {
+    flex-shrink: 0;
+}
+.jammy-orbital .gap-1 {
+    gap: 0.25rem;
+}
+.jammy-orbital .gap-1\.5 {
+    gap: 0.375rem;
+}
+.jammy-orbital .gap-2 {
+    gap: 0.5rem;
+}
+.jammy-orbital .gap-4 {
+    gap: 1rem;
+}
+
+/* ── Sizing ──────────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .h-0 {
+    height: 0;
+}
+.jammy-orbital .w-0 {
+    width: 0;
+}
+.jammy-orbital .h-full {
+    height: 100%;
+}
+.jammy-orbital .w-full {
+    width: 100%;
+}
+.jammy-orbital .h-2 {
+    height: 0.5rem;
+}
+.jammy-orbital .w-2 {
+    width: 0.5rem;
+}
+.jammy-orbital .min-w-0 {
+    min-width: 0;
+}
+
+/* The toggle/status dot. Both dimensions are required — a dot with no box is
+ * the difference between "Map: on" reading as a state and reading as nothing. */
+.jammy-orbital .h-\[9px\] {
+    height: 9px;
+}
+.jammy-orbital .w-\[9px\] {
+    width: 9px;
+}
+
+/* Pill widths. The south Start/Back pill is wide; orbital pills get a floor so
+ * short labels ("Must") and long ones ("Must Not") sit on a common rhythm. */
+.jammy-orbital .w-\[130px\] {
+    width: 130px;
+}
+.jammy-orbital .min-w-\[54px\] {
+    min-width: 54px;
+}
+.jammy-orbital .min-w-\[60px\] {
+    min-width: 60px;
+}
+
+/* The `sm:` overrides live at the END of this layer, not here — see the
+ * "Responsive overrides" section. */
+
+/* ── Position ────────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .relative {
+    position: relative;
+}
+.jammy-orbital .absolute {
+    position: absolute;
+}
+.jammy-orbital .inset-0 {
+    inset: 0;
+}
+.jammy-orbital .top-1\/2 {
+    top: 50%;
+}
+.jammy-orbital .left-4 {
+    left: 1rem;
+}
+.jammy-orbital .right-4 {
+    right: 1rem;
+}
+.jammy-orbital .bottom-2 {
+    bottom: 0.5rem;
+}
+.jammy-orbital .bottom-6 {
+    bottom: 1.5rem;
+}
+.jammy-orbital .z-20 {
+    z-index: 20;
+}
+.jammy-orbital .z-30 {
+    z-index: 30;
+}
+
+/* ── Spacing ─────────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .p-3 {
+    padding: 0.75rem;
+}
+.jammy-orbital .p-6 {
+    padding: 1.5rem;
+}
+.jammy-orbital .px-6 {
+    padding-inline: 1.5rem;
+}
+.jammy-orbital .py-3 {
+    padding-block: 0.75rem;
+}
+.jammy-orbital .py-4 {
+    padding-block: 1rem;
+}
+.jammy-orbital .px-\[10px\] {
+    padding-inline: 10px;
+}
+.jammy-orbital .py-\[2px\] {
+    padding-block: 2px;
+}
+.jammy-orbital .py-\[3px\] {
+    padding-block: 3px;
+}
+.jammy-orbital .mt-3 {
+    margin-top: 0.75rem;
+}
+.jammy-orbital .mb-2 {
+    margin-bottom: 0.5rem;
+}
+.jammy-orbital .mb-4 {
+    margin-bottom: 1rem;
+}
+.jammy-orbital .mb-8 {
+    margin-bottom: 2rem;
+}
+
+/* ── Borders & radius ────────────────────────────────────────────────────────── */
+
+/* Radius carries the whole "chunky plastic" read; the hard 4px bottom edge that
+ * pairs with it is an inline box-shadow in RadialButton/RadialBadge. */
+.jammy-orbital .rounded-\[10px\] {
+    border-radius: 10px;
+}
+.jammy-orbital .rounded-\[11px\] {
+    border-radius: 11px;
+}
+.jammy-orbital .rounded-xl {
+    border-radius: 0.75rem;
+}
+.jammy-orbital .rounded-2xl {
+    border-radius: 1rem;
+}
+.jammy-orbital .rounded-full {
+    border-radius: 9999px;
+}
+
+/* `border` / `border-2` set width AND style — the color arrives inline. */
+.jammy-orbital .border {
+    border: 1px solid currentcolor;
+}
+.jammy-orbital .border-2 {
+    border: 2px solid currentcolor;
+}
+.jammy-orbital .border-none {
+    border: none;
+}
+.jammy-orbital .border-\[\#29b6f6\] {
+    border-color: #29b6f6;
+}
+.jammy-orbital .border-\[\#f77f3e\]\/40 {
+    border-color: rgba(247, 127, 62, 0.4);
+}
+
+/* ── Color & background ──────────────────────────────────────────────────────── */
+
+.jammy-orbital .text-white {
+    color: #ffffff;
+}
+.jammy-orbital .text-black {
+    color: #000000;
+}
+.jammy-orbital .text-\[\#f77f3e\] {
+    color: #f77f3e;
+}
+.jammy-orbital .text-\[\#29b6f6\] {
+    color: #29b6f6;
+}
+.jammy-orbital .text-\[\#f44336\] {
+    color: #f44336;
+}
+.jammy-orbital .bg-white\/20 {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.jammy-orbital .bg-black\/20 {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.jammy-orbital .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+/* ── Typography ──────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .font-normal {
+    font-weight: 400;
+}
+.jammy-orbital .font-mono {
+    font-family: var(--jammy-font-game);
+}
+.jammy-orbital .font-serif {
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+}
+.jammy-orbital .leading-none {
+    line-height: 1;
+}
+.jammy-orbital .uppercase {
+    text-transform: uppercase;
+}
+.jammy-orbital .tracking-\[0\.2em\] {
+    letter-spacing: 0.2em;
+}
+.jammy-orbital .whitespace-nowrap {
+    white-space: nowrap;
+}
+.jammy-orbital .text-center {
+    text-align: center;
+}
+.jammy-orbital .text-\[9\.5px\] {
+    font-size: 9.5px;
+}
+.jammy-orbital .text-\[10px\] {
+    font-size: 10px;
+}
+.jammy-orbital .text-\[11\.5px\] {
+    font-size: 11.5px;
+}
+.jammy-orbital .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+.jammy-orbital .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+.jammy-orbital .text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+/* ── Opacity ─────────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .opacity-25 {
+    opacity: 0.25;
+}
+.jammy-orbital .opacity-40 {
+    opacity: 0.4;
+}
+.jammy-orbital .opacity-50 {
+    opacity: 0.5;
+}
+.jammy-orbital .opacity-60 {
+    opacity: 0.6;
+}
+.jammy-orbital .opacity-67 {
+    opacity: 0.67;
+}
+
+/* ── Interaction ─────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .cursor-pointer {
+    cursor: pointer;
+}
+.jammy-orbital .cursor-not-allowed {
+    cursor: not-allowed;
+}
+.jammy-orbital .pointer-events-none {
+    pointer-events: none;
+}
+.jammy-orbital .pointer-events-auto {
+    pointer-events: auto;
+}
+.jammy-orbital .select-none {
+    -webkit-user-select: none;
+    user-select: none;
+}
+.jammy-orbital .outline-none {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+.jammy-orbital .object-contain {
+    object-fit: contain;
+}
+.jammy-orbital .will-change-transform {
+    will-change: transform;
+}
+.jammy-orbital .backface-hidden,
+.jammy-orbital .\[-webkit-backface-visibility\:hidden\] {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Keyboard focus only — a mouse press must not leave a ring on the mascot. */
+.jammy-orbital .focus-visible\:ring-4:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--jammy-ring-color, #f97316);
+}
+.jammy-orbital .focus-visible\:ring-orange-500 {
+    --jammy-ring-color: #f97316;
+}
+
+/* ── Transitions ─────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .transition-transform {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+.jammy-orbital .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+/* The press feel: 80ms is short enough that the pill reads as depressing under
+ * the finger rather than easing there. */
+.jammy-orbital .transition-\[transform\2c box-shadow\] {
+    transition-property: transform, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+.jammy-orbital .duration-\[80ms\] {
+    transition-duration: 80ms;
+}
+.jammy-orbital .duration-200 {
+    transition-duration: 200ms;
+}
+.jammy-orbital .duration-300 {
+    transition-duration: 300ms;
+}
+.jammy-orbital .duration-500 {
+    transition-duration: 500ms;
+}
+.jammy-orbital .ease-out {
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+.jammy-orbital .ease-\[cubic-bezier\(0\.22\2c 0\.92\2c 0\.2\2c 1\.08\)\] {
+    transition-timing-function: cubic-bezier(0.22, 0.92, 0.2, 1.08);
+}
+.jammy-orbital .ease-\[cubic-bezier\(0\.22\2c 0\.9\2c 0\.3\2c 1\.12\)\] {
+    transition-timing-function: cubic-bezier(0.22, 0.9, 0.3, 1.12);
+}
+
+/* ── Transforms ──────────────────────────────────────────────────────────────── */
+
+.jammy-orbital .-translate-y-1\/2 {
+    transform: translateY(-50%);
+}
+.jammy-orbital .hover\:scale-105:hover {
+    transform: scale(1.05);
+}
+.jammy-orbital .hover\:scale-110:hover {
+    transform: scale(1.1);
+}
+.jammy-orbital .active\:scale-95:active {
+    transform: scale(0.95);
+}
+/* Tailwind composes transforms; plain CSS replaces them. The carousel arrows are
+ * the one place both land on a single element, so spell the combination out or
+ * hovering an arrow drops it to the top of its container. */
+.jammy-orbital .-translate-y-1\/2.hover\:scale-110:hover {
+    transform: translateY(-50%) scale(1.1);
+}
+.jammy-orbital .-translate-y-1\/2.active\:scale-95:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* ── Shadows ─────────────────────────────────────────────────────────────────── */
+
+/* RadialBadge passes its themed edge through the --btn-shadow variable it sets
+ * inline, so the badge picks up the same hard bottom edge as the buttons. */
+.jammy-orbital .shadow-\[var\(--btn-shadow\)\] {
+    box-shadow: var(--btn-shadow);
+}
+.jammy-orbital .shadow-\[0_4px_0_0_rgba\(30\2c 30\2c 30\2c 0\.9\)\] {
+    box-shadow: 0 4px 0 0 rgba(30, 30, 30, 0.9);
+}
+
+/* ── Animation ───────────────────────────────────────────────────────────────── */
+
+/* Namespaced so a host's own `pulse` keyframes can't capture the status dot. */
+@keyframes jammy-orbital-pulse {
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.jammy-orbital .animate-pulse {
+    animation: jammy-orbital-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .jammy-orbital .animate-pulse {
+        animation: none;
+    }
+
+    .jammy-orbital .transition-transform,
+    .jammy-orbital .transition-all,
+    .jammy-orbital .transition-\[transform\2c box-shadow\] {
+        transition-duration: 1ms;
+    }
+}
+
+/* ── Responsive overrides (`sm:` = 40rem) ─────────────────────────────────────
+ *
+ * LAST in the layer on purpose. These carry the same specificity as the base
+ * utilities they override (`sm:px-[14px]` vs `px-[10px]`, `sm:w-[160px]` vs
+ * `w-[130px]`), so source order is the only tiebreak — and Tailwind's own
+ * output always emits variants after base utilities. Move this block up and the
+ * wide pills silently keep their narrow padding above 640px. */
+@media (min-width: 40rem) {
+    .jammy-orbital .sm\:w-\[160px\] {
+        width: 160px;
+    }
+    .jammy-orbital .sm\:min-w-\[64px\] {
+        min-width: 64px;
+    }
+    .jammy-orbital .sm\:px-\[14px\] {
+        padding-inline: 14px;
+    }
+}

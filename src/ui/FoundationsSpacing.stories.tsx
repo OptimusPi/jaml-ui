@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { JimboText } from "./jimboText.js";
 
 const meta: Meta = {
-  title: "Foundations/Spacing & Radius",
+  title: "Primitives/Foundations/Spacing & Radius",
 };
 export default meta;
 
@@ -66,8 +66,9 @@ function RadiusTile({ token }: { token: string }) {
 }
 
 export const Tokens: StoryObj = {
+  name: "Spacing and radius on a real panel",
   render: () => (
-    <div style={{ display: "grid", gap: 24 }}>
+    <div className="j-panel" style={{ width: "min(720px, 100%)", padding: 16, display: "grid", gap: 24 }}>
       <div style={{ display: "grid", gap: 8 }}>
         <JimboText size="lg" tone="grey">
           spacing

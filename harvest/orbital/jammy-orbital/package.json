@@ -1,0 +1,28 @@
+{
+    "name": "@pifreak/jammy-orbital",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Orbital mascot menu, Jimbo pill system, and seed carousel — excavated from the JAMMY seedfinder.",
+    "type": "module",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts",
+        "./styles.css": "./src/styles.css"
+    },
+    "files": [
+        "src",
+        "assets",
+        "README.md"
+    ],
+    "peerDependencies": {
+        "clsx": "^2",
+        "react": ">=19",
+        "react-dom": ">=19",
+        "tailwind-merge": "^3",
+        "zustand": "^5"
+    },
+    "sideEffects": [
+        "*.css"
+    ]
+}

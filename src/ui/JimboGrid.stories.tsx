@@ -1,6 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { JimboGrid } from './JimboGrid';
-import { JimboBadge } from './JimboBadge';
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { StoryScene } from "../../.storybook/StoryScene.js";
+import { JimboBadge } from "./JimboBadge.js";
+import { JimboGrid } from "./JimboGrid.js";
+import { JimboText } from "./jimboText.js";
 
 const meta = {
   title: "Primitives/Layout/JimboGrid",
@@ -8,28 +10,20 @@ const meta = {
 } satisfies Meta<typeof JimboGrid>;
 export default meta;
 
-const cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven'];
-
-export const ThreeColumns: StoryObj<typeof meta> = {
+export const TagGrid: StoryObj<typeof meta> = {
+  name: "Skip-tag grid on the filter",
   render: () => (
-    <JimboGrid columns={3} gap="md">
-      {cells.map((c) => (
-        <JimboBadge key={c} tone="blue" size="md">
-          {c}
-        </JimboBadge>
-      ))}
-    </JimboGrid>
-  ),
-};
-
-export const AutoFit: StoryObj<typeof meta> = {
-  render: () => (
-    <JimboGrid minColWidth={120} gap="lg">
-      {cells.map((c) => (
-        <JimboBadge key={c} tone="green" size="md">
-          {c}
-        </JimboBadge>
-      ))}
-    </JimboGrid>
+    <StoryScene title="Must not" tone="red">
+      <JimboText size="sm" tone="grey">
+        Tags to skip
+      </JimboText>
+      <JimboGrid columns={2} gap="md">
+        {["Rare", "Uncommon", "Foil", "Negative"].map((c) => (
+          <JimboBadge key={c} tone="grey" size="md">
+            {c}
+          </JimboBadge>
+        ))}
+      </JimboGrid>
+    </StoryScene>
   ),
 };

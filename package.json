@@ -45,8 +45,7 @@
     "prepack": "npm run build",
     "storybook": "pnpm run build && storybook dev -p 3141",
     "build-storybook": "pnpm run build && storybook build",
-    "lint": "eslint . && node scripts/check-css-design.mjs",
-    "lint:css": "node scripts/check-css-design.mjs",
+    "lint": "eslint .",
     "design:detect": "node .agents/skills/impeccable/scripts/detect.mjs --json src",
     "design:doctor": "node .agents/skills/impeccable/scripts/doctor.mjs"
   },

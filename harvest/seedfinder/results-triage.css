@@ -1,0 +1,153 @@
+/* Results triage (UX Law 2: Tinder-style swipe triage).
+ * Scoped to .lab-panel--results. Existing jimbo classes (.j-btn, .j-seed-row)
+ * come from jimbo.css; everything here uses the lab- prefix and CSS vars. */
+
+/* safe center — the deck card centers vertically in tall panes (UX Law 2's
+   open polish note). The `safe` keyword is load-bearing: plain `center` puts
+   top-overflow before the scroll origin, making a tall run-card's top
+   unreachable; `safe` falls back to start alignment when content overflows. */
+.lab-triage { display: grid; gap: 10px; align-content: safe center; padding: 8px; }
+
+.lab-triage-stage { display: grid; gap: 8px; justify-items: center; }
+
+.lab-triage-card {
+  width: 100%;
+  max-width: 360px;
+  min-height: 150px;
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  justify-items: center;
+  padding: 16px 12px;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-inner-border);
+  border-radius: 8px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  box-sizing: border-box;
+  transition: transform 180ms ease-out;
+}
+.lab-triage-card--drag { cursor: grabbing; transition: none; }
+.lab-triage-card--fly { opacity: 0; transition: transform 180ms ease-out, opacity 180ms ease-out; }
+
+.lab-triage-seed {
+  font-family: 'm6x11', monospace;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--j-gold);
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.lab-triage-score {
+  font-family: 'm6x11', monospace;
+  font-size: 12px;
+  padding: 2px 8px;
+  background: var(--j-red);
+  color: #fff;
+  border-radius: 4px;
+}
+
+.lab-triage-flag {
+  font-family: 'm6x11', monospace;
+  font-size: 10px;
+  color: var(--j-gold-text);
+}
+
+.lab-triage-actions { display: flex; gap: 16px; }
+.lab-triage-btn { min-width: 96px; }
+
+/* ── Run Card: the ante-1 story as compact sprite sections inside the card ── */
+.lab-triage-story { display: grid; gap: 6px; width: 100%; }
+.lab-triage-story .jam-section { padding: 6px; gap: 4px; }
+.lab-triage-story .jam-section__title { font-size: 9px; }
+.lab-triage-story .jam-soul-line,
+.lab-triage-story .jam-soul-stream__item { font-size: 10px; }
+.lab-triage-story .jam-item__label { font-size: 8px; }
+.lab-triage-caption {
+  font-family: 'm6x11', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--j-gold);
+  user-select: text;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.lab-triage-page {
+  display: inline-block; margin-left: 8px; font-size: 11px; letter-spacing: 1px;
+  color: var(--j-blue); text-decoration: none; cursor: pointer;
+}
+.lab-triage-page:hover { color: var(--j-gold); text-decoration: underline; }
+
+.lab-triage-hint {
+  font-family: 'm6x11', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--j-gold-text);
+}
+
+.lab-triage-skipped {
+  font-family: 'm6x11', monospace;
+  font-size: 10px;
+  color: var(--j-grey);
+}
+
+.lab-triage-cleared {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 18px 8px;
+}
+.lab-triage-cleared__msg {
+  font-family: 'm6x11', monospace;
+  font-size: 12px;
+  color: var(--j-gold-text);
+  text-align: center;
+}
+
+.lab-triage-pile {
+  display: grid;
+  gap: 4px;
+  border-top: 2px solid var(--j-inner-border);
+  padding-top: 6px;
+}
+.lab-triage-pile__label {
+  font-family: 'm6x11', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--j-gold-text);
+}
+.lab-triage-pile__chips { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.lab-triage-chip {
+  font-family: 'm6x11', monospace;
+  font-size: 11px;
+  padding: 2px 6px;
+  background: var(--j-darkest);
+  color: var(--j-blue);
+  border: 2px solid var(--j-inner-border);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.lab-triage-chip:hover { border-color: var(--j-blue); }
+.lab-triage-chip--selected { border-color: var(--j-gold); color: var(--j-gold); }
+
+/* ── wide pane: the card stops cosplaying a phone. The 360px cap was right
+   inside the old self-frame; in a full-width Results pane it floats in a
+   void. Container queries (not viewport) so a narrow dock column keeps the
+   compact card no matter how big the window is. ── */
+.lab-panel--results { container-type: inline-size; }
+
+@container (min-width: 880px) {
+  .lab-triage { grid-template-columns: minmax(0,1fr) 220px; align-content: start; }
+  .lab-triage-stage { align-content: start; }
+  .lab-triage-card { max-width: 640px; }
+  .lab-triage-pile { border-top: none; border-left: 2px solid var(--j-inner-border); padding-top: 0; padding-left: 8px; align-content: start; }
+}
+
+@container (min-width: 1240px) {
+  .lab-triage-card { max-width: 980px; }
+  .lab-triage-story { display: block; columns: 2; column-gap: 8px; }
+  .lab-triage-story > * { break-inside: avoid; margin-bottom: 6px; }
+}

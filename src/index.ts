@@ -51,11 +51,6 @@ export {
   type DailyRitualViewProps,
 } from "./components/DailyRitualView.js";
 
-export {
-  JamlGenieBar,
-  type JamlGenieBarProps,
-} from "./components/JamlGenieBar.js";
-
 export { type DailyRitual, parseRitual } from "./lib/daily/ritual.js";
 
 export {
@@ -129,6 +124,7 @@ export {
   type JamlVisualClause,
   type JamlZone,
 } from "./components/JamlIde.js";
+export { SeedLab, LiveJamlIde, STARTER_JAML, JAMLYZE_JAML, type SeedHit } from "./components/SeedLab.js";
 export { JamlIdeVisual, type JamlIdeVisualProps } from "./components/JamlIdeVisual.js";
 export { JamlIdeToolbar, type JamlIdeToolbarProps, type JamlIdeMode } from "./components/JamlIdeToolbar.js";
 export { JamlMapPreview, type JamlMapPreviewProps } from "./components/JamlMapPreview.js";

@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { StoryScene } from "../../.storybook/StoryScene.js";
+import { JimboStack } from "./JimboLayout.js";
 import { JimboText } from "./jimboText.js";
 
 const meta: Meta<typeof JimboText> = {
@@ -8,31 +10,35 @@ const meta: Meta<typeof JimboText> = {
 export default meta;
 type Story = StoryObj<typeof JimboText>;
 
-export const Sizes: Story = {
+export const ResultCopy: Story = {
+  name: "Copy on a result card",
   render: () => (
-    <div style={{ display: "grid", gap: 8 }}>
-      <JimboText size="micro">Micro text</JimboText>
-      <JimboText size="xs">Extra small text</JimboText>
-      <JimboText size="sm">Small text</JimboText>
-      <JimboText size="md">Medium text</JimboText>
-      <JimboText size="lg">Large text</JimboText>
-      <JimboText size="xl">Extra large text</JimboText>
-      <JimboText size="display">Display text</JimboText>
-    </div>
+    <StoryScene title="Results" tone="gold">
+      <JimboStack gap="xs">
+        <JimboText size="lg" tone="white">
+          WEEJOKER
+        </JimboText>
+        <JimboText size="sm" tone="gold">
+          score 100
+        </JimboText>
+        <JimboText size="xs" tone="grey">
+          Red Deck · White Stake · ante 1 Blueprint
+        </JimboText>
+      </JimboStack>
+    </StoryScene>
   ),
 };
 
-export const Tones: Story = {
+export const AlertTones: Story = {
+  name: "Status copy in a filter pane",
   render: () => (
-    <div style={{ display: "grid", gap: 8, background: "var(--j-darkest)", padding: 12 }}>
-      <JimboText tone="white">White</JimboText>
-      <JimboText tone="grey">Grey</JimboText>
-      <JimboText tone="gold">Gold</JimboText>
-      <JimboText tone="red">Red</JimboText>
-      <JimboText tone="blue">Blue</JimboText>
-      <JimboText tone="green">Green</JimboText>
-      <JimboText tone="orange">Orange</JimboText>
-      <JimboText tone="purple">Purple</JimboText>
-    </div>
+    <StoryScene title="Filter" tone="blue">
+      <JimboStack gap="sm">
+        <JimboText tone="white">Must: Blueprint</JimboText>
+        <JimboText tone="gold">Should: Telescope</JimboText>
+        <JimboText tone="red">Must not: The Wall</JimboText>
+        <JimboText tone="grey">No stake locked</JimboText>
+      </JimboStack>
+    </StoryScene>
   ),
 };

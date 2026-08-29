@@ -1,59 +1,57 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { StoryScene } from "../../.storybook/StoryScene.js";
 import {
   JimboPicker,
-  JimboPickerSection,
-  JimboPickerSearch,
-  JimboPickerHint,
-  JimboPickerGrid,
-  JimboPickerItem,
-  JimboPickerPair,
   JimboPickerEmpty,
+  JimboPickerGrid,
+  JimboPickerHint,
+  JimboPickerItem,
+  JimboPickerSearch,
+  JimboPickerSection,
 } from "./JimboPicker.js";
-import { JimboTextInput } from "./JimboTextInput.js";
 import { JimboText } from "./jimboText.js";
+import { JimboTextInput } from "./JimboTextInput.js";
 
 const meta: Meta = {
   title: "Primitives/Inputs/JimboPicker",
 };
 export default meta;
 
-export const Default: StoryObj = {
+export const JokerMust: StoryObj = {
+  name: "Pick a joker for Must",
   render: () => (
-    <JimboPicker style={{ width: 320 }}>
-      <JimboPickerSection>
+    <StoryScene title="Must" tone="red">
+      <JimboPicker>
+        <JimboPickerSection>
+          <JimboPickerSearch>
+            <JimboTextInput placeholder="Search..." style={{ width: "100%" }} />
+          </JimboPickerSearch>
+          <JimboPickerHint>Type to filter, or pick "Any"</JimboPickerHint>
+          <JimboPickerGrid>
+            <JimboPickerItem>Blueprint</JimboPickerItem>
+            <JimboPickerItem>Brainstorm</JimboPickerItem>
+            <JimboPickerItem muted>Perkeo</JimboPickerItem>
+          </JimboPickerGrid>
+        </JimboPickerSection>
+      </JimboPicker>
+    </StoryScene>
+  ),
+};
+
+export const NoHits: StoryObj = {
+  name: "Picker with no matches",
+  render: () => (
+    <StoryScene title="Must" tone="red">
+      <JimboPicker>
         <JimboPickerSearch>
-          <JimboTextInput placeholder="Search..." style={{ width: "100%" }} />
+          <JimboTextInput defaultValue="zzz" placeholder="Search..." style={{ width: "100%" }} />
         </JimboPickerSearch>
-        <JimboPickerHint>Type to filter, or pick "Any"</JimboPickerHint>
-        <JimboPickerGrid>
-          <JimboPickerItem>Blueprint</JimboPickerItem>
-          <JimboPickerItem>Brainstorm</JimboPickerItem>
-          <JimboPickerItem muted>Perkeo</JimboPickerItem>
-        </JimboPickerGrid>
-      </JimboPickerSection>
-    </JimboPicker>
-  ),
-};
-
-export const Pair: StoryObj = {
-  render: () => (
-    <JimboPickerPair>
-      <JimboText size="sm" tone="white">
-        Left
-      </JimboText>
-      <JimboText size="sm" tone="white">
-        Right
-      </JimboText>
-    </JimboPickerPair>
-  ),
-};
-
-export const Empty: StoryObj = {
-  render: () => (
-    <JimboPickerEmpty>
-      <JimboText size="sm" tone="grey">
-        No matches
-      </JimboText>
-    </JimboPickerEmpty>
+        <JimboPickerEmpty>
+          <JimboText size="sm" tone="grey">
+            No matches
+          </JimboText>
+        </JimboPickerEmpty>
+      </JimboPicker>
+    </StoryScene>
   ),
 };

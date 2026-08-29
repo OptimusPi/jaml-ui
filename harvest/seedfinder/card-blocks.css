@@ -1,0 +1,93 @@
+/* card-blocks.css — styles for the block-rendered ante view (UX Law 1).
+   Import alongside seedlab.css. Only new classes live here; existing
+   jam-* classes stay in seedlab.css. */
+
+/* ── ante breakdown: tight, grouped sections ──────────────────────────
+   The ante view reads as a stack of labeled groups — Meta (boss/voucher/
+   blind tags), Shop, one group per pack, Souls & Legendaries — each with
+   its title welded to a fixed-cell sprite grid. No floating images, no
+   label drifting away from its content. */
+
+.jam-body {
+  display: grid;
+  gap: 8px;
+  padding: 4px 6px 12px;
+  align-content: start;
+}
+
+.jam-section {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--j-inner-border);
+  border-radius: 6px;
+  padding: 6px 8px 8px;
+  min-width: 0;
+}
+
+.jam-section__title {
+  font-family: "m6x11", monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  line-height: 1;
+  margin: 0 0 6px;
+  color: var(--j-grey);
+}
+
+.jam-section--meta .jam-section__title { color: var(--j-purple); }
+.jam-section--shop .jam-section__title { color: var(--j-gold-text); }
+.jam-section--pack .jam-section__title { color: var(--j-blue); }
+.jam-section--souls .jam-section__title { color: var(--j-purple); }
+
+/* Fixed sprite cells (the .lab-sprite--stream slot is 46x66) so every card
+   lands on the same grid whether the ante has 2 shop items or 8. */
+.jam-section__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(54px, max-content));
+  gap: 8px 6px;
+  align-items: start;
+}
+
+.jam-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.jam-item__label {
+  font-family: "m6x11", monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  color: var(--j-gold-text);
+  text-align: center;
+  max-width: 64px;
+  overflow-wrap: break-word;
+}
+
+.jam-item__sprite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Small m6x11 pick chip shown in each pack section title row. */
+.jam-pick-chip {
+  font-family: "m6x11", monospace;
+  font-size: 9px;
+  line-height: 1;
+  padding: 2px 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+  color: #c9a7f5;
+  border: 1px solid #8a5fd0;
+  border-radius: 3px;
+  background: rgba(138, 95, 208, 0.12);
+  white-space: nowrap;
+}
+
+.jam-pick-chip--mega {
+  color: #e2c6ff;
+  border-color: #b07fe8;
+  background: rgba(176, 127, 232, 0.18);
+}

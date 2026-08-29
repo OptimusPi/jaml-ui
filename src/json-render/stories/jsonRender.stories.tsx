@@ -3,10 +3,14 @@ import { JimboJsonRenderer } from "../JimboJsonRenderer.js";
 import type { ReactSpec } from "@json-render/react";
 
 const meta: Meta<typeof JimboJsonRenderer> = {
-  title: "JsonRender/JimboJsonRenderer",
+  title: "Apps/MCP on Desktop",
   component: JimboJsonRenderer,
   parameters: {
     layout: "fullscreen",
+    storyPad: false,
+  },
+  globals: {
+    viewport: { value: "mcp", isRotated: false },
   },
 };
 

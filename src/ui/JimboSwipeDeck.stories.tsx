@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { StoryScene } from "../../.storybook/StoryScene.js";
 import { JimboSwipeDeck, type JimboSwipeDirection } from "./JimboSwipeDeck.js";
 import { JimboText } from "./jimboText.js";
 
@@ -30,59 +31,42 @@ function SeedCard({ seed }: { seed: string }) {
   );
 }
 
-export const Default: StoryObj = {
-  render: () => (
-    <JimboSwipeDeck>
-      {SEEDS.map((seed) => (
-        <SeedCard key={seed} seed={seed} />
-      ))}
-    </JimboSwipeDeck>
-  ),
-};
-
-export const OneCard: StoryObj = {
-  render: () => (
-    <JimboSwipeDeck>
-      <SeedCard seed="lastone" />
-    </JimboSwipeDeck>
-  ),
-};
-
-export const Empty: StoryObj = {
-  render: () => <JimboSwipeDeck />,
-};
-
-function DecisionLogDemo() {
-  const [log, setLog] = useState<string[]>([]);
-  return (
-    <div style={{ display: "grid", gap: 12, justifyItems: "center" }}>
-      <JimboSwipeDeck
-        height={300}
-        onDecide={(index, direction: JimboSwipeDirection) =>
-          setLog((entries) => [...entries, `card ${index + 1}: ${direction}`])
-        }
-      >
-        {SEEDS.map((seed) => (
-          <SeedCard key={seed} seed={seed} />
-        ))}
-      </JimboSwipeDeck>
-      <div style={{ display: "grid", gap: 2, justifyItems: "center" }}>
-        {log.length === 0 ? (
-          <JimboText size="xs" tone="grey">
-            Swipe, use the buttons, or arrow keys — decisions land here
+export const TriageHits: StoryObj = {
+  name: "Swipe-triage search hits",
+  render: () => {
+    const [log, setLog] = useState<string[]>([]);
+    return (
+      <StoryScene title="Results" tone="gold">
+        <JimboText size="sm" tone="grey">
+          Keep / skip a seed. Arrows work too.
+        </JimboText>
+        <JimboSwipeDeck
+          height={260}
+          onDecide={(index, direction: JimboSwipeDirection) =>
+            setLog((entries) => [...entries, `${SEEDS[index]}: ${direction}`])
+          }
+        >
+          {SEEDS.map((seed) => (
+            <SeedCard key={seed} seed={seed} />
+          ))}
+        </JimboSwipeDeck>
+        {log.slice(-3).map((entry) => (
+          <JimboText key={entry} size="xs" tone="white">
+            {entry}
           </JimboText>
-        ) : (
-          log.map((entry, i) => (
-            <JimboText key={i} size="xs" tone="white">
-              {entry}
-            </JimboText>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
+        ))}
+      </StoryScene>
+    );
+  },
+};
 
-export const DecisionLog: StoryObj = {
-  render: () => <DecisionLogDemo />,
+export const LastCard: StoryObj = {
+  name: "Last seed in the pile",
+  render: () => (
+    <StoryScene title="Results" tone="gold">
+      <JimboSwipeDeck height={260}>
+        <SeedCard seed="lastone" />
+      </JimboSwipeDeck>
+    </StoryScene>
+  ),
 };

@@ -5,7 +5,6 @@
 import React, { useState } from "react";
 import { JamlMapPreview } from "./JamlMapPreview.js";
 import {
-  JamlMapEditor,
   CategoryMenu,
   JokerPicker,
   CategoryPicker,
@@ -23,13 +22,11 @@ import { JamlIdeToolbar, type JamlIdeMode } from "./JamlIdeToolbar.js";
 import { JamlIdeVisual, type JamlVisualFilter, type JamlZone, type JamlVisualClause } from "./JamlIdeVisual.js";
 import { JamlCodeEditor } from "./JamlCodeEditor.js";
 import { Jamlyzer } from "./Jamlyzer.js";
-import { normalizeJamlSeed } from "./jamlSeedUtils.js";
 
 import { JimboButton, JimboModal } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
 import { JimboBox } from "../ui/JimboBox.js";
 import { JimboInline } from "../ui/JimboInline.js";
-import { mergeSeedsIntoJaml } from "../lib/jaml/jamlSeeds.js";
 import { jamlTextToVisualFilter, visualFilterToJamlText } from "../utils/jamlVisualFilter.js";
 const CATEGORY_CONFIG_MAP = {
   voucher: VOUCHER_PICKER_CONFIG,
@@ -270,7 +267,7 @@ export function JamlIde({
   jaml,
   defaultJaml,
   onChange,
-  defaultMode = "code",
+  defaultMode = "visual",
   searchResults = [],
   className = "",
   style,
@@ -356,18 +353,11 @@ export function JamlIde({
     }
   };
 
-  const showResultsTab = Boolean(onSearch || searchResults.length > 0);
-  const availableModes: JamlIdeMode[] = [
-    "visual",
-    "code",
-    "map",
-    ...(showResultsTab ? (["results"] as JamlIdeMode[]) : []),
-    "jamlyzer",
-  ];
+  const availableModes: JamlIdeMode[] = ["visual", "code", "inspect"];
   const headerVisible = Boolean(title || subtitle || actions);
 
   if (!availableModes.includes(mode)) {
-    setMode("code");
+    setMode("visual");
   }
 
   // ── Add-clause picker state ──────────────────────────────────────────────
@@ -399,15 +389,6 @@ export function JamlIde({
     }
   };
 
-  const handleVerifyInJamlyzer = () => {
-    const seeds = searchResults
-      .map((result) => normalizeJamlSeed(result.seed))
-      .filter((seed) => seed.length === 8);
-    if (seeds.length === 0) return;
-    handleTextChange(mergeSeedsIntoJaml(text, seeds, 1000));
-    setMode("jamlyzer");
-  };
-
   return (
     <JimboBox
       className={`j-ide ${className}`.trim()}
@@ -430,16 +411,13 @@ export function JamlIde({
       <JamlIdeToolbar
         mode={mode}
         onModeChange={setMode}
-        resultCount={searchResults.length}
-        showResultsTab={showResultsTab}
-        showJamlyzerTab
         onSearch={onSearch}
         isSearching={isSearching}
         onLoadFile={showLoadFileButton ? handleLoadFile : undefined}
         isLoadingFile={isLoadingFile}
       />
 
-      <JimboBox className={`j-ide__body ${mode === "map" ? "j-ide__body--map" : ""}`.trim()}>
+      <JimboBox className="j-ide__body">
         {mode === "visual" ? (
           <JamlIdeVisual filter={activeFilter} onChange={handleVisualFilterChange} onAddClause={handleAddClause} />
         ) : null}
@@ -452,15 +430,7 @@ export function JamlIde({
           />
         ) : null}
 
-        {mode === "map" ? <JamlMapEditor onChange={handleTextChange} /> : null}
-
-        {mode === "results" ? (
-          <JimboBox className="j-ide__results">
-            <ResultsView results={searchResults} jaml={text} onVerify={handleVerifyInJamlyzer} />
-          </JimboBox>
-        ) : null}
-
-        {mode === "jamlyzer" ? (
+        {mode === "inspect" ? (
           <JimboBox className="j-ide__jamlyzer">
             <Jamlyzer
               jaml={text}

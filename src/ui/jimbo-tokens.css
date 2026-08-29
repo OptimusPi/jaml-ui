@@ -78,10 +78,13 @@
   --j-space-lg: 12px;
   --j-space-xl: 16px;
 
-  /* App shell — HARD-LOCKED 375x375. One size, ALWAYS — never fluid, never
-     resizes. */
+  /* MCP-on-desktop host iframe. Square on purpose — hosts clip funny. */
   --j-app-w: 375px;
   --j-app-h: 375px;
+
+  /* Mobile portrait — iPhone SE CSS pixels (375×667). Width 375 is the floor. */
+  --j-phone-w: 375px;
+  --j-phone-h: 667px;
 
   /* Radii — Balatro is chunky, not bubbly. Never > 10px. */
   --j-radius-sm: 4px;

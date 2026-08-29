@@ -17,6 +17,7 @@ import {
   deckDisplayName,
   stakeDisplayName,
 } from "./jamlyzer/names.js";
+import { JimboShopBelt } from "../ui/JimboShopBelt.js";
 import { JamlyzerItemCard } from "./jamlyzer/JamlyzerItemCard.js";
 import { JamlyzerPackSection } from "./jamlyzer/JamlyzerPackSection.js";
 
@@ -109,11 +110,11 @@ export function JamlyzerView({
         </JimboBox>
 
         {ante.shopItems.length > 0 ? (
-          <JimboBox className="j-shop-belt hide-scrollbar">
+          <JimboShopBelt>
             {ante.shopItems.map((item, i) => (
               <JamlyzerItemCard key={i} item={item} />
             ))}
-          </JimboBox>
+          </JimboShopBelt>
         ) : null}
 
         {ante.packs.length > 0 ? (

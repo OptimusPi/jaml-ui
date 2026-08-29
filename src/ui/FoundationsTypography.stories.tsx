@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { JimboText } from "./jimboText.js";
 
 const meta: Meta = {
-  title: "Foundations/Typography",
+  title: "Primitives/Foundations/Typography",
 };
 export default meta;
 
@@ -20,8 +20,9 @@ const SCALE = [
 ] as const;
 
 export const Scale: StoryObj = {
+  name: "Type on a panel, not floating on felt",
   render: () => (
-    <div style={{ display: "grid", gap: 10, alignItems: "baseline" }}>
+    <div className="j-panel" style={{ width: "min(640px, 100%)", padding: 16, display: "grid", gap: 10, alignItems: "baseline" }}>
       {SCALE.map(([cls, label]) => (
         <div
           key={cls}
@@ -38,8 +39,9 @@ export const Scale: StoryObj = {
 };
 
 export const Fonts: StoryObj = {
+  name: "Pixel grids vs code font",
   render: () => (
-    <div style={{ display: "grid", gap: 14 }}>
+    <div className="j-panel" style={{ width: "min(640px, 100%)", padding: 16, display: "grid", gap: 14 }}>
       {(
         [
           ["--j-font", "m6x11plus at 18 (native grid 18/36/54)", 18],

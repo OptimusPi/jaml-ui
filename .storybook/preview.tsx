@@ -2,15 +2,26 @@ import type { Preview } from "@storybook/react-vite";
 import React from "react";
 import "../src/ui/jimbo.css";
 import "./preview.css";
+import { ensureMotelyReady } from "../src/lib/motely/runtime.js";
+
+void ensureMotelyReady();
+import { JIMBO_VIEWPORTS } from "./appFrame.js";
 import { JimboBackground } from "../src/ui/JimboBackground.js";
 import { JimboBalatroFooter } from "../src/components/JimboBalatroFooter.js";
 
 const preview: Preview = {
   parameters: {
     layout: "fullscreen",
+    viewport: {
+      options: JIMBO_VIEWPORTS,
+    },
     options: {
       storySort: {
-        order: ["Welcome", "Foundations", "Primitives", "Cards & Sprites", "Screens", "JsonRender"],
+        order: [
+          "Primitives",
+          "Apps",
+          ["Mobile portrait", "MCP on Desktop", "Desktop Website"],
+        ],
         method: "alphabetical",
       },
     },
@@ -19,12 +30,6 @@ const preview: Preview = {
       values: [
         { name: "balatro-teal", value: "#0c1818" },
         { name: "balatro-table", value: "#1a3333" },
-        { name: "red-deck", value: "#2e1215" },
-        { name: "blue-deck", value: "#0f2033" },
-        { name: "gold-stake", value: "#29220f" },
-        { name: "nebula-purple", value: "#170f2b" },
-        { name: "crt-black", value: "#050708" },
-        { name: "light-felt", value: "#e8ecec" },
       ],
     },
   },
@@ -48,11 +53,15 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const showSwirl = context.globals.swirl !== "off";
+      const showFooter = context.parameters.jimboFooter === true;
+      const flush = context.parameters.storyPad === false;
       return (
-        <div className="story-root">
+        <div className={flush ? "story-root story-root--flush" : "story-root"}>
           {showSwirl && <JimboBackground />}
-          <Story />
-          <JimboBalatroFooter />
+          <div className={flush ? "story-root__stage story-root__stage--flush" : "story-root__stage"}>
+            <Story />
+          </div>
+          {showFooter ? <JimboBalatroFooter /> : null}
         </div>
       );
     },

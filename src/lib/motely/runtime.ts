@@ -9,3 +9,5 @@ export async function ensureMotelyReady(): Promise<void> {
   }
   await bootPromise;
 }
+
+void ensureMotelyReady();

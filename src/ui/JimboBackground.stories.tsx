@@ -28,7 +28,7 @@ const tokenSelect = {
 };
 
 const meta: Meta<typeof JimboBackground> = {
-  title: "Foundations/Background",
+  title: "Primitives/Foundations/Background",
   component: JimboBackground,
   parameters: { layout: "fullscreen" },
   globals: { swirl: "off" },
