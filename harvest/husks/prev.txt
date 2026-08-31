@@ -1,1 +1,0 @@
-seedfinder.app-prev: only .gitignore. No app/lib source.

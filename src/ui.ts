@@ -41,7 +41,43 @@ export {
   JimboOrbitalMenu,
   type JimboOrbitalMenuProps,
   type JimboOrbitalMenuItem,
+  type JimboOrbitalTone,
 } from "./ui/JimboOrbitalMenu.js";
+export {
+  useJimboOrbitalMenu,
+  createJimboOrbitalStore,
+  jimboOrbitalStore,
+  ORBITAL_CLOSE_MS,
+  ORBITAL_SINK_MS,
+  type JimboOrbitalState,
+  type JimboOrbitalStore,
+  type JimboOrbitalMenuController,
+  type UseJimboOrbitalMenuProps,
+} from "./ui/orbitalMenuStore.js";
+// Pure orbit geometry — no React, no DOM. Exported so a host can size its own
+// box (arcPageCapacity) or drive the same lattice from a different renderer.
+export {
+  layoutOrbitalArc,
+  layoutOrbitalEllipse,
+  arcPageCapacity,
+  clampOrbitRadius,
+  estimatePillWidth,
+  maxOrbitRadiusForBox,
+  minDistanceFromMascotCenter,
+  orbitRadiusForCount,
+  southButtonWidth,
+  ARC_STACK_GAP,
+  FULL_CIRCLE_RAD,
+  MASCOT_CLEARANCE_GAP,
+  MIN_SOUTH_WIDTH,
+  PAGE_CONTROL_LIFT,
+  PILL_HALF_H,
+  SOUTH_ANGLE_RAD,
+  SOUTH_EDGE_INSET,
+  SOUTH_PILL_OFFSET,
+  type OrbitSlot,
+  type OrbitMeasure,
+} from "./ui/orbitalLayout.js";
 export { JimboSeedCopyChip, type JimboSeedCopyChipProps } from "./ui/JimboSeedCopyChip.js";
 export { JimboSpinner, type JimboSpinnerProps } from "./ui/JimboSpinner.js";
 export { JimboTextInput, type JimboTextInputProps } from "./ui/JimboTextInput.js";

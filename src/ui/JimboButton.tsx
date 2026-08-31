@@ -4,7 +4,7 @@ import type { ButtonHTMLAttributes } from "react";
 
 export interface JimboButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "xs" | "sm" | "md" | "lg";
-  tone?: "orange" | "red" | "blue" | "green";
+  tone?: "orange" | "red" | "blue" | "green" | "purple";
   fullWidth?: boolean;
   label?: string;
 }
@@ -22,6 +22,7 @@ const TONE_CLASS = {
   red: "j-btn--red",
   blue: "j-btn--blue",
   green: "j-btn--green",
+  purple: "j-btn--purple",
 } as const satisfies Record<NonNullable<JimboButtonProps["tone"]>, string>;
 
 export function JimboButton({

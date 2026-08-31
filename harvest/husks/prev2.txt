@@ -1,1 +1,0 @@
-seedfinder.app-prev2: empty dirs + package.json workflow-v5 bump. No JSX.

@@ -65,11 +65,16 @@ export function JimboMascot({
       {open && menuItems && (
         <JimboOrbitalMenu
           items={menuItems}
+          // The ring's box is the mascot's own, so it must be told the mascot's
+          // size explicitly — that is what pushes pills out past the artwork
+          // instead of letting them land on his face.
+          mascotSize={size}
+          radius={size * 0.9}
           onAction={(action) => {
             onMenuAction?.(action);
             setOpen(false);
           }}
-          radius={size * 0.9}
+          onBack={() => setOpen(false)}
         />
       )}
     </div>
