@@ -61,9 +61,7 @@
 
   /* Chrome / motion */
   --j-press-y: 2px;
-  --j-press-speed: 55ms;
   --j-panel-border-width: 3px;
-  --j-panel-south-edge-width: calc(var(--j-panel-border-width) / 2);
   --j-panel-border-width-heavy: 6px;
   --j-surface-shadow-depth: 4px;
   --j-transition: 0.15s ease-out;

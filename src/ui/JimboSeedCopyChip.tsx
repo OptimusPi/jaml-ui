@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { FiCheck, FiCopy } from "react-icons/fi";
+import { JimboButton } from "./JimboButton.js";
 
 export interface JimboSeedCopyChipProps {
   value: string;
@@ -15,8 +16,7 @@ export interface JimboSeedCopyChipProps {
 }
 
 /**
- * Harvested from WeeJoker SeedCard — tap-to-copy seed row with icon + value.
- * Idle: copy icon + seed. Copied: green check + brief confirmation label.
+ * Tap-to-copy seed row. Idle: copy icon + seed. Copied: green check + label.
  */
 export function JimboSeedCopyChip({
   value,
@@ -59,16 +59,17 @@ export function JimboSeedCopyChip({
     resetTimer.current = setTimeout(() => setCopied(false), copiedDurationMs);
   };
 
-  const rootClass = ["j-seed-copy", className].filter(Boolean).join(" ");
+  const rootClass = ["j-seed-copy", copied ? "j-seed-copy--copied" : "", className]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <button
-      type="button"
+    <JimboButton
       className={rootClass}
       style={style}
       onClick={handleCopy}
       disabled={!canCopy}
-      data-copied={copied}
+      fullWidth
       aria-label={canCopy ? `Copy seed ${display}` : "Seed unavailable"}
     >
       <span className="j-seed-copy__icon" aria-hidden>
@@ -77,6 +78,6 @@ export function JimboSeedCopyChip({
       <span className="j-seed-copy__text">
         {copied ? copiedLabel : display || placeholder}
       </span>
-    </button>
+    </JimboButton>
   );
 }

@@ -186,8 +186,8 @@
   background-color: var(--j-dark-grey);
   border: var(--j-panel-border-width) solid var(--j-border-silver);
   border-radius: var(--j-radius-lg);
-  box-shadow: 0 var(--j-panel-south-edge-width) 0 0 var(--j-border-south),
-    0 calc(var(--j-surface-shadow-depth) + var(--j-panel-south-edge-width)) 0 0 rgba(0, 0, 0, 0.55),
+  box-shadow: 0 2px 0 0 var(--j-border-south),
+    0 6px 0 0 rgba(0, 0, 0, 0.55),
     inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   padding: var(--j-space-lg);
   display: grid;
@@ -2238,8 +2238,8 @@
   border: var(--j-panel-border-width) solid var(--j-border-silver);
   background: var(--j-darkest);
   color: var(--j-white);
-  box-shadow: 0 var(--j-panel-south-edge-width) 0 0 var(--j-border-south),
-    0 calc(var(--j-surface-shadow-depth) + var(--j-panel-south-edge-width)) 0 0 rgba(0, 0, 0, 0.55);
+  box-shadow: 0 2px 0 0 var(--j-border-south),
+    0 6px 0 0 rgba(0, 0, 0, 0.55);
 }
 
 .j-ide__header {
@@ -2768,8 +2768,14 @@
   letter-spacing: 2px;
 }
 
-/* WeeJoker harvest — tap icon + seed, green flash on copy. */
+/* Tap icon + seed, green flash on copy. Chrome is .j-btn's — this block only
+   re-themes the face and lays out the two children inside it. */
 .j-seed-copy {
+  --j-btn-face-color: var(--j-darkest);
+  --j-btn-shadow-color: var(--j-black);
+}
+
+.j-seed-copy .j-btn__face {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: max-content;
@@ -2778,20 +2784,6 @@
   gap: var(--j-space-sm);
   width: 100%;
   min-height: 44px;
-  padding: 6px 10px;
-  border: var(--j-panel-border-width) solid var(--j-panel-edge);
-  border-radius: var(--j-radius-sm);
-  background: var(--j-darkest);
-  color: var(--j-white);
-  font-family: var(--j-font);
-  cursor: pointer;
-  text-shadow: var(--j-text-shadow);
-  transition: border-color 0.15s ease, color 0.15s ease;
-}
-
-.j-seed-copy:disabled {
-  opacity: 0.45;
-  cursor: default;
 }
 
 .j-seed-copy__icon {
@@ -2807,7 +2799,7 @@
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.j-seed-copy[data-copied="true"] .j-seed-copy__icon {
+.j-seed-copy--copied .j-seed-copy__icon {
   background: var(--j-green);
   color: var(--j-white);
 }
@@ -2822,7 +2814,7 @@
   text-overflow: ellipsis;
 }
 
-.j-seed-copy[data-copied="true"] .j-seed-copy__text {
+.j-seed-copy--copied .j-seed-copy__text {
   color: var(--j-green-text);
 }
 
