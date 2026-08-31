@@ -41,6 +41,7 @@
     "dev:watch": "vite build --watch",
     "jaml:mcp": "node scripts/jaml-mcp-server.mjs",
     "typecheck": "tsc --noEmit --pretty false",
+    "vocab:check": "node scripts/check-vocab-drift.mjs",
     "typecheck:all": "pnpm typecheck && pnpm -r --if-present run typecheck",
     "prepack": "npm run build",
     "storybook": "pnpm run build && storybook dev -p 3141",
