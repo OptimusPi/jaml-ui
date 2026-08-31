@@ -16,8 +16,13 @@ const meta = {
 } satisfies Meta<typeof JimboOrbitalMenu>;
 export default meta;
 
-/** The ring's box. Square-ish and phone-width — the shape the MCP host gives us. */
-const BOX = { w: 340, h: 300 };
+/**
+ * The ring's box: what is left of a 375x375 MCP embed once the panel takes its
+ * title and padding. The ring sizes itself to this, so it is worth being honest
+ * about it — a demo box roomier than the real host hides exactly the crowding
+ * the orbit law exists to survive.
+ */
+const BOX = { w: 300, h: 232 };
 
 function Stage({ children }: { children: React.ReactNode }) {
   return (
@@ -31,9 +36,11 @@ const MENUS: Record<string, JimboOrbitalMenuItem[]> = {
   main: [
     { label: "Find Seeds", submenu: "Find Seeds" },
     { label: "Analyze", action: "analyze" },
+    { label: "Ante Map", action: "map" },
     { label: "Tools", submenu: "Tools" },
-    { label: "Voice", action: "voice", active: true },
     { label: "Results", action: "results", tone: "purple", count: 12 },
+    { label: "Ask Jimbo", action: "chat", tone: "blue" },
+    { label: "Voice", action: "voice", active: true },
     { label: "Close", south: true },
   ],
   "Find Seeds": [
@@ -74,7 +81,7 @@ export const MascotRing: StoryObj<typeof meta> = {
               currentMenu={menu.currentMenu}
               closing={menu.isClosing}
               boxHeight={BOX.h}
-              mascotSize={104}
+              mascotSize={84}
               breadcrumb={
                 menu.breadcrumb.length > 0 ? (
                   <JimboText size="xs" tone="grey">
@@ -84,7 +91,7 @@ export const MascotRing: StoryObj<typeof meta> = {
               }
               center={
                 <JimboMascot
-                  size={104}
+                  size={84}
                   mood={menu.isOpen ? "happy" : "idle"}
                   onClick={menu.toggle}
                   style={{ cursor: "pointer" }}

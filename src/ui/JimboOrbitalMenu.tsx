@@ -166,7 +166,19 @@ export function JimboOrbitalMenu({
     return () => observer.disconnect();
   }, []);
 
-  if (items.length === 0) return null;
+  // A closed ring still has to draw its center: the mascot IS the tap target
+  // that opens it, so returning null here would leave nothing to tap.
+  if (items.length === 0) {
+    return center ? (
+      <div
+        ref={rootRef}
+        className={["j-orbital-menu", className].filter(Boolean).join(" ")}
+        style={{ transform: `translateY(${translateY}px)` }}
+      >
+        <div className="j-orbital-menu__center">{center}</div>
+      </div>
+    ) : null;
+  }
 
   const rx = radius;
   const ry = radiusY ?? radius;
@@ -187,7 +199,11 @@ export function JimboOrbitalMenu({
   // Chrome is anchored to the south button rather than to the viewport, so it
   // stays attached to it when the orbit resizes.
   const southY = pinnedSouth ? boxHeight / 2 - PILL_HALF_H - SOUTH_EDGE_INSET : ry + SOUTH_PILL_OFFSET;
-  const pageControlW = Math.max(56, Math.floor(southWidth * 0.5));
+  // Capped, not just floored. The harvested formula was half the south button,
+  // which was fine when south rode the orbit — but a pinned south spans the
+  // whole container, and two half-width controls then tile it edge to edge and
+  // read as one segmented bar. Capped, they sit at south's tips as nudges.
+  const pageControlW = Math.min(96, Math.max(56, Math.floor(southWidth * 0.5)));
   const pageControlY = southY - PAGE_CONTROL_LIFT;
 
   // The arc must clear the topmost south chrome — page controls sit above the
