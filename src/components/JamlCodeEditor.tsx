@@ -14,7 +14,7 @@ import { JimboCodeSurface } from "../ui/JimboCodeSurface.js";
 const balatroHighlight = HighlightStyle.define([
   { tag: tags.comment, color: JimboColorOption.GREY, fontStyle: "italic" },
   { tag: tags.keyword, color: JimboColorOption.RED },
-  { tag: tags.string, color: JimboColorOption.GOLD_TEXT },
+  { tag: tags.string, color: JimboColorOption.GOLD },
   { tag: tags.number, color: JimboColorOption.BLUE },
   { tag: tags.bool, color: JimboColorOption.BLUE },
   { tag: tags.null, color: JimboColorOption.GREY },
@@ -34,7 +34,7 @@ const balatroTheme = EditorView.theme(
       fontFamily: "var(--j-font-code, 'JetBrains Mono', ui-monospace, monospace)",
       lineHeight: "23px",
       padding: "12px 0",
-      caretColor: JimboColorOption.GOLD_TEXT,
+      caretColor: JimboColorOption.GOLD,
       minHeight: "100%",
     },
     ".cm-gutters": {
@@ -48,7 +48,7 @@ const balatroTheme = EditorView.theme(
       fontSize: "14px",
     },
     ".cm-activeLineGutter": {
-      color: JimboColorOption.GOLD_TEXT,
+      color: JimboColorOption.GOLD,
       backgroundColor: "transparent",
     },
     ".cm-activeLine": {
@@ -61,7 +61,7 @@ const balatroTheme = EditorView.theme(
       backgroundColor: `${JimboColorOption.WHITE}20`,
     },
     ".cm-cursor, .cm-dropCursor": {
-      borderLeftColor: JimboColorOption.GOLD_TEXT,
+      borderLeftColor: JimboColorOption.GOLD,
     },
     ".cm-scroller": {
       overflow: "auto",

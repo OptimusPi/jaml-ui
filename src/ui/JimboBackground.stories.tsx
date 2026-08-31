@@ -16,9 +16,8 @@ const SHADER_COLORS = {
   "--j-dark-orange": JimboColorOption.DARK_ORANGE,
   "--j-darkest": JimboColorOption.DARKEST,
   "--j-black": JimboColorOption.BLACK,
-  "--j-tarot-btn": JimboColorOption.TAROT_BUTTON,
-  "--j-planet-btn": JimboColorOption.PLANET_BUTTON,
-  "--j-spectral-btn": JimboColorOption.SPECTRAL_BUTTON,
+  "--j-planet": JimboColorOption.PLANET,
+  "--j-spectral": JimboColorOption.SPECTRAL,
 } as const;
 
 const tokenSelect = {

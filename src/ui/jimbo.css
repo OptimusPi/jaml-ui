@@ -148,7 +148,7 @@
 }
 
 .j-text--gold {
-  color: var(--j-gold-text);
+  color: var(--j-gold);
 }
 
 .j-text--green {
@@ -156,7 +156,7 @@
 }
 
 .j-text--orange {
-  color: var(--j-orange-text);
+  color: var(--j-orange);
 }
 
 .j-text--purple {
@@ -403,21 +403,6 @@
 .j-btn--green {
   --j-btn-face-color: var(--j-green);
   --j-btn-shadow-color: var(--j-dark-green);
-}
-
-.j-btn--tarot {
-  --j-btn-face-color: var(--j-tarot-btn);
-  --j-btn-shadow-color: var(--j-tarot-btn-dark);
-}
-
-.j-btn--planet {
-  --j-btn-face-color: var(--j-planet-btn);
-  --j-btn-shadow-color: var(--j-planet-btn-dark);
-}
-
-.j-btn--spectral {
-  --j-btn-face-color: var(--j-spectral-btn);
-  --j-btn-shadow-color: var(--j-spectral-btn-dark);
 }
 
 
@@ -1189,7 +1174,7 @@
 .j-inline-edit--md { font-size: 14px; }
 .j-inline-edit--lg { font-size: 18px; }
 .j-inline-edit--white { color: var(--j-white); }
-.j-inline-edit--gold  { color: var(--j-gold-text); }
+.j-inline-edit--gold  { color: var(--j-gold); }
 .j-inline-edit--grey  { color: var(--j-grey); }
 .j-inline-edit--dim   { opacity: 0.8; }
 
@@ -1936,7 +1921,7 @@
 .j-stat-grid__value {
   font-family: var(--j-font);
   font-size: 16px;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   text-shadow: var(--j-text-shadow);
 }
 
@@ -1987,7 +1972,7 @@
 .j-info-card__sub {
   font-family: var(--j-font);
   font-size: 9px;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   letter-spacing: 1px;
   margin-top: 2px;
 }
@@ -2025,7 +2010,7 @@
   font-size: 32px;
   letter-spacing: 3px;
   line-height: 1.15;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
 }
 
@@ -2281,7 +2266,7 @@
 .j-ide__title {
   font-family: var(--j-font);
   font-size: 16px;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   text-shadow: var(--j-text-shadow);
 }
 
@@ -2412,7 +2397,7 @@
   border-radius: var(--j-radius-sm);
   border: var(--j-panel-border-width) solid var(--j-panel-edge);
   background: var(--j-seed-field-bg);
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   font-size: 18px;
   font-family: var(--j-font);
   font-weight: 400;
@@ -2532,13 +2517,13 @@
 
 .j-aesthetic-pill:hover {
   border-color: var(--j-gold);
-  color: var(--j-gold-text);
+  color: var(--j-gold);
 }
 
 .j-aesthetic-pill[data-active="true"] {
   border-color: var(--j-gold);
   background: rgba(228, 182, 67, 0.13);
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   box-shadow: 0 0 0 1px var(--j-gold), 0 2px 0 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -2572,7 +2557,7 @@
   font-size: 32px;
   letter-spacing: 3px;
   line-height: 1.15;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
 }
 
@@ -2597,7 +2582,7 @@
 
 .j-showcase__stat-value {
   font-size: 16px;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   text-shadow: var(--j-text-shadow);
 }
 
@@ -2684,7 +2669,7 @@
 
 .j-showcase__filter-author {
   font-size: 9px;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   letter-spacing: 1px;
   margin-top: 2px;
 }
@@ -3435,7 +3420,7 @@
   color: var(--j-white);
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
 }
-.j-stat__value--gold { color: var(--j-gold-text); }
+.j-stat__value--gold { color: var(--j-gold); }
 .j-stat__value--red  { color: var(--j-red); }
 .j-stat__value--blue { color: var(--j-blue); }
 
@@ -3625,7 +3610,7 @@
 .j-marquee__title {
   font-family: var(--j-font);
   font-size: 26px;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
   letter-spacing: 0.06em;
   position: relative;
@@ -4257,7 +4242,7 @@
 .j-seed-card--interactive:hover {
   border: 1px solid var(--j-blue);
   transform: translateY(-2px);
-  box-shadow: var(--j-shadow);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Code snippet (inline JAML / filter fragments) ─────────────────────── */
@@ -4294,7 +4279,7 @@
   user-select: none;
 }
 .j-outer-tab:active { cursor: grabbing; }
-.j-outer-tab--active { border-color: var(--j-gold); color: var(--j-gold-text); }
+.j-outer-tab--active { border-color: var(--j-gold); color: var(--j-gold); }
 .j-outer-tab__grip { display: inline-grid; place-items: center; color: var(--j-grey); }
 .j-outer-tab__space { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .j-outer-tab__fs {
@@ -4312,7 +4297,7 @@
 .j-outer-tab--orange { color: var(--j-orange); }
 .j-outer-tab--green { color: var(--j-green-text); }
 .j-outer-tab--purple { color: var(--j-purple); }
-.j-outer-tab--gold { color: var(--j-gold-text); }
+.j-outer-tab--gold { color: var(--j-gold); }
 
 
 /* ── JamlMapPreview ────────────────────────────────────────────────────── */
@@ -4549,7 +4534,7 @@
   font-weight: 400;
   font-size: 14px;
   letter-spacing: 1px;
-  color: var(--j-gold-text);
+  color: var(--j-gold);
   min-width: 80px;
 }
 

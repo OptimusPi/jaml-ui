@@ -9,10 +9,10 @@ export default meta;
 
 /** Token names, grouped the way jimbo-tokens.css groups them. */
 const GROUPS: Array<{ name: string; tokens: string[] }> = [
-  { name: "game", tokens: ["--j-red", "--j-blue", "--j-green", "--j-orange", "--j-gold", "--j-purple"] },
-  { name: "pressed", tokens: ["--j-dark-red", "--j-dark-blue", "--j-dark-green", "--j-dark-orange", "--j-grey", "--j-dark-grey"] },
-  { name: "surfaces", tokens: ["--j-darkest", "--j-surface-inset"] },
-  { name: "chrome", tokens: ["--j-border-silver", "--j-border-south", "--j-white", "--j-orange-text"] },
+  { name: "game", tokens: ["--j-red", "--j-blue", "--j-green", "--j-orange", "--j-gold", "--j-purple", "--j-planet", "--j-spectral"] },
+  { name: "pressed", tokens: ["--j-dark-red", "--j-dark-blue", "--j-dark-green", "--j-dark-orange"] },
+  { name: "surfaces", tokens: ["--j-darkest", "--j-dark-grey", "--j-surface-inset", "--j-grey"] },
+  { name: "chrome", tokens: ["--j-border-silver", "--j-border-south", "--j-panel-edge", "--j-white"] },
 ];
 
 /* Token names and hex values are code, not game copy — the pixel font at 10px
