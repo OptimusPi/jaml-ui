@@ -14,7 +14,13 @@ import {
   type DockEdge,
   type DockGroup,
   type DockNode,
-} from "./jimboDock.js";
+} from "./dockTree.js";
+
+export {
+  defaultPyramidDock,
+  dockActivate,
+  type DockNode,
+} from "./dockTree.js";
 
 export interface JimboDockPane {
   label: string;

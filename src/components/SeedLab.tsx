@@ -5,7 +5,7 @@ import { MotelyJaml, MotelySearch, type MotelyProgress, type MotelyScoredSeedRes
 import { ensureMotelyReady } from "../lib/motely/runtime.js";
 import { fromJaml } from "../lib/motely/jamlParse.js";
 import { JimboButton } from "../ui/JimboButton.js";
-import { JimboDock } from "../ui/JimboDock.tsx";
+import { JimboDock } from "../ui/JimboDock.js";
 import { JimboListItem } from "../ui/JimboListItem.js";
 import { JimboStack } from "../ui/JimboLayout.js";
 import { JimboStatusPill } from "../ui/JimboStatusPill.js";

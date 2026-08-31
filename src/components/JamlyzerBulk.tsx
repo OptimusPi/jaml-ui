@@ -231,8 +231,6 @@ export function JamlyzerBulk({
                   result={result}
                   deck={deck}
                   stake={stake}
-                  clauses={clauses}
-                  tallies={seedTallies ? [...seedTallies] : undefined}
                 />
               )}
             </JimboPanel>
