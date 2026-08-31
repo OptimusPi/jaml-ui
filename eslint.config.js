@@ -7,7 +7,11 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 export default tseslint.config(
-  { ignores: ['dist/**', 'storybook-static/**', 'node_modules/**', 'assets/**', '**/*.d.ts', 'examples/**', '.claude/', '.claude/**', '.storybook/**', 'scripts/**', '.design-sync/**', '.ds-sync/**', 'ds-bundle/**'] },
+  // `harvest/**` is a quarry, not product: verbatim copies from the dead
+  // seedfinder / weejoker / JAMMY trees, kept only until each one is ported onto
+  // Jimbo primitives and deleted (see harvest/MANIFEST.md). Linting foreign code
+  // that is scheduled for deletion is wasted work.
+  { ignores: ['dist/**', 'storybook-static/**', 'node_modules/**', 'assets/**', '**/*.d.ts', 'examples/**', 'harvest/**', '.claude/', '.claude/**', '.storybook/**', 'scripts/**', '.design-sync/**', '.ds-sync/**', 'ds-bundle/**'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

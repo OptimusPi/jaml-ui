@@ -5,7 +5,6 @@ import { JimboBox } from "./JimboBox.js";
 import { JimboOuterTab, type JimboOuterTabTone } from "./JimboOuterTab.js";
 import {
   defaultPyramidDock,
-  dockActivate,
   dockMapGroup,
   dockRemove,
   dockSplitAt,
@@ -65,7 +64,7 @@ export function JimboDock({
     if (storageKey) saveDock(storageKey, tree);
   }, [storageKey, tree]);
 
-  const zoneFromEvent = (e: DragEvent, group: DockGroup): DockEdge => {
+  const zoneFromEvent = (e: DragEvent): DockEdge => {
     const t = e.target as HTMLElement;
     if (t.closest(".j-dock-tabs")) return "center";
     const r = e.currentTarget.getBoundingClientRect();
@@ -121,7 +120,7 @@ export function JimboDock({
         className={`j-dock-pane${dropClass}`}
         onDragOver={(e) => {
           e.preventDefault();
-          const zone = zoneFromEvent(e, group);
+          const zone = zoneFromEvent(e);
           setDropZone((v) =>
             v && v.groupId === group.id && v.zone === zone ? v : { groupId: group.id, zone },
           );
@@ -132,7 +131,7 @@ export function JimboDock({
         onDrop={(e) => {
           e.preventDefault();
           const key = e.dataTransfer.getData("text/plain");
-          const zone = zoneFromEvent(e, group);
+          const zone = zoneFromEvent(e);
           setDropZone(null);
           dropPane(key, group, zone);
         }}
