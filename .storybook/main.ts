@@ -13,6 +13,13 @@ const config: StorybookConfig = {
     name: "@storybook/react-vite",
     options: {},
   },
+  async viteFinal(config) {
+    config.optimizeDeps = {
+      ...config.optimizeDeps,
+      exclude: [...new Set([...(config.optimizeDeps?.exclude ?? []), "motely-wasm"])],
+    };
+    return config;
+  },
 };
 
 export default config;

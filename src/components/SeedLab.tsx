@@ -1,9 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MotelyJaml, MotelySearch, type MotelyProgress, type MotelyScoredSeedResult } from "motely-wasm";
-import { ensureMotelyReady } from "../lib/motely/runtime.js";
-import { fromJaml } from "../lib/motely/jamlParse.js";
+import bootsharp, { MotelyJaml, MotelySearch, type MotelyProgress, type MotelyScoredSeedResult } from "motely-wasm";
 import { JimboButton } from "../ui/JimboButton.js";
 import { JimboDock } from "../ui/JimboDock.js";
 import { JimboListItem } from "../ui/JimboListItem.js";
@@ -27,11 +25,6 @@ ${STARTER_JAML}`;
 
 export type SeedHit = { seed: string; score: number };
 
-function parseConfig(jaml: string) {
-  if (typeof MotelyJaml.fromJaml === "function") return MotelyJaml.fromJaml(jaml);
-  return fromJaml(jaml);
-}
-
 export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }) {
   const [jaml, setJaml] = useState(defaultJaml);
   const [hits, setHits] = useState<SeedHit[]>([]);
@@ -43,10 +36,10 @@ export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: stri
     setError(null);
     setSearching(true);
     try {
-      await ensureMotelyReady();
+      if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
       const bad = MotelyJaml.validate(jaml);
       if (bad && bad !== "valid") throw new Error(bad);
-      const results = await MotelySearch.searchRandom(parseConfig(jaml), 2000);
+      const results = await MotelySearch.searchRandom(MotelyJaml.fromJaml(jaml), 2000);
       setHits(results.map((r) => ({ seed: r.seed, score: r.score })));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -107,10 +100,10 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
     MotelySearch.onScoredResult.subscribe(onHit);
     MotelySearch.onProgress.subscribe(onProg);
     try {
-      await ensureMotelyReady();
+      if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
       const bad = MotelyJaml.validate(jaml);
       if (bad && bad !== "valid") throw new Error(bad);
-      const results = await MotelySearch.searchRandom(parseConfig(jaml), 2000);
+      const results = await MotelySearch.searchRandom(MotelyJaml.fromJaml(jaml), 2000);
       setHits(results.map((r) => ({ seed: r.seed, score: r.score })));
       if (results[0]) setSelected(results[0].seed);
     } catch (e) {

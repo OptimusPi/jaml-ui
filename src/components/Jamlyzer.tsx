@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import {
+import bootsharp, {
   MotelyJaml,
   MotelyJamlyzer,
   type MotelyJamlyzerSeedResult,
   MotelyDeck,
   MotelyStake,
 } from "motely-wasm";
-import { ensureMotelyReady } from "../lib/motely/runtime.js";
-import { fromJaml } from "../lib/motely/jamlParse.js";
 import { parseJaml } from "../lib/jaml/jaml.js";
 import { JimboPanel } from "../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../ui/panel.js";
@@ -44,7 +42,7 @@ type JamlyzerLoadState =
   | { status: "ready"; seeds: readonly MotelyJamlyzerSeedResult[]; elapsedMs: number }
   | { status: "error"; message: string };
 
-export type JamlyzerSortMode = "highest-score" | "lowest-score" | "ante1-hits" | "alpha";
+export type JamlyzerSortMode = "highest-score" | "ante1-hits" | "alpha";
 export type JamlyzerFilterMode = "all" | "matches" | "pinned";
 
 const PAGE_SIZE = 20;
@@ -79,7 +77,6 @@ export function Jamlyzer({
   const [lastJaml, setLastJaml] = useState(jaml);
   const [lastResults, setLastResults] = useState(resultsProp);
 
-  // Parse JAML clauses for milestone matching and rail scoring
   const clauses = useMemo(() => {
     if (!jaml) return [];
     try {
@@ -89,7 +86,6 @@ export function Jamlyzer({
     }
   }, [jaml]);
 
-  // Handle prop updates
   if (resultsProp !== lastResults) {
     setLastResults(resultsProp);
     if (resultsProp) {
@@ -110,7 +106,7 @@ export function Jamlyzer({
 
     void (async () => {
       try {
-        await ensureMotelyReady();
+        if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
         const t0 = performance.now();
 
         let analyzed: MotelyJamlyzerSeedResult[] = [];
@@ -121,12 +117,11 @@ export function Jamlyzer({
           if (validation) {
             throw new Error(validation);
           }
-          analyzed = MotelyJamlyzer.analyzeSeeds(fromJaml(trimmed));
+          analyzed = MotelyJamlyzer.analyzeSeeds(MotelyJaml.fromJaml(trimmed));
         } else if (seedsProp && seedsProp.length > 0) {
-          // If strings are provided, create synthetic JAML query or analyze
           const seedStrings = seedsProp.map((s) => (typeof s === "string" ? s : s.seed));
           const syntheticJaml = `seeds:\n${seedStrings.map((s) => `  - ${s}`).join("\n")}`;
-          analyzed = MotelyJamlyzer.analyzeSeeds(fromJaml(syntheticJaml));
+          analyzed = MotelyJamlyzer.analyzeSeeds(MotelyJaml.fromJaml(syntheticJaml));
         } else {
           throw new Error("No seeds or JAML filter provided.");
         }
@@ -153,7 +148,6 @@ export function Jamlyzer({
     [load]
   );
 
-  // Filter and sort the candidate seeds
   const filteredAndSortedRows = useMemo(() => {
     const q = searchQuery.trim().toUpperCase();
 
@@ -166,7 +160,6 @@ export function Jamlyzer({
     });
 
     return filtered.sort((a, b) => {
-      // Pinned seeds always float to the top
       const aPinned = pinnedSeeds.has(a.seed);
       const bPinned = pinnedSeeds.has(b.seed);
       if (aPinned && !bPinned) return -1;
@@ -178,8 +171,6 @@ export function Jamlyzer({
       switch (sortMode) {
         case "highest-score":
           return bScore - aScore;
-        case "lowest-score":
-          return aScore - bScore;
         case "ante1-hits": {
           const aA1 = (a.antes[0]?.shopItems.length ?? 0) + (a.antes[0]?.packs.length ?? 0);
           const bA1 = (b.antes[0]?.shopItems.length ?? 0) + (b.antes[0]?.packs.length ?? 0);
@@ -193,7 +184,6 @@ export function Jamlyzer({
     });
   }, [allRows, searchQuery, filterMode, sortMode, pinnedSeeds]);
 
-  // Pagination calculation
   const totalPages = Math.max(1, Math.ceil(filteredAndSortedRows.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const pagedRows = useMemo(
@@ -287,7 +277,6 @@ export function Jamlyzer({
 
   return (
     <JimboStack gap="md" align="stretch" className={rootClass} style={style}>
-      {/* ── Top Metric & Action Header ───────────────────────────────────── */}
       <JimboInnerPanel className="j-jamlyzer-header">
         <JimboRow wrap gap="md" align="center" justify="between">
           <JimboRow gap="sm" align="center">
@@ -317,7 +306,6 @@ export function Jamlyzer({
           </JimboRow>
         </JimboRow>
 
-        {/* ── Filter & Search Toolbar ────────────────────────────────────── */}
         <JimboRow wrap gap="sm" align="center" justify="between" className="j-jamlyzer-toolbar">
           <JimboBox className="j-jamlyzer-search-wrap">
             <FiSearch className="j-jamlyzer-search-icon" />
@@ -414,9 +402,7 @@ export function Jamlyzer({
         </JimboRow>
       </JimboInnerPanel>
 
-      {/* ── Split Main View: Candidate List + Ante Inspector ────────────── */}
       <JimboBox className="j-jamlyzer-split">
-        {/* Left Pane: Candidate Seeds Rail */}
         <JimboBox className="j-jamlyzer-candidate-pane">
           <JimboInnerPanel className="j-jamlyzer-candidate-header">
             <JimboRow gap="xs" align="center" justify="between">
@@ -473,7 +459,6 @@ export function Jamlyzer({
           </JimboBox>
         </JimboBox>
 
-        {/* Right Pane: Deep Ante Timeline Inspector */}
         <JimboBox className="j-jamlyzer-inspector-pane">
           {activeResult ? (
             <JamlyzerView

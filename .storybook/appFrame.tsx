@@ -1,4 +1,5 @@
 import type { Decorator, Meta } from "@storybook/react-vite";
+import bootsharp from "motely-wasm";
 import { JimboApp, type JimboAppVariant } from "../src/ui/JimboApp.js";
 
 export const JIMBO_VIEWPORTS = {
@@ -42,6 +43,12 @@ export function appMeta(shell: AppShell): Meta {
   );
   return {
     title: TITLE[shell],
+    loaders: [
+      async () => {
+        if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
+        return {};
+      },
+    ],
     parameters: {
       layout: "fullscreen",
       storyPad: false,

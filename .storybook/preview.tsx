@@ -1,15 +1,19 @@
 import type { Preview } from "@storybook/react-vite";
 import React from "react";
+import bootsharp from "motely-wasm";
 import "../src/ui/jimbo.css";
 import "./preview.css";
-import { ensureMotelyReady } from "../src/lib/motely/runtime.js";
-
-void ensureMotelyReady();
 import { JIMBO_VIEWPORTS } from "./appFrame.js";
 import { JimboBackground } from "../src/ui/JimboBackground.js";
 import { JimboBalatroFooter } from "../src/components/JimboBalatroFooter.js";
 
 const preview: Preview = {
+  loaders: [
+    async () => {
+      if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
+      return {};
+    },
+  ],
   parameters: {
     layout: "fullscreen",
     viewport: {
