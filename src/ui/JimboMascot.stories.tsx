@@ -34,11 +34,59 @@ export const RadialMenu: StoryObj<typeof meta> = {
             { label: "Search", action: "search", tone: "blue" },
             { label: "Analyze", action: "analyze", tone: "green" },
             { label: "Copy", action: "copy", tone: "purple" },
-            { label: "Help", action: "help", tone: "grey" },
+            { label: "Help", action: "help" },
           ]}
           onMenuAction={(action) => console.log("menu action", action)}
         />
       </JimboRow>
+    </StoryScene>
+  ),
+};
+
+/**
+ * The whole organ from one component: the mascot owns the tap, the menu path,
+ * the pager and the south exit, so a consumer supplies items and handles
+ * actions — nothing else. This is what seedfinder.app hand-assembled.
+ */
+export const HostedMenu: StoryObj<typeof meta> = {
+  name: "Jammy hosts a submenu tree",
+  render: () => (
+    <StoryScene title="Seed Lab" tone="blue">
+      {/* The ring centers on the mascot, so the host puts the mascot where the
+          ring's center belongs — here, the middle of its square. */}
+      <div
+        style={{
+          display: "grid",
+          placeItems: "center",
+          width: 300,
+          height: 232,
+          margin: "0 auto",
+        }}
+      >
+        <JimboMascot
+          size={84}
+          orbitBoxWidth={300}
+          orbitBoxHeight={232}
+          getMenuItems={(stack) =>
+            stack.at(-1) === "Filters"
+              ? [
+                  { label: "Must", action: "add-must" },
+                  { label: "Should", action: "add-should" },
+                  { label: "Must Not", action: "add-mustnot" },
+                  { label: "Browser", action: "browser" },
+                  { label: "Map", action: "map", active: true },
+                ]
+              : [
+                  { label: "Search", action: "search" },
+                  { label: "Filters", submenu: "Filters" },
+                  { label: "Results", action: "results", tone: "purple", count: 12 },
+                  { label: "Jamlyze", action: "jamlyze" },
+                  { label: "Settings", action: "settings", active: false },
+                ]
+          }
+          onMenuAction={(action) => console.log("menu action", action)}
+        />
+      </div>
     </StoryScene>
   ),
 };
