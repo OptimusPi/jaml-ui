@@ -47,6 +47,11 @@ export {
 } from "./components/JamlyzerBulk.js";
 
 export {
+  JamlyzerTape,
+  type JamlyzerTapeProps,
+} from "./components/jamlyzer/JamlyzerTape.js";
+
+export {
   JamlSeedInput,
   type JamlSeedInputProps,
   type JamlSeedInputVariant,
