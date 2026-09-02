@@ -80,6 +80,7 @@ export {
 } from "./ui/orbitalLayout.js";
 export { JimboSeedCopyChip, type JimboSeedCopyChipProps } from "./ui/JimboSeedCopyChip.js";
 export { JimboSpinner, type JimboSpinnerProps } from "./ui/JimboSpinner.js";
+export { JimboPanelSpinner, type JimboPanelSpinnerProps } from "./ui/JimboPanelSpinner.js";
 export { JimboTextInput, type JimboTextInputProps } from "./ui/JimboTextInput.js";
 export { JimboInnerPanel, type JimboInnerPanelProps, JimboModal, type JimboModalProps } from "./ui/panel.js";
 

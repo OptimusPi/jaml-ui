@@ -1,6 +1,6 @@
 {
   "name": "jaml-ui",
-  "version": "4.5.1",
+  "version": "4.6.0",
   "description": "Balatro card sprites and the Jimbo design system for MCP Apps, with a @json-render (Vercel Labs) catalog.",
   "type": "module",
   "main": "./dist/index.js",
@@ -41,7 +41,8 @@
     "dev:watch": "vite build --watch",
     "jaml:mcp": "node scripts/jaml-mcp-server.mjs",
     "typecheck": "tsc --noEmit --pretty false",
-    "vocab:check": "node scripts/check-vocab-drift.mjs",
+    "vocab:check": "node --experimental-strip-types scripts/check-vocab-drift.mjs",
+    "lut:emit": "node scripts/emit-motely-sprite-lut.mjs",
     "typecheck:all": "pnpm typecheck && pnpm -r --if-present run typecheck",
     "prepack": "npm run build",
     "storybook": "pnpm run build && storybook dev -p 3141",
@@ -90,7 +91,7 @@
     "zod": "^4.5.4"
   },
   "peerDependencies": {
-    "motely-wasm": "^25.0.0",
+    "motely-wasm": "^25.1.0",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
@@ -115,7 +116,7 @@
     "eslint-plugin-react-refresh": "^0.5.5",
     "eslint-plugin-storybook": "10.4.6",
     "globals": "^17.11.0",
-    "motely-wasm": "25.0.3",
+    "motely-wasm": "25.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "storybook": "^10.5.10",

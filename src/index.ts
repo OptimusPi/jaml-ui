@@ -102,6 +102,13 @@ export {
   type DeckSpriteProps,
 } from "./components/DeckSprite.js";
 
+export {
+  DeckStakePicker,
+  DECK_PICKER_NAMES,
+  STAKE_PICKER_NAMES,
+  type DeckStakePickerProps,
+} from "./components/DeckStakePicker.js";
+
 export { StandardCard } from "./components/StandardCard.js";
 export {
   CardSuit,

@@ -167,6 +167,24 @@ for (const kind of DECODE_ENUMS) {
 }
 notes.push(`${roundTripped}/${DECODE_ENUMS.length} decode enums round-trip name -> value -> name`);
 
+const { MOTELY_SPRITE_BY_TYPE } = await import("../src/decode/motelySpriteLut.generated.ts");
+const itemTypeNames = runtimeEnumNames(Motely.MotelyItemType);
+let lutHits = 0;
+let lutUnknown = 0;
+for (const [type] of MOTELY_SPRITE_BY_TYPE) {
+  if (Motely.MotelyItemType[type] === undefined) lutUnknown += 1;
+  else lutHits += 1;
+}
+if (lutUnknown) {
+  problems.push(`sprite LUT has ${lutUnknown} keys not in MotelyItemType`);
+}
+if (MOTELY_SPRITE_BY_TYPE.size === 0) {
+  problems.push("sprite LUT is empty — run pnpm lut:emit");
+}
+notes.push(
+  `sprite LUT ${MOTELY_SPRITE_BY_TYPE.size} cells, ${lutHits} in MotelyItemType (${itemTypeNames.length} names)`,
+);
+
 // ── report ──────────────────────────────────────────────────────────────────
 for (const note of notes) console.log(`  · ${note}`);
 

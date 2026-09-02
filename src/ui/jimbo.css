@@ -353,35 +353,39 @@
    the slack sits under the glyphs, matching the in-game buttons where the label
    hugs the top edge above the pressed lip. */
 .j-btn--xs .j-btn__face {
-  padding-top: 3px;
-  padding-right: 8px;
-  padding-bottom: 6px;
-  padding-left: 8px;
-  font-size: 11px;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 7px;
+  padding-left: 10px;
+  font-size: 12px;
 }
 
 .j-btn--sm .j-btn__face {
-  padding-top: 5px;
-  padding-right: 12px;
-  padding-bottom: 6px;
-  padding-left: 12px;
-  font-size: 13px;
+  padding-top: 8px;
+  padding-right: 16px;
+  padding-bottom: 11px;
+  padding-left: 16px;
+  font-size: 14px;
 }
 
 .j-btn--md .j-btn__face {
-  padding-top: 6px;
-  padding-right: 18px;
-  padding-bottom: 9px;
-  padding-left: 18px;
-  font-size: 16px;
+  padding-top: 10px;
+  padding-right: 22px;
+  padding-bottom: 14px;
+  padding-left: 22px;
+  font-size: 18px;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 .j-btn--lg .j-btn__face {
-  padding-top: 6px;
-  padding-right: 18px;
-  padding-bottom: 11px;
-  padding-left: 18px;
-  font-size: 20px;
+  padding-top: 12px;
+  padding-right: 24px;
+  padding-bottom: 16px;
+  padding-left: 24px;
+  font-size: 22px;
+  min-height: 52px;
+  box-sizing: border-box;
 }
 
 /* Tone colors — set via CSS custom properties */
@@ -408,6 +412,11 @@
 .j-btn--purple {
   --j-btn-face-color: var(--j-purple);
   --j-btn-shadow-color: var(--j-dark-purple);
+}
+
+.j-btn--grey {
+  --j-btn-face-color: var(--j-teal-grey);
+  --j-btn-shadow-color: var(--j-darkest);
 }
 
 

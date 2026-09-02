@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import bootsharp, { MotelyJaml, MotelySearch, type MotelyProgress, type MotelyScoredSeedResult } from "motely-wasm";
+import bootsharp, { Search, type MotelyProgress, type MotelySeedScore } from "motely-wasm";
+import { randomLength8Seeds } from "./jamlSeedUtils.js";
 import { JimboButton } from "../ui/JimboButton.js";
 import { JimboDock } from "../ui/JimboDock.js";
 import { JimboListItem } from "../ui/JimboListItem.js";
@@ -37,10 +38,17 @@ export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: stri
     setSearching(true);
     try {
       if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
-      const bad = MotelyJaml.validate(jaml);
-      if (bad && bad !== "valid") throw new Error(bad);
-      const results = await MotelySearch.searchRandom(MotelyJaml.fromJaml(jaml), 2000);
-      setHits(results.map((r) => ({ seed: r.seed, score: r.score })));
+      const collected: SeedHit[] = [];
+      const onHit = (r: MotelySeedScore) => {
+        collected.push({ seed: r.seed, score: r.score });
+      };
+      Search.onScored.subscribe(onHit);
+      try {
+        await Search.scoreList(jaml, randomLength8Seeds(2000));
+      } finally {
+        Search.onScored.unsubscribe(onHit);
+      }
+      setHits(collected);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -73,13 +81,13 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
   const [hits, setHits] = useState<SeedHit[]>([]);
   const [checked, setChecked] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
-  const hitHandler = useRef<((r: MotelyScoredSeedResult) => void) | null>(null);
+  const hitHandler = useRef<((r: MotelySeedScore) => void) | null>(null);
   const progHandler = useRef<((p: MotelyProgress) => void) | null>(null);
 
   useEffect(() => {
     return () => {
-      if (hitHandler.current) MotelySearch.onScoredResult.unsubscribe(hitHandler.current);
-      if (progHandler.current) MotelySearch.onProgress.unsubscribe(progHandler.current);
+      if (hitHandler.current) Search.onScored.unsubscribe(hitHandler.current);
+      if (progHandler.current) Search.onProgress.unsubscribe(progHandler.current);
     };
   }, []);
 
@@ -89,7 +97,9 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
     setHits([]);
     setChecked(0);
     setRunning(true);
-    const onHit = (r: MotelyScoredSeedResult) => {
+    let lastSeed: string | null = null;
+    const onHit = (r: MotelySeedScore) => {
+      lastSeed = r.seed;
       setHits((prev) => [{ seed: r.seed, score: r.score }, ...prev].slice(0, 80));
     };
     const onProg = (p: MotelyProgress) => {
@@ -97,20 +107,17 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
     };
     hitHandler.current = onHit;
     progHandler.current = onProg;
-    MotelySearch.onScoredResult.subscribe(onHit);
-    MotelySearch.onProgress.subscribe(onProg);
+    Search.onScored.subscribe(onHit);
+    Search.onProgress.subscribe(onProg);
     try {
       if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
-      const bad = MotelyJaml.validate(jaml);
-      if (bad && bad !== "valid") throw new Error(bad);
-      const results = await MotelySearch.searchRandom(MotelyJaml.fromJaml(jaml), 2000);
-      setHits(results.map((r) => ({ seed: r.seed, score: r.score })));
-      if (results[0]) setSelected(results[0].seed);
+      await Search.scoreList(jaml, randomLength8Seeds(2000));
+      if (lastSeed) setSelected(lastSeed);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
-      MotelySearch.onScoredResult.unsubscribe(onHit);
-      MotelySearch.onProgress.unsubscribe(onProg);
+      Search.onScored.unsubscribe(onHit);
+      Search.onProgress.unsubscribe(onProg);
       hitHandler.current = null;
       progHandler.current = null;
       setRunning(false);
@@ -138,7 +145,7 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
                 label={running ? "Searching…" : error ? "Error" : hits.length ? "Done" : "Ready"}
               />
               <JimboText size="sm" tone="grey">
-                {running ? `checked ${checked} · hits ${hits.length}` : "MotelySearch · 2000 random seeds"}
+                {running ? `checked ${checked} · hits ${hits.length}` : "Search.scoreList · 2000 random seeds"}
               </JimboText>
               {error ? (
                 <JimboText size="sm" tone="red">

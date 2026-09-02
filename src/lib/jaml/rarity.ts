@@ -8,7 +8,7 @@ import { RARITY_DATA } from "./rarityData.generated.js";
 // the filter text alone — no search, no engine boot. Every game number comes
 // from rarityData.generated.ts (file:line-cited corpus data, v1.0.1o-FULL);
 // every engine-behaviour assumption was verified empirically against
-// motely-wasm 25.0.3:
+// motely-wasm 25.1.0:
 //   - bare `tag:` matches EITHER blind's skip tag (union of both draws);
 //     smallBlindTag/bigBlindTag are blind-exclusive.
 //   - `sources.shopItems` indexes the MIXED per-ante shop queue (jokers,

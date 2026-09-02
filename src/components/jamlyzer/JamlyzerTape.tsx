@@ -1,13 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import bootsharp, {
-  MotelyJaml,
-  MotelyJamlyzer,
-  type JamlConfig,
-  type MotelyJamlyzerEvents,
-  type MotelyJamlyzerStreamStates,
-} from "motely-wasm";
+import bootsharp, { Analyze, type MotelyJamlyzerEvents } from "motely-wasm";
+import { parseJamlSeeds } from "../../lib/jaml/jamlSeeds.js";
 import { JimboPanel } from "../../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../../ui/panel.js";
 import { JimboText } from "../../ui/jimboText.js";
@@ -18,11 +13,8 @@ import { JimboRow } from "../../ui/JimboLayout.js";
  * The PRNG tape.
  *
  * `JamlyzerEvents` shows the first 8 rolls of 12 streams and drops the rest on
- * the floor. But the engine hands back a `streamStates` bag on every result and
- * takes it straight back as `resumeFrom`, so a seed's event streams page
- * forward forever with no roll duplicated and none skipped — event streams
- * resume by re-injecting the 14 saved doubles, composite streams by replaying
- * `rollOffset` rolls and discarding them.
+ * the floor. 25.1.0 dropped resumeSeeds; paging is `Analyze.seedsPaged(jaml, n)`
+ * with a growing n, then we keep only the new suffix.
  *
  * Nothing shipped has ever used it. This scrolls it.
  */
@@ -103,11 +95,7 @@ export function JamlyzerTape({
   // The cursor lives in a ref, not state: a stale closure reading it would
   // silently re-fetch the same window. It carries the filter it belongs to, so
   // it invalidates itself rather than needing a render-phase reset.
-  const cursorRef = useRef<{
-    jaml: string;
-    config: JamlConfig | null;
-    resume: MotelyJamlyzerStreamStates | null;
-  }>({ jaml, config: null, resume: null });
+  const cursorRef = useRef<{ jaml: string; rolls: number }>({ jaml, rolls: 0 });
   const busyRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
@@ -127,46 +115,37 @@ export function JamlyzerTape({
     try {
       if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
 
-      // The filter changed under us; drop the cursor rather than resuming a
-      // different seed's tape.
       if (cursorRef.current.jaml !== jaml) {
-        cursorRef.current = { jaml, config: null, resume: null };
+        cursorRef.current = { jaml, rolls: 0 };
       }
 
-      let cfg = cursorRef.current.config;
-      if (!cfg) {
-        cfg = MotelyJaml.fromJaml(jaml);
-        // The engine guards this itself, but the message is lost crossing the
-        // WASM boundary — it surfaces as an opaque NativeAOT exception. Check
-        // here so the user gets a sentence instead.
-        const count = cfg.seeds?.length ?? 0;
-        if (count !== 1) {
-          throw new Error(
-            `The tape follows one seed at a time; this filter names ${count}. Put a single seed in \`seeds:\`.`,
-          );
-        }
-        cursorRef.current = { ...cursorRef.current, config: cfg };
+      const count = parseJamlSeeds(jaml).length;
+      if (count !== 1) {
+        throw new Error(
+          `The tape follows one seed at a time; this filter names ${count}. Put a single seed in \`seeds:\`.`,
+        );
       }
 
-      const resume = cursorRef.current.resume;
-      const [result] = resume
-        ? MotelyJamlyzer.resumeSeeds(cfg, resume, pageSize)
-        : MotelyJamlyzer.analyzeSeedsPaged(cfg, pageSize);
-
+      const from = cursorRef.current.rolls;
+      const want = Math.min(from + pageSize, maxRolls);
+      const [result] = Analyze.seedsPaged(jaml, want);
       if (!result) throw new Error("The engine returned no result for this seed.");
 
-      // Every page re-returns the whole 8-ante payload (~700 KB of shop items
-      // and packs) and it is byte-identical each time, because it does not
-      // depend on the roll offset. Keep the events and the cursor; let the rest
-      // go, or the tape costs ~700 KB per scroll tick.
-      cursorRef.current = { ...cursorRef.current, resume: result.streamStates };
+      const sliced = {} as MotelyJamlyzerEvents;
+      for (const s of STREAMS) {
+        const incoming = result.events[s.key] as ArrayLike<boolean | number> | undefined;
+        (sliced as Record<string, unknown>)[s.key] = incoming
+          ? Array.from(incoming).slice(from)
+          : [];
+      }
+      cursorRef.current = { jaml, rolls: want };
       const offset = result.streamStates.rollOffset;
       setState((prev) => ({
         ...prev,
-        tape: appendPage(prev.tape, result.events),
+        tape: appendPage(prev.tape, sliced),
         rollOffset: offset,
         pages: prev.pages + 1,
-        status: offset >= maxRolls ? "done" : "ready",
+        status: want >= maxRolls ? "done" : "ready",
       }));
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
