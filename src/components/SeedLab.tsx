@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import bootsharp, { Search, type MotelyProgress, type MotelySeedScore } from "motely-wasm";
-import { randomLength8Seeds } from "./jamlSeedUtils.js";
 import { JimboButton } from "../ui/JimboButton.js";
 import { JimboDock } from "../ui/JimboDock.js";
 import { JimboListItem } from "../ui/JimboListItem.js";
@@ -44,7 +43,7 @@ export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: stri
       };
       Search.onScored.subscribe(onHit);
       try {
-        await Search.scoreList(jaml, randomLength8Seeds(2000));
+        await Search.sequential(jaml, 0, 2, 4, 1);
       } finally {
         Search.onScored.unsubscribe(onHit);
       }
@@ -69,7 +68,7 @@ export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: stri
         tallyColumns: [h.score],
         tallyLabels: ["score"],
       }))}
-      subtitle={error ? error : searching ? "searching 2000 random seeds" : undefined}
+      subtitle={error ? error : searching ? "Search.sequential [0, 2) batchChars=4 threads=1" : undefined}
     />
   );
 }
@@ -111,7 +110,7 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
     Search.onProgress.subscribe(onProg);
     try {
       if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
-      await Search.scoreList(jaml, randomLength8Seeds(2000));
+      await Search.sequential(jaml, 0, 2, 4, 1);
       if (lastSeed) setSelected(lastSeed);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -145,7 +144,9 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
                 label={running ? "Searching…" : error ? "Error" : hits.length ? "Done" : "Ready"}
               />
               <JimboText size="sm" tone="grey">
-                {running ? `checked ${checked} · hits ${hits.length}` : "Search.scoreList · 2000 random seeds"}
+                {running
+                  ? `checked ${checked} · hits ${hits.length}`
+                  : "Search.sequential · [0, 2) · batchChars=4 · threads=1"}
               </JimboText>
               {error ? (
                 <JimboText size="sm" tone="red">
