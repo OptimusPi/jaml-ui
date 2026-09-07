@@ -85,7 +85,7 @@ importers:
         specifier: ^17.11.0
         version: 17.11.0
       motely-wasm:
-        specifier: 26.0.0
+        specifier: ^26.0.0
         version: 26.0.0
       react:
         specifier: ^19.2.8

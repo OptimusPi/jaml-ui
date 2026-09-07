@@ -1,6 +1,6 @@
 {
   "name": "jaml-ui",
-  "version": "4.6.0",
+  "version": "5.0.0",
   "description": "Balatro card sprites and the Jimbo design system for MCP Apps, with a @json-render (Vercel Labs) catalog.",
   "type": "module",
   "main": "./dist/index.js",
@@ -116,7 +116,7 @@
     "eslint-plugin-react-refresh": "^0.5.5",
     "eslint-plugin-storybook": "10.4.6",
     "globals": "^17.11.0",
-    "motely-wasm": "26.0.0",
+    "motely-wasm": "^26.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "storybook": "^10.5.10",
