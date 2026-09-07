@@ -105,7 +105,8 @@ export function SeedCalculus({
     const ctx = cv.getContext("2d");
     if (!ctx) return;
     const DPR = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
-    const cssW = cv.clientWidth || 480;
+    const cssW = cv.clientWidth;
+    if (!cssW) return; // not laid out yet — never draw into a mismatched buffer, or scrub coords lie
     const cssH = 220;
     if (cv.width !== Math.round(cssW * DPR)) {
       cv.width = Math.round(cssW * DPR);
@@ -196,6 +197,14 @@ export function SeedCalculus({
 
   useEffect(() => {
     draw();
+    const cv = canvasRef.current;
+    // Redraw on *element* resize (dock/sidebar/tab), not just window — otherwise the
+    // canvas keeps stale dimensions and the scrub marker drifts off the cursor.
+    if (cv && typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(() => draw());
+      ro.observe(cv);
+      return () => ro.disconnect();
+    }
     if (typeof window === "undefined") return;
     const onResize = () => draw();
     window.addEventListener("resize", onResize);
