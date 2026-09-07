@@ -153,6 +153,7 @@ export { SeedLab, LiveJamlIde, STARTER_JAML, JAMLYZE_JAML, type SeedHit } from "
 export { JamlIdeVisual, type JamlIdeVisualProps } from "./components/JamlIdeVisual.js";
 export { JamlIdeToolbar, type JamlIdeToolbarProps, type JamlIdeMode } from "./components/JamlIdeToolbar.js";
 export { JamlMapPreview, type JamlMapPreviewProps } from "./components/JamlMapPreview.js";
+export { SeedCalculus, type SeedCalculusProps } from "./components/SeedCalculus.js";
 
 export * from "./ui.js";
 // motely.js is NOT re-exported here on purpose. This entry is a client boundary
