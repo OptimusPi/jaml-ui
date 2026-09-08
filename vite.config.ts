@@ -45,13 +45,14 @@ function emitAssetsAsFiles(): Plugin {
 // call hooks. Vite's library build strips module-level directives when bundling,
 // so Next.js's RSC compiler can't see the boundary and tries to render them as
 // Server Components, crashing on any hook use (e.g. "useRef is not a function").
-// Re-adding the banner to these entries (not shared chunks like core.js or
-// spriteMapper) is enough: Next only checks the directive on the module a
-// consumer actually imports.
+// Re-adding the banner to these entries (not the server-safe entries below,
+// nor shared chunks like spriteMapper) is enough: Next only checks the
+// directive on the module a consumer actually imports.
 //
-// motely.js stays off this list on purpose. It exports pure enum decoders and
-// re-exports motely-wasm, a single-file native-LLVM ESM module that runs in Node
-// and in the browser alike — no React, no hooks, no client boundary. Banner it and
+// motely.js, sprites.js and assets.js stay off this list on purpose. They hold
+// pure enum decoders and sprite tables over motely-wasm, a single-file
+// native-LLVM ESM module that runs in Node and in the browser alike — no React,
+// no hooks, no client boundary. Banner motely.js and
 // every server caller importing decodeMotelyItemName through it dies with
 // "decodeMotelyItemName is on the client", which is exactly what took the MCP
 // JAMLyzer down.
@@ -103,7 +104,14 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, "src/index.ts"),
         ui: resolve(__dirname, "src/ui.ts"),
-        core: resolve(__dirname, "src/core.ts"),
+        // Server-safe entries. Each one points at a module that holds actual
+        // code — no barrel files. src/core.ts used to sit here re-exporting
+        // these four under one meaningless name; a consumer who wanted the
+        // sprite tables had to pull the asset resolver and Layer along with
+        // them, and "core" told them nothing about either.
+        sprites: resolve(__dirname, "src/sprites/spriteData.ts"),
+        assets: resolve(__dirname, "src/assets.ts"),
+        motely: resolve(__dirname, "src/decode/motelyItemDecoder.ts"),
       },
       formats: ["es"],
     },
@@ -116,6 +124,14 @@ export default defineConfig({
         if (
           warning.code === "MODULE_LEVEL_DIRECTIVE" ||
           warning.code === "SOURCEMAP_ERROR"
+        ) {
+          return;
+        }
+        // zod ships @__PURE__ comments Rollup can't place. Scoped to
+        // node_modules so a first-party one still surfaces.
+        if (
+          warning.code === "INVALID_ANNOTATION" &&
+          warning.id?.includes("node_modules")
         ) {
           return;
         }

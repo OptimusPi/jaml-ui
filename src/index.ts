@@ -156,11 +156,12 @@ export { JamlMapPreview, type JamlMapPreviewProps } from "./components/JamlMapPr
 export { SeedCalculus, type SeedCalculusProps } from "./components/SeedCalculus.js";
 
 export * from "./ui.js";
-// motely.js is NOT re-exported here on purpose. This entry is a client boundary
-// ("use client" above), and re-exporting the pure decoders through it hands
-// server callers a client-marked copy — decodeMotelyItemName then dies with
-// "is on the client" even though dist/motely.js itself is clean. Server callers
-// import from "jaml-ui/motely", which is what that subpath export is for.
+// The motely decoders are NOT re-exported here on purpose. This entry is a
+// client boundary ("use client" above), and re-exporting the pure decoders
+// through it hands server callers a client-marked copy — decodeMotelyItemName
+// then dies with "is on the client" even though dist/motely.js itself is clean.
+// Server callers import from "jaml-ui/motely". Same for the sprite tables and
+// the asset resolver: "jaml-ui/sprites" and "jaml-ui/assets".
 
 // ── Generative UI: catalog/registry/renderer for Vercel Labs' @json-render ──
 export * from "./json-render/index.js";

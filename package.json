@@ -1,6 +1,6 @@
 {
   "name": "jaml-ui",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Balatro card sprites and the Jimbo design system for MCP Apps, with a @json-render (Vercel Labs) catalog.",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,9 +14,17 @@
       "types": "./dist/ui.d.ts",
       "default": "./dist/ui.js"
     },
-    "./core": {
-      "types": "./dist/core.d.ts",
-      "default": "./dist/core.js"
+    "./sprites": {
+      "types": "./dist/sprites/spriteData.d.ts",
+      "default": "./dist/sprites.js"
+    },
+    "./assets": {
+      "types": "./dist/assets.d.ts",
+      "default": "./dist/assets.js"
+    },
+    "./motely": {
+      "types": "./dist/decode/motelyItemDecoder.d.ts",
+      "default": "./dist/motely.js"
     },
     "./jimbo.css": "./dist/ui/jimbo.css",
     "./fonts.css": "./fonts.css",
