@@ -10,7 +10,7 @@ import { JimboBox } from "../ui/JimboBox.js";
 export type JamlSeedInputVariant = "normal" | "dark" | "alt";
 
 const VARIANT_CLASS: Record<JamlSeedInputVariant, string> = {
-  normal: "",
+  normal: "j-seed-input--normal",
   dark: "j-seed-input--dark",
   alt: "j-seed-input--alt",
 };
@@ -80,7 +80,7 @@ export const JamlSeedInput = React.forwardRef<HTMLInputElement, JamlSeedInputPro
 
   return (
     <JimboBox className={`j-seed-input ${VARIANT_CLASS[variant]} ${className ?? ""}`.trim()} style={style}>
-      {label ? <JimboText size="xs" tone="grey">{label}</JimboText> : null}
+      {typeof label === "string" ? <JimboText size="xs" tone="grey">{label}</JimboText> : label ?? null}
       <JimboBox
         className="j-seed-input__shell"
         data-valid={validState}
