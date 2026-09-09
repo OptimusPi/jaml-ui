@@ -1,7 +1,7 @@
 "use client";
 
 import { Vocab } from "jaml-lang";
-import { DeckSprite } from "./DeckSprite.js";
+import { DeckSprite, StakeSprite } from "./DeckSprite.js";
 import { JimboPanelSpinner } from "../ui/JimboPanelSpinner.js";
 import { JimboStack, JimboRow } from "../ui/JimboLayout.js";
 
@@ -45,7 +45,7 @@ export function DeckStakePicker({
       <JimboPanelSpinner
         label="Stake"
         title={stake}
-        media={<DeckSprite deck={deck} stake={stake} size={64} />}
+        media={<StakeSprite stake={stake} size={54} />}
         onPrev={() => onStakeChange(cycle(STAKES, stake, -1))}
         onNext={() => onStakeChange(cycle(STAKES, stake, 1))}
       />

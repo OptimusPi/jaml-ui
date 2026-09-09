@@ -275,3 +275,5 @@ export function decodeMotelyItemToJamlCard(input: MotelyItemInput, scale?: numbe
     },
   };
 }
+
+export * from "./motelySprite.js";
