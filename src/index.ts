@@ -97,10 +97,18 @@ export { RARITY_DATA, type RarityData } from "./lib/jaml/rarityData.generated.js
 
 export {
   DeckSprite,
+  StakeSprite,
   DECK_SPRITE_POS,
   STAKE_SPRITE_POS,
   type DeckSpriteProps,
+  type StakeSpriteProps,
 } from "./components/DeckSprite.js";
+
+export {
+  motelyItemTypeToSprite,
+  motelyItemToSprite,
+  type MotelySpriteCell,
+} from "./decode/motelySprite.js";
 
 export {
   DeckStakePicker,

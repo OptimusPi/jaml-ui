@@ -434,6 +434,7 @@
   white-space: nowrap;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
   border: none;
+  box-shadow: 0 2px 0 0 var(--j-badge-south, rgba(0, 0, 0, 0.4));
 }
 
 .j-badge--sm {
@@ -446,40 +447,47 @@
   font-size: 12px;
 }
 
-/* Badge tones — flat, no shadow, no edges */
+/* Badge tones — chips with dark-color-variant south edge */
 .j-badge--dark {
   background: var(--j-darkest);
   color: var(--j-white);
+  --j-badge-south: var(--j-black);
 }
 
 .j-badge--blue {
   background: var(--j-blue);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-blue);
 }
 
 .j-badge--red {
   background: var(--j-red);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-red);
 }
 
 .j-badge--green {
   background: var(--j-green);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-green);
 }
 
 .j-badge--orange {
   background: var(--j-orange);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-orange);
 }
 
 .j-badge--purple {
   background: var(--j-purple);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-purple);
 }
 
 .j-badge--grey {
   background: var(--j-teal-grey);
   color: var(--j-white);
+  --j-badge-south: var(--j-darkest);
 }
 
 

@@ -99,3 +99,39 @@ export function DeckSprite({ deck, stake, size = 50, className = '', style }: De
     </JimboBox>
   )
 }
+
+export interface StakeSpriteProps {
+  /** Stake name (e.g. "White", "Red", "Green", "Gold Stake"). */
+  stake: string
+  /** Rendered width & height in pixels (1:1 sticker chip). */
+  size?: number
+  className?: string
+  style?: React.CSSProperties
+}
+
+/**
+ * Balatro stake sticker chip (White, Red, Green, Blue, Black, Purple, Orange, Gold).
+ * Draws the isolated stake sticker directly from stickers.png.
+ */
+export function StakeSprite({ stake, size = 48, className = '', style }: StakeSpriteProps) {
+  const stakeKey = (stake || 'white').toLowerCase().replace(/\s*stake$/, '').trim()
+  const stakePos = STAKE_SPRITE_POS[stakeKey] ?? STAKE_SPRITE_POS.white
+
+  return (
+    <JimboBox
+      className={`j-stake-sprite ${className}`.trim()}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        position: 'relative',
+        display: 'inline-block',
+        backgroundImage: `url(${resolveJamlAssetUrl('stickers')})`,
+        backgroundSize: `${STICKER_COLS * 100}% ${STICKER_ROWS * 100}%`,
+        backgroundPosition: `${(stakePos.x / (STICKER_COLS - 1)) * 100}% ${(stakePos.y / (STICKER_ROWS - 1)) * 100}%`,
+        backgroundRepeat: 'no-repeat',
+        imageRendering: 'pixelated',
+        ...style,
+      } as React.CSSProperties}
+    />
+  )
+}
