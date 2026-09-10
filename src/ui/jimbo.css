@@ -1035,6 +1035,9 @@
   font-size: 20px;
   letter-spacing: 0.08em;
   outline: none;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 
 .j-filter-bar__search-icon {
@@ -1243,6 +1246,9 @@
   background: var(--j-black);
   padding: 4px 8px 5px;
   text-align: center;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 
 .j-footer__line {
@@ -3032,6 +3038,9 @@
   gap: var(--j-space-xs);
   text-align: left;
   font-family: var(--j-font);
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 
 .j-list-item[data-active="true"],
@@ -3149,6 +3158,9 @@
   text-transform: none;
   letter-spacing: 0.04em;
   font-size: 13px;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 
 .j-picker__hint {
@@ -3453,6 +3465,9 @@
   font-size: 14px;
   letter-spacing: 0.04em;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 .j-section-header__bar--orange  { background: var(--j-orange); }
 .j-section-header__bar--blue    { background: var(--j-blue); }
@@ -3760,6 +3775,9 @@
   animation: j-row-in 200ms ease-out;
   transition: background 100ms ease, border-color 100ms ease;
   text-decoration: none;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 .j-seed-row:hover {
   background: var(--j-dark-grey);
@@ -4064,6 +4082,9 @@
   font-family: var(--j-font);
   font-size: 12px;
   outline: none;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 
 .j-jamlyzer-search-input:focus {
@@ -4643,6 +4664,9 @@
   cursor: var(--j-result-cursor, default);
   color: inherit;
   text-align: left;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
 }
 
 .j-ide-result__seed {
@@ -5021,7 +5045,11 @@
 .j-jaml-map-editor__title { text-align: center; margin-bottom: 12px; }
 .j-jaml-map-editor__scroll { overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
 .j-jaml-map-editor__ante { scroll-snap-align: start; padding: 16px 8px 24px 8px; min-height: 100%; display: grid; place-items: center; }
-.j-jaml-map-editor__ante-panel { display: grid; gap: 16px; padding: 12px 8px; width: 100%; }
+.j-jaml-map-editor__ante-panel { display: grid; gap: 16px; padding: 12px 8px; width: 100%;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
+}
 .j-jaml-map-editor__ante-title { text-align: center; }
 .j-jaml-map-editor__row { padding: 0 4px; }
 .j-jaml-map-editor__section-title { letter-spacing: 1px; padding: 0 4px; }
