@@ -1,9 +1,9 @@
 "use client";
 
 import { Vocab } from "jaml-lang";
-import { DeckSprite } from "./DeckSprite.js";
+import { DeckSprite, StakeSprite } from "./DeckSprite.js";
 import { JimboPanelSpinner } from "../ui/JimboPanelSpinner.js";
-import { JimboStack } from "../ui/JimboLayout.js";
+import { JimboStack, JimboRow } from "../ui/JimboLayout.js";
 
 const DECKS = Vocab.Enums.MotelyDeck;
 const STAKES = Vocab.Enums.MotelyStake;
@@ -19,6 +19,7 @@ export interface DeckStakePickerProps {
   stake: string;
   onDeckChange: (deck: string) => void;
   onStakeChange: (stake: string) => void;
+  layout?: "stack" | "row";
   className?: string;
 }
 
@@ -28,10 +29,12 @@ export function DeckStakePicker({
   stake,
   onDeckChange,
   onStakeChange,
+  layout = "stack",
   className = "",
 }: DeckStakePickerProps) {
+  const Container = layout === "row" ? JimboRow : JimboStack;
   return (
-    <JimboStack gap="md" className={className} align="center">
+    <Container gap="md" className={className} align="center" justify="center">
       <JimboPanelSpinner
         label="Deck"
         title={deck}
@@ -42,12 +45,12 @@ export function DeckStakePicker({
       <JimboPanelSpinner
         label="Stake"
         title={stake}
-        media={<DeckSprite deck={deck} stake={stake} size={64} />}
+        media={<StakeSprite stake={stake} size={54} />}
         onPrev={() => onStakeChange(cycle(STAKES, stake, -1))}
         onNext={() => onStakeChange(cycle(STAKES, stake, 1))}
       />
-    </JimboStack>
-  );
-}
+      </Container>
+    );
+  }
 
 export { DECKS as DECK_PICKER_NAMES, STAKES as STAKE_PICKER_NAMES };

@@ -434,6 +434,7 @@
   white-space: nowrap;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
   border: none;
+  box-shadow: 0 2px 0 0 var(--j-badge-south, rgba(0, 0, 0, 0.4));
 }
 
 .j-badge--sm {
@@ -446,40 +447,47 @@
   font-size: 12px;
 }
 
-/* Badge tones — flat, no shadow, no edges */
+/* Badge tones — chips with dark-color-variant south edge */
 .j-badge--dark {
   background: var(--j-darkest);
   color: var(--j-white);
+  --j-badge-south: var(--j-black);
 }
 
 .j-badge--blue {
   background: var(--j-blue);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-blue);
 }
 
 .j-badge--red {
   background: var(--j-red);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-red);
 }
 
 .j-badge--green {
   background: var(--j-green);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-green);
 }
 
 .j-badge--orange {
   background: var(--j-orange);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-orange);
 }
 
 .j-badge--purple {
   background: var(--j-purple);
   color: var(--j-white);
+  --j-badge-south: var(--j-dark-purple);
 }
 
 .j-badge--grey {
   background: var(--j-teal-grey);
   color: var(--j-white);
+  --j-badge-south: var(--j-darkest);
 }
 
 
@@ -2363,6 +2371,10 @@
   gap: var(--j-space-xs);
   width: fit-content;
   max-width: 100%;
+  --j-seed-shell-bg: var(--j-dark-grey);
+  --j-seed-shell-border: var(--j-border-silver);
+  --j-seed-shell-border-bottom: var(--j-border-south);
+  --j-seed-field-bg: var(--j-darkest);
 }
 
 .j-seed-input--normal {
@@ -2404,9 +2416,9 @@
 }
 
 .j-seed-input__field {
-  width: calc(8ch + 16px);
-  min-width: calc(8ch + 16px);
-  max-width: calc(8ch + 16px);
+  width: calc(10ch + 36px);
+  min-width: 144px;
+  max-width: 180px;
   padding: 6px 8px 8px;
   border-radius: var(--j-radius-sm);
   border: var(--j-panel-border-width) solid var(--j-panel-edge);
@@ -5100,4 +5112,89 @@
 .j-seed-input__field:focus-visible {
   outline: 2px solid var(--j-gold);
   outline-offset: 2px;
+}
+
+/* ── JimboSlider — chunky range dial ──────────────────────────────────── */
+.j-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: var(--j-radius-md);
+  border: 2px solid var(--j-panel-edge);
+  background: linear-gradient(
+    90deg,
+    var(--j-gold) 0%, var(--j-gold) var(--j-slider-fill, 50%),
+    var(--j-surface-inset) var(--j-slider-fill, 50%), var(--j-surface-inset) 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+.j-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px; height: 24px;
+  border-radius: var(--j-radius-md);
+  background: radial-gradient(circle at 40% 35%, #fff7e6, var(--j-grey) 45%, #7f8b8d 100%);
+  border: 2px solid var(--j-dark-orange);
+  box-shadow: 0 var(--j-press-y) 0 var(--j-dark-orange);
+  cursor: grab;
+}
+.j-slider::-webkit-slider-thumb:active { transform: translateY(1px); cursor: grabbing; }
+.j-slider::-moz-range-thumb {
+  width: 22px; height: 22px;
+  border-radius: var(--j-radius-md);
+  background: radial-gradient(circle at 40% 35%, #fff7e6, var(--j-grey) 45%, #7f8b8d 100%);
+  border: 2px solid var(--j-dark-orange);
+  cursor: grab;
+}
+.j-slider:disabled { opacity: 0.55; cursor: not-allowed; }
+.j-slider:focus-visible { box-shadow: 0 0 0 3px rgba(228, 182, 67, 0.5); }
+
+/* ── SeedCalculus — geometric-waiting-time panel ──────────────────────── */
+.j-seedcalc__rarity { text-align: center; display: flex; flex-direction: column; gap: var(--j-space-xs); }
+.j-seedcalc__rarity-big { letter-spacing: 0.5px; }
+.j-seedcalc__one { color: var(--j-gold); }
+
+.j-seedcalc__dials {
+  display: grid; gap: var(--j-space-lg);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 520px) { .j-seedcalc__dials { grid-template-columns: 1fr 1fr; } }
+.j-seedcalc__dial { display: flex; flex-direction: column; gap: var(--j-space-sm); }
+
+.j-seedcalc__tiles {
+  display: grid; gap: var(--j-space-md);
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 640px) { .j-seedcalc__tiles { grid-template-columns: repeat(4, 1fr); } }
+.j-seedcalc__tile {
+  position: relative;
+  background: var(--j-darkest);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  border-radius: var(--j-radius-lg);
+  padding: var(--j-space-lg) var(--j-space-md) var(--j-space-md);
+  display: flex; flex-direction: column; gap: var(--j-space-xs);
+  overflow: hidden;
+}
+.j-seedcalc__tile--red { border-color: var(--j-dark-red); }
+.j-seedcalc__tile--blue { border-color: var(--j-dark-blue); }
+.j-seedcalc__tile--gold { border-color: var(--j-dark-orange); }
+.j-seedcalc__tile--green { border-color: var(--j-dark-green); }
+.j-seedcalc__suit {
+  position: absolute; top: 6px; right: 8px;
+  font-size: 30px; line-height: 1; opacity: 0.85;
+}
+.j-seedcalc__tile--red .j-seedcalc__suit { color: var(--j-red); }
+.j-seedcalc__tile--blue .j-seedcalc__suit { color: var(--j-blue); }
+.j-seedcalc__tile--gold .j-seedcalc__suit { color: var(--j-gold); }
+.j-seedcalc__tile--green .j-seedcalc__suit { color: var(--j-green); }
+.j-seedcalc__tile-value { font-variant-numeric: tabular-nums; }
+.j-seedcalc__formula { opacity: 0.8; }
+
+.j-seedcalc__plot {
+  width: 100%; height: auto; display: block;
+  border-radius: var(--j-radius-md);
+  border: 2px solid var(--j-panel-edge);
+  background: var(--j-darkest);
+  touch-action: none; cursor: ew-resize;
 }

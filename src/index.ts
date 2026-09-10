@@ -97,10 +97,18 @@ export { RARITY_DATA, type RarityData } from "./lib/jaml/rarityData.generated.js
 
 export {
   DeckSprite,
+  StakeSprite,
   DECK_SPRITE_POS,
   STAKE_SPRITE_POS,
   type DeckSpriteProps,
+  type StakeSpriteProps,
 } from "./components/DeckSprite.js";
+
+export {
+  motelyItemTypeToSprite,
+  motelyItemToSprite,
+  type MotelySpriteCell,
+} from "./decode/motelySprite.js";
 
 export {
   DeckStakePicker,
@@ -153,13 +161,15 @@ export { SeedLab, LiveJamlIde, STARTER_JAML, JAMLYZE_JAML, type SeedHit } from "
 export { JamlIdeVisual, type JamlIdeVisualProps } from "./components/JamlIdeVisual.js";
 export { JamlIdeToolbar, type JamlIdeToolbarProps, type JamlIdeMode } from "./components/JamlIdeToolbar.js";
 export { JamlMapPreview, type JamlMapPreviewProps } from "./components/JamlMapPreview.js";
+export { SeedCalculus, type SeedCalculusProps } from "./components/SeedCalculus.js";
 
 export * from "./ui.js";
-// motely.js is NOT re-exported here on purpose. This entry is a client boundary
-// ("use client" above), and re-exporting the pure decoders through it hands
-// server callers a client-marked copy — decodeMotelyItemName then dies with
-// "is on the client" even though dist/motely.js itself is clean. Server callers
-// import from "jaml-ui/motely", which is what that subpath export is for.
+// The motely decoders are NOT re-exported here on purpose. This entry is a
+// client boundary ("use client" above), and re-exporting the pure decoders
+// through it hands server callers a client-marked copy — decodeMotelyItemName
+// then dies with "is on the client" even though dist/motely.js itself is clean.
+// Server callers import from "jaml-ui/motely". Same for the sprite tables and
+// the asset resolver: "jaml-ui/sprites" and "jaml-ui/assets".
 
 // ── Generative UI: catalog/registry/renderer for Vercel Labs' @json-render ──
 export * from "./json-render/index.js";

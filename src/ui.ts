@@ -99,6 +99,7 @@ export {
 export { JimboBox, type JimboBoxProps } from "./ui/JimboBox.js";
 export { JimboInline, type JimboInlineProps } from "./ui/JimboInline.js";
 export { JimboCanvas, type JimboCanvasProps } from "./ui/JimboCanvas.js";
+export { JimboSlider, type JimboSliderProps } from "./ui/JimboSlider.js";
 export { JimboLink, type JimboLinkProps } from "./ui/JimboLink.js";
 
 // Storied primitives that never made the barrel — every one of these has a
