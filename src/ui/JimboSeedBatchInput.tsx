@@ -17,7 +17,7 @@ const NOT_SEEDS = new Set([
 
 /** Pull seed codes out of arbitrary pasted text. Same logic as seedfinder's
  *  parseSeedList, but self-contained so jaml-ui does not depend on app code. */
-function extractSeeds(text) {
+function extractSeeds(text: string) {
   if (!text || typeof text !== "string") return [];
   const scrubbed = text
     .toUpperCase()
@@ -33,7 +33,7 @@ function extractSeeds(text) {
   return [...new Set(chosen)];
 }
 
-function invalidTokens(text) {
+function invalidTokens(text: string) {
   if (!text) return [];
   const lines = text.split(/\r?\n/);
   const bad = [];
