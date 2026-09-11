@@ -112,6 +112,7 @@ export default defineConfig({
         sprites: resolve(__dirname, "src/sprites/spriteData.ts"),
         assets: resolve(__dirname, "src/assets.ts"),
         motely: resolve(__dirname, "src/decode/motelyItemDecoder.ts"),
+        motd: resolve(__dirname, "src/motd/motd.ts"),
       },
       formats: ["es"],
     },

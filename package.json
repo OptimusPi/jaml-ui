@@ -26,6 +26,10 @@
       "types": "./dist/decode/motelyItemDecoder.d.ts",
       "default": "./dist/motely.js"
     },
+    "./motd": {
+      "types": "./dist/motd/motd.d.ts",
+      "default": "./dist/motd.js"
+    },
     "./jimbo.css": "./dist/ui/jimbo.css",
     "./fonts.css": "./fonts.css",
     "./assets/*": "./assets/*"
@@ -51,6 +55,7 @@
     "typecheck": "tsc --noEmit --pretty false",
     "vocab:check": "node --experimental-strip-types scripts/check-vocab-drift.mjs",
     "lut:emit": "node scripts/emit-motely-sprite-lut.mjs",
+    "motd:emit": "node scripts/emit-motds.mjs",
     "typecheck:all": "pnpm typecheck && pnpm -r --if-present run typecheck",
     "prepack": "npm run build",
     "storybook": "pnpm run build && storybook dev -p 3141",
