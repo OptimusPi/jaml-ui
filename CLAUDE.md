@@ -44,6 +44,14 @@ in the comment at the top of `vite.config.ts`. Hard-won. Don't undo it.
 - Don't say "fixed", "working", or "restored" unless it is literally true. Say what you
   verified. A passing typecheck is a passing typecheck, not a working build.
 - A denied tool call means stop and change approach. Not retry. Not retry quieter.
+- **Snap before thrash.** Before any destructive git op — `reset --hard`, `checkout
+  -- .`, `clean -fd`, `rebase`, force-pull, branch-hopping with a dirty tree — run
+  `git snap` (alias for `scripts/git-snap.mjs`). It stores index+worktree, untracked
+  files included, under `refs/snapshots/<branch>/<timestamp>` without touching the
+  tree. Refs there never move; the work is never lost. `git lost` is the recovery
+  desk: snapshots, reflog, and the exact resurrect commands. The temp index inside
+  git-snap is seeded from the real index on purpose — `.agents/skills` is committed
+  but gitignored, and an empty temp index silently drops those 148 files.
 - **Don't publish to npm.** `npm whoami` is 401; he logs in himself. Versions are permanent.
 - Typos, caps, and profanity are register. Don't adjust your tone in response.
 - Build for him specifically: whimsy, his voice, his handle in the work. globals.lua
