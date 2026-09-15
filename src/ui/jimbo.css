@@ -1447,6 +1447,12 @@
   height: 100%;
   z-index: -10;
   pointer-events: none;
+  /* WebGL-failure fallback: apps are transparent by design (".j-app paints no
+     second background"), so a failed context used to fall through to whatever
+     is behind — a white page in the MCP host, white-on-white grey text, dead
+     app. The shader writes alpha=1 over the whole viewport, so this flat felt
+     is invisible when WebGL works and is the whole difference when it doesn't. */
+  background: var(--j-darkest, #0c1818);
 }
 
 .j-app {

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Renderer, type ReactSpec } from "@json-render/react";
+import { JSONUIProvider, Renderer, type ReactSpec } from "@json-render/react";
 import type { Spec } from "@json-render/core";
 import { jimboRegistry } from "./registry.js";
 import { jimboCatalog } from "./catalog.js";
@@ -34,7 +34,9 @@ export function JimboJsonRenderer({
 
   return (
     <JimboApp className={className} style={style}>
-      <Renderer spec={spec as never} registry={jimboRegistry} loading={loading} />
+      <JSONUIProvider registry={jimboRegistry}>
+        <Renderer spec={spec as never} registry={jimboRegistry} loading={loading} />
+      </JSONUIProvider>
     </JimboApp>
   );
 }
