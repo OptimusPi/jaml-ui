@@ -26,6 +26,10 @@
   --j-white: #ffffff;
   --j-black: #000000;
 
+  /* Base dark surface. Seven rules referenced this before it existed —
+     they all silently computed to transparent. */
+  --j-dark: var(--j-dark-grey);
+
   --j-green-text: #35bd86;
 
   /* Roles */

@@ -46,6 +46,35 @@ const ITEM_KEYS: JamlItemType[] = [
   "seed",
 ];
 
+/*
+ * The engine accepts a wider clause vocabulary than the bare ITEM_KEYS list —
+ * plurals (`jokers:`), rarity-scoped jokers (`legendaryJoker: Perkeo`), and
+ * qualified cards/tags (`spectralCard: Ankh`, `smallBlindTag: NegativeTag`).
+ * jaml-lang's validate() passes all of them (verified against simpleCola.jaml),
+ * so a parser that doesn't resolve them here silently drops real clauses from
+ * the UI. Keys are matched case-insensitively after lowercasing.
+ */
+const ITEM_KEY_ALIASES: Record<string, JamlItemType> = (() => {
+  const map: Record<string, JamlItemType> = {};
+  for (const key of ITEM_KEYS) {
+    map[key.toLowerCase()] = key;
+    map[`${key.toLowerCase()}s`] = key;
+  }
+  map["legendaryjoker"] = "joker";
+  map["rarejoker"] = "joker";
+  map["uncommonjoker"] = "joker";
+  map["commonjoker"] = "joker";
+  map["spectralcard"] = "spectral";
+  map["spectralcards"] = "spectral";
+  map["smallblindtag"] = "tag";
+  map["bigblindtag"] = "tag";
+  return map;
+})();
+
+function resolveItemType(key: string): JamlItemType | null {
+  return ITEM_KEY_ALIASES[key.toLowerCase()] ?? null;
+}
+
 function asArray<T>(value: unknown): T[] {
   if (value === undefined || value === null) return [];
   if (Array.isArray(value)) return value as T[];
@@ -57,9 +86,10 @@ function toStringArray(value: unknown): string[] {
 }
 
 function extractNames(clause: Record<string, unknown>): { itemType: JamlItemType; names: string[] } {
-  for (const key of ITEM_KEYS) {
-    if (key in clause) {
-      return { itemType: key, names: toStringArray(clause[key]) };
+  for (const key of Object.keys(clause)) {
+    const itemType = resolveItemType(key);
+    if (itemType) {
+      return { itemType, names: toStringArray(clause[key]) };
     }
   }
   // "any" is a wildcard catch-all supported by some JAML dialects.
@@ -96,6 +126,9 @@ function parseClauseList(kind: JamlClauseKind, list: unknown): JamlClause[] {
 }
 
 export interface JamlFilter {
+  name?: string;
+  author?: string;
+  description?: string;
   deck?: string;
   stake?: string;
   must: JamlClause[];
@@ -135,6 +168,22 @@ export function parseJamlDocument(jamlText: string): Record<string, unknown> {
     if (!line.trim()) continue;
 
     const trimmed = line.trim();
+    if (trimmed.startsWith("name:")) {
+      doc.name = trimmed.slice(5).trim();
+      currentSection = null;
+      continue;
+    }
+    if (trimmed.startsWith("author:")) {
+      doc.author = trimmed.slice(7).trim();
+      currentSection = null;
+      continue;
+    }
+    if (trimmed.startsWith("description:")) {
+      // The whole essay, colons and smileys included — verbatim, typos and all.
+      doc.description = trimmed.slice(12).trim();
+      currentSection = null;
+      continue;
+    }
     if (trimmed.startsWith("deck:")) {
       doc.deck = trimmed.slice(5).trim();
       currentSection = null;
@@ -204,6 +253,9 @@ export function parseJaml(jamlText: string): JamlFilter {
   const mustNot = parseClauseList("mustNot", doc.mustNot);
 
   return {
+    name: typeof doc.name === "string" ? doc.name : undefined,
+    author: typeof doc.author === "string" ? doc.author : undefined,
+    description: typeof doc.description === "string" ? doc.description : undefined,
     deck: typeof doc.deck === "string" ? doc.deck : undefined,
     stake: typeof doc.stake === "string" ? doc.stake : undefined,
     must,
