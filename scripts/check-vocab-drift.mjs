@@ -39,6 +39,17 @@ const jamlLang = Vocab.Enums;
 const problems = [];
 const notes = [];
 
+/**
+ * The runtime enum for a jaml-lang kind. motely-wasm 27 dropped the `Motely`
+ * prefix from its TS enums (`MotelyDeck` is `Deck`), while jaml-lang keeps the
+ * prefixed kind names, so look under both. Without the fallback every renamed
+ * enum reads as "not exported" and check 1 skips it without comparing.
+ */
+function runtimeEnum(kind) {
+  const found = Motely[kind] ?? Motely[kind.replace(/^Motely/, "")];
+  return found !== null && typeof found === "object" ? found : undefined;
+}
+
 /** motely-wasm ships numeric enums — string keys are the names. */
 function runtimeEnumNames(enumObject) {
   return Object.keys(enumObject).filter((key) => Number.isNaN(Number(key)));
@@ -47,8 +58,8 @@ function runtimeEnumNames(enumObject) {
 // ── 1. Every enum both packages ship must agree, name for name ──────────────
 let compared = 0;
 for (const [kind, names] of Object.entries(jamlLang)) {
-  const runtime = Motely[kind];
-  if (runtime === undefined || typeof runtime !== "object") {
+  const runtime = runtimeEnum(kind);
+  if (runtime === undefined) {
     // Not every name list has a runtime counterpart exported (jokers, tarots,
     // spectrals and planets are name-only today). Nothing to cross-check.
     notes.push(`${kind}: name-only (${names.length}) — no motely-wasm export to compare`);
@@ -135,8 +146,8 @@ const DECODE_ENUMS = [
 
 let roundTripped = 0;
 for (const kind of DECODE_ENUMS) {
-  const runtime = Motely[kind];
-  if (runtime === undefined || typeof runtime !== "object") {
+  const runtime = runtimeEnum(kind);
+  if (runtime === undefined) {
     problems.push(`${kind}: expected by the decode path but not exported by motely-wasm`);
     continue;
   }
@@ -168,11 +179,12 @@ for (const kind of DECODE_ENUMS) {
 notes.push(`${roundTripped}/${DECODE_ENUMS.length} decode enums round-trip name -> value -> name`);
 
 const { MOTELY_SPRITE_BY_TYPE } = await import("../src/decode/motelySpriteLut.generated.ts");
-const itemTypeNames = runtimeEnumNames(Motely.MotelyItemType);
+const itemType = runtimeEnum("MotelyItemType");
+const itemTypeNames = runtimeEnumNames(itemType);
 let lutHits = 0;
 let lutUnknown = 0;
 for (const [type] of MOTELY_SPRITE_BY_TYPE) {
-  if (Motely.MotelyItemType[type] === undefined) lutUnknown += 1;
+  if (itemType[type] === undefined) lutUnknown += 1;
   else lutHits += 1;
 }
 if (lutUnknown) {
