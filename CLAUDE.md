@@ -68,9 +68,8 @@ three/r3f/rapier dependency — that stack lives elsewhere.
 
 ## Open
 
-- `vite.config.ts` `onwarn` filters `MODULE_LEVEL_DIRECTIVE` and `SOURCEMAP_ERROR`. The
-  zod build noise is `INVALID_ANNOTATION` from node_modules — one more condition silences
-  it. Trivial, unstarted.
+- `vite.config.ts` `onwarn` filters `MODULE_LEVEL_DIRECTIVE`, `SOURCEMAP_ERROR`, and
+  `INVALID_ANNOTATION` scoped to node_modules (the zod `@__PURE__` noise). Done.
 - `dist/ui/jimbo.css` is ~130KB. Known, unaddressed.
 
 o7

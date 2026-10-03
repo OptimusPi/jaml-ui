@@ -23,7 +23,6 @@ export const Jamlyze: Story = {
 };
 
 export const AnteMap: Story = {
-  name: "Ante Map",
   render: () => <JamlMapEditor zone="must" />,
 };
 

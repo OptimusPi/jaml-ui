@@ -1,10 +1,13 @@
 name: Deploy Pages
 
+# Publishes the Storybook (the Jimbo design system, live) to GitHub Pages on
+# every push to master. Same build Vercel runs (see vercel.json); Pages is the
+# second mirror. This used to upload `examples/`, which was deleted on
+# 2026-07-20 (97ae54f) — every run since had failed on `tar: examples: Cannot
+# open: No such file or directory`.
 on:
   push:
-    branches:
-      - master
-      - claude/code-review-8gIku
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -24,11 +27,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # package.json's build-storybook runs the library build first, then
+      # storybook build. Same command Vercel runs.
+      - name: Build Storybook
+        run: pnpm build-storybook
+
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: examples
+          path: storybook-static
+
       - id: deployment
         uses: actions/deploy-pages@v4

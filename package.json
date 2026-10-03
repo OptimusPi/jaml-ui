@@ -18,10 +18,6 @@
       "types": "./dist/sprites/spriteData.d.ts",
       "default": "./dist/sprites.js"
     },
-    "./core": {
-      "types": "./dist/core.d.ts",
-      "default": "./dist/core.js"
-    },
     "./assets": {
       "types": "./dist/assets.d.ts",
       "default": "./dist/assets.js"

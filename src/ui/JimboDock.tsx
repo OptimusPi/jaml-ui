@@ -15,12 +15,6 @@ import {
   type DockNode,
 } from "./dockTree.js";
 
-export {
-  defaultPyramidDock,
-  dockActivate,
-  type DockNode,
-} from "./dockTree.js";
-
 export interface JimboDockPane {
   label: string;
   tone: JimboOuterTabTone;

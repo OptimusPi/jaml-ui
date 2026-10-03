@@ -33,7 +33,7 @@ export interface SeedMilestoneHit {
   tone: "green" | "orange" | "purple" | "blue" | "red";
 }
 
-export function extractSeedMilestones(
+function extractSeedMilestones(
   result: MotelyJamlyzerSeedResult,
   clauses?: JamlClause[],
   maxMilestones = 3
