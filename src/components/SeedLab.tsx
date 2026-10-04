@@ -79,41 +79,7 @@ const PROGRESS_INTERVAL_MS = 150n;
  * per-component. Handlers are attached for the length of a run and detached in
  * its finally block, so a component that is not running receives nothing.
  */
-let activeRun: SearchCancellation | null = null;
-
-/*
- * motely-wasm 26.0.0 exports no usable CancellationToken at runtime, and
- * TypeScript will not warn you about it.
- *
- * Its root index.mjs star-exports both bcl/cancellation.mjs (the real class)
- * and generated/modules/index.g.mjs (an internal marshalling shim that happens
- * to reuse the name). A name exported ambiguously by two `export *` clauses is
- * excluded from the ES module namespace, so `CancellationToken` imports as
- * undefined — while tsc resolves the type to the class and reports nothing.
- * `new CancellationToken()` compiles clean, then throws "CancellationToken is
- * not a constructor" in the browser. Verified against 26.0.0: the root
- * namespace has CancellationToken === undefined, Event === class.
- *
- * settings.start() marshals a token by subscribing to onCancellationRequested
- * and reading isCancellationRequested, so that shape — built on Event, which
- * *is* exported unambiguously — is the whole contract.
- *
- * Delete this in favour of the real import once upstream disambiguates.
- */
-class SearchCancellation {
-  readonly onCancellationRequested = new MotelyEvent<[]>();
-  private cancelled = false;
-
-  get isCancellationRequested() {
-    return this.cancelled;
-  }
-
-  cancel() {
-    if (this.cancelled) return;
-    this.cancelled = true;
-    this.onCancellationRequested.broadcast();
-  }
-}
+let activeRun: { cancel: () => void; isCancellationRequested: boolean } | null = null;
 
 export type SeedSearchPhase = "idle" | "booting" | "searching" | "done" | "cancelled" | "error";
 
@@ -155,7 +121,7 @@ function useSeedSearch(jaml: string) {
    * have to see the token that exists *now*, not the one captured when the
    * callback was last rebuilt.
    */
-  const runRef = useRef<SearchCancellation | null>(null);
+  const runRef = useRef<{ cancel: () => void; isCancellationRequested: boolean } | null>(null);
 
   const stop = useCallback(() => {
     runRef.current?.cancel();
@@ -179,7 +145,14 @@ function useSeedSearch(jaml: string) {
       return;
     }
 
-    const token = new SearchCancellation();
+    let settingsObj: ReturnType<typeof Search.settings> | null = null;
+    const token = {
+      isCancellationRequested: false,
+      cancel: () => {
+        token.isCancellationRequested = true;
+        settingsObj?.cancel();
+      }
+    };
     runRef.current = token;
     activeRun = token;
 
@@ -226,8 +199,10 @@ function useSeedSearch(jaml: string) {
         .withEndBatchIndex(END_BATCH)
         .withAnalysis(ANALYSIS_EVENT_ROLLS)
         .withProgressReportIntervalMs(PROGRESS_INTERVAL_MS);
+      
+      settingsObj = settings;
 
-      await settings.start(token);
+      await settings.start();
 
       /*
        * Cancelling crosses back as a thrown OperationCanceledException on some
