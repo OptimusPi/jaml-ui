@@ -172,9 +172,34 @@ export function motelyItemDisplayName(input: MotelyItemInput): string {
 }
 
 // Packed MotelyItem.value bit layout (mirrors MotelyGlobals in the engine's Motely.cs):
-// seal @bit16 (3b), enhancement @bit19 (4b), edition @bit23 (3b);
-// stickers rental@29 / eternal@30 / perishable@31. Decoding is JS-side because
-// motely-wasm 19.x returns raw ints — the decodeItem*/isX helpers were removed.
+// rank @bit0 (4b), suit @bit4 (2b), category @bit12 (4b), seal @bit16 (3b),
+// enhancement @bit19 (4b), edition @bit23 (3b); stickers rental@29 / eternal@30 /
+// perishable@31.
+//
+// A motely-wasm enum member IS its bit pattern in place: at runtime
+// MotelyItemEdition.Foil is 8_388_608 (1 << 23), not 1. The generated .d.mts
+// declares the members without values, so TypeScript believes Foil is 1 and will
+// happily type a shifted-down ordinal as MotelyItemEdition — which then indexes
+// nothing in a table keyed by the real enum. That was the bug: every edition,
+// seal, enhancement and suit decoded from a packed int came back undefined while
+// the MotelyItem-object path (which carries the real enum values) worked.
+//
+// So: decode with `value & mask`, never a shift, and OR the masks out of the
+// runtime enums themselves so this file cannot drift from motely-wasm's layout.
+// `pnpm decode:check` (scripts/check-decoder.mjs) pins this against the installed
+// motely-wasm on every CI run.
+function enumMask(enumObject: Record<string, unknown>): number {
+  let mask = 0;
+  for (const member of Object.values(enumObject)) if (typeof member === "number") mask |= member;
+  return mask;
+}
+
+const EDITION_MASK = enumMask(MotelyItemEdition);
+const SEAL_MASK = enumMask(MotelyItemSeal);
+const ENHANCEMENT_MASK = enumMask(MotelyItemEnhancement);
+const RANK_MASK = enumMask(MotelyStandardcardRank);
+const SUIT_MASK = enumMask(MotelyStandardcardSuit);
+
 function isStickerSet(input: MotelyItemInput, bitOffset: number): boolean {
   const val = resolvePackedValue(input);
   if (val === null) return false;
@@ -183,21 +208,21 @@ function isStickerSet(input: MotelyItemInput, bitOffset: number): boolean {
 
 export function motelyItemEditionName(input: MotelyItemInput): "Foil" | "Holographic" | "Polychrome" | "Negative" | null {
   if (input == null) return null;
-  const val = typeof input === "number" ? (((input >>> 23) & 0x7) as MotelyItemEdition) : (input.edition as MotelyItemEdition);
+  const val = typeof input === "number" ? ((input & EDITION_MASK) as MotelyItemEdition) : (input.edition as MotelyItemEdition);
   if (val == null || val === MotelyItemEdition.None) return null;
-  return EDITIONS[val] as "Foil" | "Holographic" | "Polychrome" | "Negative";
+  return (EDITIONS[val] as "Foil" | "Holographic" | "Polychrome" | "Negative" | undefined) ?? null;
 }
 
 export function motelyItemSealName(input: MotelyItemInput): "Gold" | "Red" | "Blue" | "Purple" | null {
   if (input == null) return null;
-  const val = typeof input === "number" ? (((input >>> 16) & 0x7) as MotelyItemSeal) : (input.seal as MotelyItemSeal);
+  const val = typeof input === "number" ? ((input & SEAL_MASK) as MotelyItemSeal) : (input.seal as MotelyItemSeal);
   if (val == null || val === MotelyItemSeal.None) return null;
-  return SEALS[val] as "Gold" | "Red" | "Blue" | "Purple";
+  return (SEALS[val] as "Gold" | "Red" | "Blue" | "Purple" | undefined) ?? null;
 }
 
 export function motelyItemEnhancementName(input: MotelyItemInput): string | null {
   if (input == null) return null;
-  const val = typeof input === "number" ? (((input >>> 19) & 0xF) as MotelyItemEnhancement) : (input.enhancement as MotelyItemEnhancement);
+  const val = typeof input === "number" ? ((input & ENHANCEMENT_MASK) as MotelyItemEnhancement) : (input.enhancement as MotelyItemEnhancement);
   if (val == null || val === MotelyItemEnhancement.None) return null;
   return ENHANCEMENTS[val] ?? null;
 }
@@ -206,7 +231,7 @@ export function motelyItemEnhancementName(input: MotelyItemInput): string | null
 export function motelyStandardcardRankName(input: MotelyItemInput): string | null {
   if (input == null) return null;
   if (motelyItemRenderCategory(input) !== "playing") return null;
-  const rawRank = typeof input === "number" ? (input & 0xF) : (input.standardcardRank ?? input.rank);
+  const rawRank = typeof input === "number" ? (input & RANK_MASK) : (input.standardcardRank ?? input.rank);
   const val = rawRank as MotelyStandardcardRank;
   if (val == null) return null;
   return RANKS[val] ?? null;
@@ -215,7 +240,7 @@ export function motelyStandardcardRankName(input: MotelyItemInput): string | nul
 export function motelyStandardcardSuitName(input: MotelyItemInput): "Clubs" | "Diamonds" | "Hearts" | "Spades" | null {
   if (input == null) return null;
   if (motelyItemRenderCategory(input) !== "playing") return null;
-  const rawSuit = typeof input === "number" ? ((input >>> 4) & 0x3) : (input.standardcardSuit ?? input.suit);
+  const rawSuit = typeof input === "number" ? (input & SUIT_MASK) : (input.standardcardSuit ?? input.suit);
   const val = rawSuit as MotelyStandardcardSuit;
   if (val == null) return null;
   return SUITS[val] ?? null;

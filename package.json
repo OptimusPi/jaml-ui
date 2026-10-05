@@ -54,6 +54,7 @@
     "jaml:mcp": "node scripts/jaml-mcp-server.mjs",
     "typecheck": "tsc --noEmit --pretty false",
     "vocab:check": "node --experimental-strip-types scripts/check-vocab-drift.mjs",
+    "decode:check": "node scripts/check-decoder.mjs",
     "lut:emit": "node scripts/emit-motely-sprite-lut.mjs",
     "motd:emit": "node scripts/emit-motds.mjs",
     "typecheck:all": "pnpm typecheck && pnpm -r --if-present run typecheck",

@@ -43,3 +43,10 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # motely-wasm's enums are bit-packed at runtime but declared ordinal in its
+      # .d.mts, so typecheck cannot see a decoder that shifts a field down to an
+      # ordinal and indexes nothing. Only decoding real packed ints against the
+      # installed motely-wasm catches it. Runs against dist, so it goes after Build.
+      - name: Packed-int decoder
+        run: pnpm decode:check
