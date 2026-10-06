@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import bootsharp, { Analyze, type MotelyJamlyzerSeedResult, MotelyDeck, MotelyStake } from "motely-wasm";
+import bootsharp, { JamlConfigLoader, MotelyJamlyzer, type MotelyJamlyzerSeedResult, MotelyDeck, MotelyStake } from "motely-wasm";
 import { parseJaml } from "../lib/jaml/jaml.js";
 import { JimboPanel } from "../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../ui/panel.js";
@@ -106,11 +106,11 @@ export function Jamlyzer({
         let analyzed: MotelyJamlyzerSeedResult[] = [];
 
         if (jaml && jaml.trim().length > 0) {
-          analyzed = Analyze.seeds(jaml.trim());
+          analyzed = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(jaml.trim()));
         } else if (seedsProp && seedsProp.length > 0) {
           const seedStrings = seedsProp.map((s) => (typeof s === "string" ? s : s.seed));
           const syntheticJaml = `seeds:\n${seedStrings.map((s) => `  - ${s}`).join("\n")}`;
-          analyzed = Analyze.seeds(syntheticJaml);
+          analyzed = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(syntheticJaml));
         } else {
           throw new Error("No seeds or JAML filter provided.");
         }

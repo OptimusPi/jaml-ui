@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import bootsharp, {
-  Event as MotelyEvent,
-  Search,
+  CancellationToken,
+  Errors,
+  JamlConfigLoader,
+  JamlSearchBuilder,
+  MotelyJamlyzer,
   type MotelyJamlyzerSeedResult,
   type MotelyProgress,
-  type MotelySeedScore,
+  type MotelyScoredSeedResult,
 } from "motely-wasm";
 import { JimboButton } from "../ui/JimboButton.js";
 import { JimboDock } from "../ui/JimboDock.js";
@@ -58,11 +61,11 @@ const WINDOW_SEEDS = Number(END_BATCH - START_BATCH) * SEEDS_PER_BATCH; // 3,001
 /*
  * Analysis depth carried by the search itself.
  *
- * withAnalysis(eventRolls) makes the engine run the Jamlyzer on every hit in
- * the same pass and emit the breakdown on Search.onAnalyzed, so the Jamlyze
- * pane never crosses back into wasm for a seed the search already handed us.
- * 20 is the depth Analyze.seeds() uses, so the pane renders exactly what it
- * rendered back when it called Analyze itself.
+ * A Jamlyzer rider (MotelyJamlyzer.createRiderDesc) makes the engine run the
+ * Jamlyzer on every hit in the same pass, so the Jamlyze pane never crosses
+ * back into wasm for a seed the search already handed us. 20 is the depth
+ * MotelyJamlyzer.analyze() uses, so the pane renders exactly what it rendered
+ * back when it called the analyzer itself.
  */
 const ANALYSIS_EVENT_ROLLS = 20;
 
@@ -71,15 +74,6 @@ const MAX_HITS = 80;
 
 /** How often the engine reports progress. ~7 ticks/second reads as live. */
 const PROGRESS_INTERVAL_MS = 150n;
-
-/*
- * Search.onScored / onProgress / onAnalyzed are module-global: one wasm engine,
- * one event bus. Two mounted components running at once would interleave their
- * hits into both lists, so runs are serialised process-wide rather than
- * per-component. Handlers are attached for the length of a run and detached in
- * its finally block, so a component that is not running receives nothing.
- */
-let activeRun: { cancel: () => void; isCancellationRequested: boolean } | null = null;
 
 export type SeedSearchPhase = "idle" | "booting" | "searching" | "done" | "cancelled" | "error";
 
@@ -121,7 +115,7 @@ function useSeedSearch(jaml: string) {
    * have to see the token that exists *now*, not the one captured when the
    * callback was last rebuilt.
    */
-  const runRef = useRef<{ cancel: () => void; isCancellationRequested: boolean } | null>(null);
+  const runRef = useRef<CancellationToken | null>(null);
 
   const stop = useCallback(() => {
     runRef.current?.cancel();
@@ -139,22 +133,10 @@ function useSeedSearch(jaml: string) {
 
   const start = useCallback(async () => {
     if (runRef.current) return;
-    if (activeRun) {
-      setError("Another search is already running on this page.");
-      setPhase("error");
-      return;
-    }
 
-    let settingsObj: ReturnType<typeof Search.settings> | null = null;
-    const token = {
-      isCancellationRequested: false,
-      cancel: () => {
-        token.isCancellationRequested = true;
-        settingsObj?.cancel();
-      }
-    };
+    // The engine's own token: stop() cancels the running search directly.
+    const token = new CancellationToken();
     runRef.current = token;
-    activeRun = token;
 
     setError(null);
     setHits([]);
@@ -162,8 +144,8 @@ function useSeedSearch(jaml: string) {
     setStats(ZERO_STATS);
     setPhase("booting");
 
-    const onScored = (r: MotelySeedScore) => {
-      setHits((prev) => [{ seed: r.seed, score: r.score }, ...prev].slice(0, MAX_HITS));
+    const onHit = (seed: string, score: number) => {
+      setHits((prev) => [{ seed, score }, ...prev].slice(0, MAX_HITS));
     };
     const onAnalyzed = (r: MotelyJamlyzerSeedResult) => {
       setAnalyses((prev) => new Map(prev).set(r.seed, r));
@@ -178,7 +160,6 @@ function useSeedSearch(jaml: string) {
       });
     };
 
-    let subscribed = false;
     try {
       if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
       if (token.isCancellationRequested) {
@@ -186,23 +167,26 @@ function useSeedSearch(jaml: string) {
         return;
       }
 
-      Search.onScored.subscribe(onScored);
-      Search.onAnalyzed.subscribe(onAnalyzed);
-      Search.onProgress.subscribe(onProgress);
-      subscribed = true;
-
       setPhase("searching");
-      const settings = Search.settings(jaml)
+      const config = JamlConfigLoader.fromJaml(jaml);
+      const settings = JamlSearchBuilder.createSettings(config)
+        .withThreadCount(1)
+        .withQuietMode(true)
         .withSequentialSearch()
         .withBatchCharacterCount(BATCH_CHARS)
         .withStartBatchIndex(START_BATCH)
         .withEndBatchIndex(END_BATCH)
-        .withAnalysis(ANALYSIS_EVENT_ROLLS)
+        .withSeedAnalyzeProvider(MotelyJamlyzer.createRiderDesc(config, onAnalyzed, ANALYSIS_EVENT_ROLLS))
+        .withProgressCallback(onProgress)
         .withProgressReportIntervalMs(PROGRESS_INTERVAL_MS);
-      
-      settingsObj = settings;
+      // A scored filter reports every find on the scored channel (and the bare seed on the
+      // match channel too): listen to exactly one, or each hit lands twice.
+      if (settings.seedScoreDesc != null)
+        settings.withScoredResultCallback((r: MotelyScoredSeedResult) => onHit(r.seed, r.score));
+      else settings.withSeedMatchCallback((seed: string) => onHit(seed, 1));
 
-      await settings.start();
+      const search = settings.start(token);
+      await search.waitForCompletionAsync();
 
       /*
        * Cancelling crosses back as a thrown OperationCanceledException on some
@@ -214,14 +198,14 @@ function useSeedSearch(jaml: string) {
         return;
       }
 
-      // Final totals come off the settings object, not the last progress tick,
-      // which lands before the closing batch is counted.
+      // Final totals come off the search, not the last progress tick, which
+      // lands before the closing batch is counted.
       setStats({
-        seedsSearched: Number(settings.totalSeedsSearched),
-        matchingSeeds: Number(settings.matchingSeeds),
+        seedsSearched: Number(search.totalSeedsSearched),
+        matchingSeeds: Number(search.matchingSeeds),
         percentComplete: 1,
-        seedsPerSecond: settings.seedsPerSecond,
-        elapsedMs: Number(settings.elapsedMs),
+        seedsPerSecond: search.seedsPerSecond,
+        elapsedMs: Number(search.elapsedMs),
       });
       setPhase("done");
     } catch (e) {
@@ -229,15 +213,10 @@ function useSeedSearch(jaml: string) {
         setPhase("cancelled");
         return;
       }
-      setError(e instanceof Error ? e.message : String(e));
+      // NativeAOT hands the exception over without its message; the engine keeps it.
+      setError(Errors.last() ?? (e instanceof Error ? e.message : String(e)));
       setPhase("error");
     } finally {
-      if (subscribed) {
-        Search.onScored.unsubscribe(onScored);
-        Search.onAnalyzed.unsubscribe(onAnalyzed);
-        Search.onProgress.unsubscribe(onProgress);
-      }
-      if (activeRun === token) activeRun = null;
       if (runRef.current === token) runRef.current = null;
     }
   }, [jaml]);
@@ -404,7 +383,7 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
           content: selected ? (
             /*
              * results= when the search already analysed this seed in-pass,
-             * which skips Jamlyzer's own Analyze.seeds() call entirely. seeds=
+             * which skips Jamlyzer's own MotelyJamlyzer.analyze() call entirely. seeds=
              * is the fallback for a selection we have no breakdown for.
              */
             analysisResults ? (

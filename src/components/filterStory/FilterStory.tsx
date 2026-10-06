@@ -2,7 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 import bootsharp, {
-  Analyze,
+  JamlConfigLoader,
+  MotelyJamlyzer,
   MotelyBoosterPack,
   MotelyVoucher,
   type MotelyJamlyzerSeedResult,
@@ -45,7 +46,7 @@ async function analyzeSeed(seed: string): Promise<MotelyJamlyzerSeedResult> {
   const hit = analysisCache.get(seed);
   if (hit) return hit;
   if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
-  const [result] = Analyze.seeds(`seeds:\n  - ${seed}`);
+  const [result] = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(`seeds:\n  - ${seed}`));
   if (!result) throw new Error(`Motely returned nothing for ${seed}`);
   analysisCache.set(seed, result);
   return result;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import bootsharp, { Analyze, type MotelyJamlyzerEvents } from "motely-wasm";
+import bootsharp, { JamlConfigLoader, MotelyJamlyzer, type MotelyJamlyzerEvents } from "motely-wasm";
 import { parseJamlSeeds } from "../../lib/jaml/jamlSeeds.js";
 import { JimboPanel } from "../../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../../ui/panel.js";
@@ -13,7 +13,7 @@ import { JimboRow } from "../../ui/JimboLayout.js";
  * The PRNG tape.
  *
  * `JamlyzerEvents` shows the first 8 rolls of 12 streams and drops the rest on
- * the floor. 25.1.0 dropped resumeSeeds; paging is `Analyze.seedsPaged(jaml, n)`
+ * the floor. 25.1.0 dropped resumeSeeds; paging is `MotelyJamlyzer.analyze(config, n)`
  * with a growing n, then we keep only the new suffix.
  *
  * Nothing shipped has ever used it. This scrolls it.
@@ -128,7 +128,7 @@ export function JamlyzerTape({
 
       const from = cursorRef.current.rolls;
       const want = Math.min(from + pageSize, maxRolls);
-      const [result] = Analyze.seedsPaged(jaml, want);
+      const [result] = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(jaml), want);
       if (!result) throw new Error("The engine returned no result for this seed.");
 
       const sliced = {} as MotelyJamlyzerEvents;
