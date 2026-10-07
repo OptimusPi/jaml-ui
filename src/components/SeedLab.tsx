@@ -187,10 +187,8 @@ function useSeedSearch(jaml: string) {
       }
 
       setPhase("searching");
-      // The safe two-step: check() returns the loader's line-numbered reason (or null),
-      // so a bad filter is a clean error state — never an uncaught throw out of fromJaml.
-      const problem = JamlConfigLoader.check(jaml);
-      if (problem) throw new Error(problem);
+      // It loads or it throws — motely-wasm 29+ makes the throw catchable with
+      // the line-numbered reason on Errors.last() (the catch below reads it).
       const config = JamlConfigLoader.fromJaml(jaml);
       setTallyLabels(tallyLabelsFor(config));
       const settings = JamlSearchBuilder.createSettings(config)

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import bootsharp, { JamlConfigLoader, MotelyJamlyzer, type MotelyJamlyzerSeedResult, MotelyDeck, MotelyStake } from "motely-wasm";
+import bootsharp, { JamlConfigLoader, MotelyJamlyzer, type MotelyJamlyzerSeedResult, MotelyDeck, MotelyStake, Errors } from "motely-wasm";
 import { parseJaml } from "../lib/jaml/jaml.js";
 import { JimboPanel } from "../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../ui/panel.js";
@@ -106,10 +106,8 @@ export function Jamlyzer({
         let analyzed: MotelyJamlyzerSeedResult[] = [];
 
         if (jaml && jaml.trim().length > 0) {
-          // check() first: a bad filter becomes this pane's error state, never an
-          // uncaught throw out of fromJaml.
-          const problem = JamlConfigLoader.check(jaml.trim());
-          if (problem) throw new Error(problem);
+          // It loads or it throws: motely-wasm 29+ keeps the throw catchable and
+          // the line-numbered reason on Errors.last() (read in the catch below).
           analyzed = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(jaml.trim()));
         } else if (seedsProp && seedsProp.length > 0) {
           const seedStrings = seedsProp.map((s) => (typeof s === "string" ? s : s.seed));
@@ -124,9 +122,11 @@ export function Jamlyzer({
         setLoad({ status: "ready", seeds: analyzed, elapsedMs });
       } catch (error) {
         if (cancelled) return;
+        // NativeAOT drops the thrown message at the boundary; the engine kept it.
+        const reason = Errors.last();
         setLoad({
           status: "error",
-          message: error instanceof Error ? error.message : String(error),
+          message: reason ?? (error instanceof Error ? error.message : String(error)),
         });
       }
     })();
