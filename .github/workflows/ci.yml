@@ -32,9 +32,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      # jaml-lang (name lists) and motely-wasm (runtime enums) are versioned
-      # independently — this fails the build when they describe different
-      # engine builds, instead of letting an ordinal decode to a wrong name.
+      # Proves the generated grammar and the joker tiers against motely-wasm itself
+      # (JamlConfigLoader.check), and that decode enums round-trip, so a name
+      # never decodes to the wrong item.
       - name: Vocabulary drift
         run: pnpm vocab:check
 

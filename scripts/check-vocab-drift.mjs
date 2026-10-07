@@ -1,52 +1,25 @@
 /**
- * Vocabulary drift guard.
+ * Engine vocabulary guard. Every name and key this package uses comes from the engine:
+ * item names from motely-wasm's enums (src/engineVocab.ts) and filter keys from
+ * src/lib/jaml/engineGrammar.generated.ts (generated from MotelyJAML's YAML loader by
+ * scripts/gen-engine-grammar.mjs). This script proves both against the engine itself:
  *
- * This package takes engine vocabulary from two independently-versioned
- * upstreams:
- *
- *   jaml-lang   — generated *name lists* (strings), used for authoring,
- *                 pickers and validation.
- *   motely-wasm — the *runtime numeric enums*, used to decode packed values
- *                 that come back from a search.
- *
- * Both are generated from the same Motely engine, but nothing in the dependency
- * graph forces the two installed versions to describe the *same engine build*.
- * When they disagree the UI quietly shows a name the engine never meant. This
- * script turns that silent failure into a build failure.
- *
- * Scope — what this can and cannot check:
- *
- *   Names, across packages (check 1). This is the only seam that exists between
- *   the two, because jaml-lang exposes *no ordinals at all*: its arrays are
- *   alphabetically sorted name lists, while motely-wasm's values are bitpacked
- *   (MotelyItemEdition.Foil is 8_388_608, not 1). There is nothing to align an
- *   ordinal against, so cross-package ordinal comparison is not expressible.
- *
- *   Ordinals, within motely-wasm (check 3). Every ordinal-to-name decode in this
- *   package reads motely-wasm's own enum (`MotelyBossBlind[boss]`) on a value
- *   that motely-wasm's own WASM produced, so the two sides of a decode always
- *   ship together and cannot drift apart. What *can* still corrupt a decode is a
- *   collision inside one of those enums — two names sharing a value makes the
- *   reverse lookup silently return the wrong one. That is checkable, so it is
- *   checked.
+ *   1. Every generated root, clause, clause-property and sources key is mapped by
+ *      motely-wasm's JamlConfigLoader.check, and a made-up key is refused.
+ *   2. The rarity bits partition the joker list: common + uncommon + rare + legendary.
+ *   3. Decode enums round-trip name -> value -> name (a collision mislabels results).
  *
  * Run: pnpm vocab:check
  */
-import { Vocab } from "jaml-lang";
 import * as Motely from "motely-wasm";
 
-const jamlLang = Vocab.Enums;
+import { CLAUSE_KEYS, DISCRIMINATORS, ROOT_KEYS, SOURCE_KEYS } from "../src/lib/jaml/engineGrammar.generated.ts";
+
 const problems = [];
 const notes = [];
 
-/**
- * The runtime enum for a jaml-lang kind. motely-wasm 27 dropped the `Motely`
- * prefix from its TS enums (`MotelyDeck` is `Deck`), while jaml-lang keeps the
- * prefixed kind names, so look under both. Without the fallback every renamed
- * enum reads as "not exported" and check 1 skips it without comparing.
- */
 function runtimeEnum(kind) {
-  const found = Motely[kind] ?? Motely[kind.replace(/^Motely/, "")];
+  const found = Motely[kind];
   return found !== null && typeof found === "object" ? found : undefined;
 }
 
@@ -55,75 +28,56 @@ function runtimeEnumNames(enumObject) {
   return Object.keys(enumObject).filter((key) => Number.isNaN(Number(key)));
 }
 
-// ── 1. Every enum both packages ship must agree, name for name ──────────────
-let compared = 0;
-for (const [kind, names] of Object.entries(jamlLang)) {
-  const runtime = runtimeEnum(kind);
-  if (runtime === undefined) {
-    // Not every name list has a runtime counterpart exported (jokers, tarots,
-    // spectrals and planets are name-only today). Nothing to cross-check.
-    notes.push(`${kind}: name-only (${names.length}) — no motely-wasm export to compare`);
-    continue;
-  }
+// ── 1. The generated grammar is the engine loader's grammar ─────────────────
+const boot = Motely.default;
+if (boot.getStatus() !== boot.BootStatus.Booted) await boot.boot();
+const UNMAPPED = /could not be mapped|no clause key among/i;
+const check = (yaml) => Motely.JamlConfigLoader.check(yaml) ?? "";
+const head = "deck: Red\nstake: White\nmust:\n";
 
-  compared += 1;
-  const fromRuntime = new Set(runtimeEnumNames(runtime));
-  const fromNames = new Set(names);
-
-  const missingFromRuntime = [...fromNames].filter((n) => !fromRuntime.has(n));
-  const missingFromNames = [...fromRuntime].filter((n) => !fromNames.has(n));
-
-  if (missingFromRuntime.length || missingFromNames.length) {
-    problems.push(
-      `${kind}: jaml-lang has ${fromNames.size}, motely-wasm has ${fromRuntime.size}\n` +
-        (missingFromRuntime.length
-          ? `    only in jaml-lang:   ${missingFromRuntime.join(", ")}\n`
-          : "") +
-        (missingFromNames.length
-          ? `    only in motely-wasm: ${missingFromNames.join(", ")}\n`
-          : ""),
-    );
+if (!UNMAPPED.test(check(`${head}  - joker: Blueprint
+    notAKey: 1
+`))) {
+  problems.push("JamlConfigLoader.check accepted a made-up key; the grammar probe cannot tell mapped from unmapped");
+}
+let keysChecked = 0;
+const probe = (label, yaml) => {
+  keysChecked += 1;
+  const msg = check(yaml);
+  if (UNMAPPED.test(msg)) problems.push(`${label}: ${msg}`);
+};
+for (const key of ROOT_KEYS) probe(`root.${key}`, `${key}: x
+`);
+for (const [disc, d] of Object.entries(DISCRIMINATORS)) {
+  probe(disc, `${head}  - ${disc}: x
+`);
+  for (const key of CLAUSE_KEYS[d.clause]) {
+    if (key !== d.valueProperty) probe(`${disc}.${key}`, `${head}  - ${disc}: x
+    ${key}: x
+`);
   }
 }
+for (const [where, keys] of Object.entries(SOURCE_KEYS)) {
+  const [clause, block] = where.split(".");
+  const disc = Object.keys(DISCRIMINATORS).find((k) => DISCRIMINATORS[k].clause === clause);
+  for (const key of keys) probe(`${where}.${key}`, `${head}  - ${disc}: x
+    ${block}:
+      ${key}: x
+`);
+}
+notes.push(`${keysChecked} grammar keys mapped by JamlConfigLoader.check`);
 
-// ── 2. The rarity tiers must still partition the full joker list ────────────
-// src/vocab.ts derives legendaries by subtraction (full set minus the three
-// named tiers) because the engine ships no legendary-name enum. If the engine
-// ever adds a fifth rarity, those jokers silently become "legendary". Assert
-// the arithmetic instead of trusting it.
-const {
-  MotelyJoker: allJokers,
-  MotelyJokerCommon: common,
-  MotelyJokerUncommon: uncommon,
-  MotelyJokerRare: rare,
-} = jamlLang;
-
-if (allJokers && common && uncommon && rare) {
-  const named = new Set([...common, ...uncommon, ...rare]);
-  const leftovers = allJokers.filter((j) => !named.has(j));
-  const EXPECTED_LEGENDARIES = 5; // Canio, Triboulet, Yorick, Chicot, Perkeo
-
-  const strays = [...named].filter((j) => !allJokers.includes(j));
-  if (strays.length) {
-    problems.push(
-      `joker rarity tiers contain names absent from MotelyJoker: ${strays.join(", ")}`,
-    );
-  }
-
-  if (leftovers.length !== EXPECTED_LEGENDARIES) {
-    problems.push(
-      `expected ${EXPECTED_LEGENDARIES} legendary jokers (full set minus Common/Uncommon/Rare), ` +
-        `got ${leftovers.length}: ${leftovers.join(", ")}\n` +
-        `    A new rarity tier would land here silently — teach src/vocab.ts about it.`,
-    );
-  } else {
-    notes.push(
-      `joker tiers partition cleanly: ${common.length} common + ${uncommon.length} uncommon + ` +
-        `${rare.length} rare + ${leftovers.length} legendary = ${allJokers.length}`,
-    );
-  }
+// ── 2. The rarity bits partition the joker list ─────────────────────────────
+const itemTypeEnum = runtimeEnum("MotelyItemType");
+const jokers = runtimeEnumNames(itemTypeEnum).filter((n) => (itemTypeEnum[n] & 0xf000) === Motely.MotelyItemTypeCategory.Joker);
+const tiers = ["Common", "Uncommon", "Rare", "Legendary"].map((r) =>
+  jokers.filter((n) => (itemTypeEnum[n] & 0x0c00) === Motely.MotelyJokerRarity[r]),
+);
+const tierTotal = tiers.reduce((sum, t) => sum + t.length, 0);
+if (tierTotal !== jokers.length || tiers[3].length !== 5) {
+  problems.push(`rarity tiers ${tiers.map((t) => t.length).join("/")} do not partition ${jokers.length} jokers into 5 legendaries`);
 } else {
-  problems.push("jaml-lang Vocab is missing one of the joker rarity enums");
+  notes.push(`joker tiers partition cleanly: ${tiers.map((t) => t.length).join(" + ")} = ${jokers.length}`);
 }
 
 // ── 3. Decode enums must round-trip: name -> value -> same name ─────────────
@@ -179,7 +133,7 @@ for (const kind of DECODE_ENUMS) {
 notes.push(`${roundTripped}/${DECODE_ENUMS.length} decode enums round-trip name -> value -> name`);
 
 const { MOTELY_SPRITE_BY_TYPE } = await import("../src/decode/motelySpriteLut.generated.ts");
-const itemType = runtimeEnum("MotelyItemType");
+const itemType = itemTypeEnum;
 const itemTypeNames = runtimeEnumNames(itemType);
 let lutHits = 0;
 let lutUnknown = 0;
@@ -204,13 +158,13 @@ if (problems.length) {
   console.error(`\n✗ vocabulary drift detected (${problems.length}):\n`);
   for (const problem of problems) console.error(`  ${problem}`);
   console.error(
-    "\njaml-lang and motely-wasm describe different engine builds. Align the two\n" +
-      "versions in package.json, or regenerate the stale one from Motely.\n",
+    "\nRegenerate the grammar (node scripts/gen-engine-grammar.mjs) against the MotelyJAML\n" +
+      "build motely-wasm was published from.\n",
   );
   process.exit(1);
 }
 
 console.log(
-  `\n✓ vocabulary in sync — ${compared} enum(s) cross-checked, joker tiers partition, ` +
+  `\n✓ vocabulary in sync — ${keysChecked} grammar keys mapped, joker tiers partition, ` +
     `${roundTripped} decode enum(s) round-trip\n`,
 );

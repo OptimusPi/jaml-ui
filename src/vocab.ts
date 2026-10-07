@@ -1,22 +1,14 @@
 /**
  * Engine vocabulary — the ONE place item names enter this package.
  *
- * Everything here is derived from `jaml-lang`'s generated `Vocab`, which is
- * itself generated from the Motely engine's enums. Nothing in this file is
- * hand-listed, so it cannot drift from the engine on its own.
+ * Everything here is read from motely-wasm's own enums (src/engineVocab.ts):
+ * the runtime the UI decodes search results with is the same table the names
+ * come from, so the two cannot describe different engine builds.
  *
- * What CAN drift is the seam between our two upstreams: `jaml-lang` ships the
- * *name lists* (strings, used for authoring/pickers/validation) while
- * `motely-wasm` ships the *runtime numeric enums* (used to decode packed values
- * coming back from a search). They are versioned independently, so nothing
- * forces them to describe the same engine build. `scripts/check-vocab-drift.mjs`
- * asserts they agree and runs in CI — that guard is the reason this module can
- * be trusted as the single source.
- *
- * Add a new vocabulary consumer? Import it from here, not from `jaml-lang`
- * directly, so the next fix only has to happen once.
+ * Add a new vocabulary consumer? Import it from here, so the next fix only has
+ * to happen once.
  */
-import { Vocab } from "jaml-lang";
+import { ENGINE_ENUMS } from "./engineVocab.js";
 
 /** Joker rarity as the engine models it. */
 export type JokerRarityName = "Common" | "Uncommon" | "Rare" | "Legendary";
@@ -44,24 +36,12 @@ export const engineKey = (name: string): string =>
 const keySet = (names: readonly string[]): ReadonlySet<string> =>
   new Set(names.map(normalizeItemName));
 
-export const COMMON_JOKER_KEYS = keySet(Vocab.Enums.MotelyJokerCommon);
-export const UNCOMMON_JOKER_KEYS = keySet(Vocab.Enums.MotelyJokerUncommon);
-export const RARE_JOKER_KEYS = keySet(Vocab.Enums.MotelyJokerRare);
+export const COMMON_JOKER_KEYS = keySet(ENGINE_ENUMS.MotelyJokerCommon);
+export const UNCOMMON_JOKER_KEYS = keySet(ENGINE_ENUMS.MotelyJokerUncommon);
+export const RARE_JOKER_KEYS = keySet(ENGINE_ENUMS.MotelyJokerRare);
 
-/**
- * Legendaries are the full joker set minus the three named tiers — the engine
- * ships no legendary-name enum. If a future engine adds a fifth rarity, those
- * jokers would silently land here; `check-vocab-drift.mjs` asserts the tier
- * counts still partition the full list so that shows up as a CI failure.
- */
-export const LEGENDARY_JOKER_KEYS: ReadonlySet<string> = new Set(
-  Vocab.Enums.MotelyJoker.map(normalizeItemName).filter(
-    (key) =>
-      !COMMON_JOKER_KEYS.has(key) &&
-      !UNCOMMON_JOKER_KEYS.has(key) &&
-      !RARE_JOKER_KEYS.has(key),
-  ),
-);
+/** Legendaries straight from the engine's rarity bits (MotelyJokerRarity.Legendary). */
+export const LEGENDARY_JOKER_KEYS = keySet(ENGINE_ENUMS.MotelyJokerLegendary);
 
 /** Rarity tier for a joker, by engine key or sprite display name. */
 export function jokerRarityOf(name: string): JokerRarityName {

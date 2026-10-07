@@ -1,19 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import bootsharp, {
   CancellationToken,
   Errors,
   JamlConfigLoader,
   JamlSearchBuilder,
-  MotelyJamlyzer,
-  type MotelyJamlyzerSeedResult,
+  type JamlConfig,
   type MotelyProgress,
   type MotelyScoredSeedResult,
 } from "motely-wasm";
 import { JimboButton } from "../ui/JimboButton.js";
 import { JimboDock } from "../ui/JimboDock.js";
-import { JimboListItem } from "../ui/JimboListItem.js";
 import { JimboStack } from "../ui/JimboLayout.js";
 import { JimboStatusPill } from "../ui/JimboStatusPill.js";
 import { JimboText } from "../ui/jimboText.js";
@@ -38,7 +36,19 @@ export const JAMLYZE_JAML = `seeds:
   - WEEJOKER
 ${STARTER_JAML}`;
 
-export type SeedHit = { seed: string; score: number };
+/**
+ * One search hit. `tallies` is motely-wasm 28's per-should-clause tally: one raw
+ * occurrence count per `should:` clause, in authored order. Empty for an unscored filter.
+ */
+export type SeedHit = { seed: string; score: number; tallies: readonly number[] };
+
+/**
+ * Tally column headers: each should clause's own `label:` when the JAML gives one,
+ * otherwise "Tally 1..N". Same order the engine fills `tallies` in.
+ */
+function tallyLabelsFor(config: JamlConfig): string[] {
+  return config.should.map((clause, i) => clause.label ?? `Tally ${i + 1}`);
+}
 
 /*
  * Search window.
@@ -63,17 +73,6 @@ const START_BATCH = 0n;
 const END_BATCH = 2n;
 const SEEDS_PER_BATCH = 35 ** BATCH_CHARS; // 1,500,625
 const WINDOW_SEEDS = Number(END_BATCH - START_BATCH) * SEEDS_PER_BATCH; // 3,001,250
-
-/*
- * Analysis depth carried by the search itself.
- *
- * A Jamlyzer rider (MotelyJamlyzer.createRiderDesc) makes the engine run the
- * Jamlyzer on every hit in the same pass, so the Jamlyze pane never crosses
- * back into wasm for a seed the search already handed us. 20 is the depth
- * MotelyJamlyzer.analyze() uses, so the pane renders exactly what it rendered
- * back when it called the analyzer itself.
- */
-const ANALYSIS_EVENT_ROLLS = 20;
 
 /** Hits kept in the list. The engine can out-run the DOM on a loose filter. */
 const MAX_HITS = 80;
@@ -119,8 +118,6 @@ const ZERO_STATS: SeedSearchStats = {
   elapsedMs: 0,
 };
 
-const NO_ANALYSES: ReadonlyMap<string, MotelyJamlyzerSeedResult> = new Map();
-
 /**
  * Drives one Motely search over `jaml` and streams what it finds.
  *
@@ -132,7 +129,7 @@ function useSeedSearch(jaml: string) {
   const [phase, setPhase] = useState<SeedSearchPhase>("idle");
   const [error, setError] = useState<string | null>(null);
   const [hits, setHits] = useState<SeedHit[]>([]);
-  const [analyses, setAnalyses] = useState<ReadonlyMap<string, MotelyJamlyzerSeedResult>>(NO_ANALYSES);
+  const [tallyLabels, setTallyLabels] = useState<readonly string[]>([]);
   const [stats, setStats] = useState<SeedSearchStats>(ZERO_STATS);
 
   /*
@@ -165,15 +162,12 @@ function useSeedSearch(jaml: string) {
 
     setError(null);
     setHits([]);
-    setAnalyses(NO_ANALYSES);
+    setTallyLabels([]);
     setStats(ZERO_STATS);
     setPhase("booting");
 
-    const onHit = (seed: string, score: number) => {
-      setHits((prev) => [{ seed, score }, ...prev].slice(0, MAX_HITS));
-    };
-    const onAnalyzed = (r: MotelyJamlyzerSeedResult) => {
-      setAnalyses((prev) => new Map(prev).set(r.seed, r));
+    const onHit = (seed: string, score: number, tallies: readonly number[]) => {
+      setHits((prev) => [{ seed, score, tallies }, ...prev].slice(0, MAX_HITS));
     };
     const onProgress = (p: MotelyProgress) => {
       setStats({
@@ -194,6 +188,7 @@ function useSeedSearch(jaml: string) {
 
       setPhase("searching");
       const config = JamlConfigLoader.fromJaml(jaml);
+      setTallyLabels(tallyLabelsFor(config));
       const settings = JamlSearchBuilder.createSettings(config)
         .withThreadCount(1)
         .withQuietMode(true)
@@ -201,14 +196,13 @@ function useSeedSearch(jaml: string) {
         .withBatchCharacterCount(BATCH_CHARS)
         .withStartBatchIndex(START_BATCH)
         .withEndBatchIndex(END_BATCH)
-        .withSeedAnalyzeProvider(MotelyJamlyzer.createRiderDesc(config, onAnalyzed, ANALYSIS_EVENT_ROLLS))
         .withProgressCallback(onProgress)
         .withProgressReportIntervalMs(PROGRESS_INTERVAL_MS);
       // A scored filter reports every find on the scored channel (and the bare seed on the
       // match channel too): listen to exactly one, or each hit lands twice.
       if (settings.seedScoreDesc != null)
-        settings.withScoredResultCallback((r: MotelyScoredSeedResult) => onHit(r.seed, r.score));
-      else settings.withSeedMatchCallback((seed: string) => onHit(seed, 1));
+        settings.withScoredResultCallback((r: MotelyScoredSeedResult) => onHit(r.seed, r.score, Array.from(r.tallies)));
+      else settings.withSeedMatchCallback((seed: string) => onHit(seed, 1, []));
 
       const search = settings.start(token);
       await search.waitForCompletionAsync();
@@ -247,7 +241,7 @@ function useSeedSearch(jaml: string) {
   }, [jaml]);
 
   const running = phase === "booting" || phase === "searching";
-  return { phase, running, error, hits, analyses, stats, start, stop };
+  return { phase, running, error, hits, tallyLabels, stats, start, stop };
 }
 
 const integer = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
@@ -268,7 +262,7 @@ function describeProgress(phase: SeedSearchPhase, stats: SeedSearchStats, hitCou
 
 export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }) {
   const [jaml, setJaml] = useState(defaultJaml);
-  const { running, error, hits, stats, phase, start } = useSeedSearch(jaml);
+  const { running, error, hits, tallyLabels, stats, phase, start } = useSeedSearch(jaml);
 
   return (
     <JamlIde
@@ -280,8 +274,8 @@ export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: stri
       searchResults={hits.map((h) => ({
         seed: h.seed,
         score: h.score,
-        tallyColumns: [h.score],
-        tallyLabels: ["score"],
+        tallyColumns: [...h.tallies],
+        tallyLabels: [...tallyLabels],
       }))}
       subtitle={error ?? (running ? describeProgress(phase, stats, hits.length) : undefined)}
     />
@@ -302,7 +296,7 @@ export function SeedLab({
 }) {
   const [jaml, setJaml] = useState(defaultJaml);
   const [selected, setSelected] = useState<string | null>(null);
-  const { phase, running, error, hits, analyses, stats, start, stop } = useSeedSearch(jaml);
+  const { phase, running, error, hits, tallyLabels, stats, start, stop } = useSeedSearch(jaml);
   const wide = useWideLayout();
 
   const autoStarted = useRef(false);
@@ -321,17 +315,6 @@ export function SeedLab({
     setPinnedFirstHit(firstHit);
     if (selected === null && firstHit) setSelected(firstHit);
   }
-
-  /*
-   * Jamlyzer resets its load state whenever this prop changes identity, and
-   * progress ticks re-render this component several times a second — so the
-   * array has to survive them.
-   */
-  const selectedAnalysis = selected ? analyses.get(selected) : undefined;
-  const analysisResults = useMemo(
-    () => (selectedAnalysis ? [selectedAnalysis] : undefined),
-    [selectedAnalysis],
-  );
 
   const statusLabel =
     phase === "booting"
@@ -423,15 +406,12 @@ export function SeedLab({
                   {running ? "Sweeping…" : "No hits yet. Start a search."}
                 </JimboText>
               ) : (
-                hits.map((h) => (
-                  <JimboListItem
-                    key={h.seed}
-                    active={h.seed === selected}
-                    onClick={() => setSelected(h.seed)}
-                  >
-                    {h.seed} · {h.score}
-                  </JimboListItem>
-                ))
+                <SeedHitTable
+                  hits={hits}
+                  tallyLabels={tallyLabels}
+                  selected={selected}
+                  onSelect={setSelected}
+                />
               )}
             </JimboStack>
           ),
@@ -441,15 +421,10 @@ export function SeedLab({
           tone: "purple",
           content: selected ? (
             /*
-             * results= when the search already analysed this seed in-pass,
-             * which skips Jamlyzer's own MotelyJamlyzer.analyze() call entirely. seeds=
-             * is the fallback for a selection we have no breakdown for.
+             * motely-wasm 28 dropped the in-pass Jamlyzer rider, so the pane
+             * analyses the picked seed itself, on demand.
              */
-            analysisResults ? (
-              <Jamlyzer jaml={jaml} results={analysisResults} defaultSelectedSeed={selected} />
-            ) : (
-              <Jamlyzer jaml={jaml} seeds={[selected]} defaultSelectedSeed={selected} />
-            )
+            <Jamlyzer jaml={jaml} seeds={[selected]} defaultSelectedSeed={selected} />
           ) : (
             <JimboText size="sm" tone="grey">
               Pick a hit in Results.
@@ -458,5 +433,69 @@ export function SeedLab({
         },
       }}
     />
+  );
+}
+
+/**
+ * Results pane: one row per hit — Seed, Score, then one column per should
+ * clause's tally, headed by that clause's label. Clicking a row picks it for Jamlyze.
+ */
+function SeedHitTable({
+  hits,
+  tallyLabels,
+  selected,
+  onSelect,
+}: {
+  hits: readonly SeedHit[];
+  tallyLabels: readonly string[];
+  selected: string | null;
+  onSelect: (seed: string) => void;
+}) {
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", color: "var(--j-white)" }}>
+        <thead>
+          <tr>
+            <th scope="col" style={{ textAlign: "left" }}>Seed</th>
+            <th scope="col" style={{ textAlign: "right" }}>Score</th>
+            {tallyLabels.map((label, i) => (
+              <th key={i} scope="col" style={{ textAlign: "right" }}>
+                {label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {hits.map((h) => (
+            <tr
+              key={h.seed}
+              tabIndex={0}
+              aria-selected={h.seed === selected}
+              onClick={() => onSelect(h.seed)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelect(h.seed);
+                }
+              }}
+              style={{
+                cursor: "pointer",
+                background: h.seed === selected ? "var(--j-dark-red)" : undefined,
+              }}
+            >
+              <th scope="row" style={{ textAlign: "left", fontFamily: "var(--j-font-code)", color: "var(--j-gold)" }}>
+                {h.seed}
+              </th>
+              <td style={{ textAlign: "right" }}>{h.score}</td>
+              {tallyLabels.map((_, i) => (
+                <td key={i} style={{ textAlign: "right" }}>
+                  {h.tallies[i] ?? 0}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

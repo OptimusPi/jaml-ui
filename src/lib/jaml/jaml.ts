@@ -50,7 +50,7 @@ const ITEM_KEYS: JamlItemType[] = [
  * The engine accepts a wider clause vocabulary than the bare ITEM_KEYS list —
  * plurals (`jokers:`), rarity-scoped jokers (`legendaryJoker: Perkeo`), and
  * qualified cards/tags (`spectralCard: Ankh`, `smallBlindTag: NegativeTag`).
- * jaml-lang's validate() passes all of them (verified against simpleCola.jaml),
+ * The engine loader maps all of them (JamlConfigLoader.cs JamlClauseConverter.Keys),
  * so a parser that doesn't resolve them here silently drops real clauses from
  * the UI. Keys are matched case-insensitively after lowercasing.
  */

@@ -34,3 +34,6 @@ ds-bundle/
 /.agents/skills/impeccable
 /.agents/skills
 /.claude/skills/impeccable
+
+.vercel
+.env*

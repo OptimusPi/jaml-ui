@@ -1,12 +1,15 @@
 "use client";
 
-import { Vocab } from "jaml-lang";
+import { MotelyDeck, MotelyStake } from "motely-wasm";
 import { DeckSprite, StakeSprite } from "./DeckSprite.js";
 import { JimboPanelSpinner } from "../ui/JimboPanelSpinner.js";
 import { JimboStack, JimboRow } from "../ui/JimboLayout.js";
 
-const DECKS = Vocab.Enums.MotelyDeck;
-const STAKES = Vocab.Enums.MotelyStake;
+/** Member names of a numeric TS enum, in declaration order (drops the reverse-mapped numbers). */
+const enumNames = (e: object): readonly string[] => Object.keys(e).filter((k) => Number.isNaN(Number(k)));
+
+const DECKS = enumNames(MotelyDeck);
+const STAKES = enumNames(MotelyStake);
 
 function cycle(list: readonly string[], value: string, dir: -1 | 1): string {
   const i = list.indexOf(value);

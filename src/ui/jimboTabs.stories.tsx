@@ -33,7 +33,7 @@ export const IdeModes: Story = {
         </JimboRow>
         <JimboText size="sm" tone="grey">
           {active === "visual" && "Clause cards. Drag a joker onto Must."}
-          {active === "code" && "jaml-lang editor with typeahead."}
+          {active === "code" && "YAML editor with engine typeahead."}
           {active === "inspect" && "Raw Motely dump for this seed."}
         </JimboText>
       </StoryScene>
