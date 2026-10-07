@@ -106,6 +106,10 @@ export function Jamlyzer({
         let analyzed: MotelyJamlyzerSeedResult[] = [];
 
         if (jaml && jaml.trim().length > 0) {
+          // check() first: a bad filter becomes this pane's error state, never an
+          // uncaught throw out of fromJaml.
+          const problem = JamlConfigLoader.check(jaml.trim());
+          if (problem) throw new Error(problem);
           analyzed = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(jaml.trim()));
         } else if (seedsProp && seedsProp.length > 0) {
           const seedStrings = seedsProp.map((s) => (typeof s === "string" ? s : s.seed));
