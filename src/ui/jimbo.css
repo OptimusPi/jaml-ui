@@ -4945,6 +4945,14 @@
     gap: 10px;
 }
 
+/* Below a phone-ish pane the side-by-side zones squeeze clause cards into
+   ~160px and their content clips — stacking reads better. */
+@media (max-width: 560px) {
+    .j-jaml-ide-visual__top-zones {
+        grid-template-columns: 1fr;
+    }
+}
+
 .j-jaml-ide-visual__top-zone-must,
 .j-jaml-ide-visual__top-zone-mustnot {
     min-width: 0;
@@ -5054,7 +5062,7 @@
 @keyframes jaml-spade   { 0%,61.5%{opacity:0} 62%{opacity:1;transform:scale(1.45)} 64.5%{opacity:1;transform:scale(1)} 71.5%{opacity:1} 72%{opacity:0} 100%{opacity:0} }
 @keyframes jaml-diamond { 0%,71.5%{opacity:0} 72%{opacity:1;transform:scale(1.45)} 74.5%{opacity:1;transform:scale(1)} 81.5%{opacity:1} 82%{opacity:0} 100%{opacity:0} }
 @keyframes jaml-club    { 0%,81.5%{opacity:0} 82%{opacity:1;transform:scale(1.45)} 84.5%{opacity:1;transform:scale(1)} 99.5%{opacity:1} 100%{opacity:0} }
-.j-jaml-map-editor { width: 100%; height: 100%; display: grid; grid-template-rows: auto 1fr; }
+.j-jaml-map-editor { width: 100%; height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .j-jaml-map-editor__header { position: sticky; top: 0; z-index: 10; background: var(--j-darkest); padding: max(32px, env(safe-area-inset-top, 32px)) 0 8px 0; border-bottom: 2px solid var(--j-panel-edge); }
 .j-jaml-map-editor__title { text-align: center; margin-bottom: 12px; }
 .j-jaml-map-editor__scroll { overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; }

@@ -25,6 +25,12 @@ export interface JimboDockProps {
   panes: Record<string, JimboDockPane>;
   /** Filter / search / results / jamlyze keys for the pyramid default. */
   pyramid?: { filter: string; search: string; results: string; jamlyze: string };
+  /**
+   * Explicit starting layout — wins over the pyramid default. Pair with a
+   * `key` on the dock when the layout follows viewport size, so crossing the
+   * breakpoint rebuilds the tree instead of keeping the stale one.
+   */
+  defaultLayout?: DockNode;
   storageKey?: string;
   className?: string;
 }
@@ -32,19 +38,21 @@ export interface JimboDockProps {
 export function JimboDock({
   panes,
   pyramid,
+  defaultLayout,
   storageKey,
   className,
 }: JimboDockProps) {
   const keys = Object.keys(panes);
   const fallback =
-    pyramid && keys.includes(pyramid.filter)
+    defaultLayout ??
+    (pyramid && keys.includes(pyramid.filter)
       ? defaultPyramidDock(pyramid)
       : {
           type: "group" as const,
           id: "g-all",
           panes: keys,
           active: keys[0] ?? null,
-        };
+        });
 
   const [tree, setTree] = useState<DockNode>(() =>
     storageKey && typeof localStorage !== "undefined"

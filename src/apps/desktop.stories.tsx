@@ -28,5 +28,5 @@ export const AnteMap: Story = {
 
 export const SeedLabApp: Story = {
   name: "SeedLab",
-  render: () => <SeedLab />,
+  render: () => <SeedLab autoStart />,
 };

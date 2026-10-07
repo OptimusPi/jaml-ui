@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import bootsharp, {
   CancellationToken,
   Errors,
@@ -19,8 +19,14 @@ import { JimboStatusPill } from "../ui/JimboStatusPill.js";
 import { JimboText } from "../ui/jimboText.js";
 import { JamlIde } from "./JamlIde.js";
 import { Jamlyzer } from "./Jamlyzer.js";
+import { defaultPyramidDock, stackedDock } from "../ui/dockTree.js";
 
-export const STARTER_JAML = `must:
+export const STARTER_JAML = `name: Blueprint Faucet
+author: pifreak
+description: Blueprint in the ante 1 shop, Telescope voucher on the house.
+deck: Red
+stake: White
+must:
   - joker: Blueprint
     antes: [1]
 should:
@@ -77,6 +83,25 @@ const PROGRESS_INTERVAL_MS = 150n;
 
 export type SeedSearchPhase = "idle" | "booting" | "searching" | "done" | "cancelled" | "error";
 
+/*
+ * Below this width the pyramid's side-by-side entry row squeezes the IDE and
+ * the search controls into ~180px columns — the stacked layout reads instead.
+ */
+const WIDE_LAYOUT_QUERY = "(min-width: 720px)";
+
+function subscribeWideLayout(callback: () => void) {
+  const mql = window.matchMedia(WIDE_LAYOUT_QUERY);
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function useWideLayout(): boolean {
+  return useSyncExternalStore(
+    subscribeWideLayout,
+    () => window.matchMedia(WIDE_LAYOUT_QUERY).matches,
+    () => true,
+  );
+}
 export type SeedSearchStats = {
   seedsSearched: number;
   matchingSeeds: number;
@@ -263,10 +288,39 @@ export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: stri
   );
 }
 
-export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }) {
+export function SeedLab({
+  defaultJaml = STARTER_JAML,
+  autoStart = false,
+}: {
+  defaultJaml?: string;
+  /**
+   * Kick off the demo sweep on mount and pin the first hit. Stories use this
+   * so the lab opens alive — hits streaming into Results, Jamlyzer fed by the
+   * search rider — instead of on a wall of empty panes.
+   */
+  autoStart?: boolean;
+}) {
   const [jaml, setJaml] = useState(defaultJaml);
   const [selected, setSelected] = useState<string | null>(null);
   const { phase, running, error, hits, analyses, stats, start, stop } = useSeedSearch(jaml);
+  const wide = useWideLayout();
+
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStart || autoStarted.current) return;
+    autoStarted.current = true;
+    void start();
+  }, [autoStart, start]);
+
+  // Demo mode: pin the first hit so the Jamlyze pane lights up with it.
+  // Adjust-state-during-render (same pattern as the IDE's prop sync above) —
+  // an effect here would fire setState after paint and trip the lint rule.
+  const firstHit = hits[0]?.seed ?? null;
+  const [pinnedFirstHit, setPinnedFirstHit] = useState<string | null>(null);
+  if (autoStart && firstHit !== pinnedFirstHit) {
+    setPinnedFirstHit(firstHit);
+    if (selected === null && firstHit) setSelected(firstHit);
+  }
 
   /*
    * Jamlyzer resets its load state whenever this prop changes identity, and
@@ -296,7 +350,12 @@ export function SeedLab({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }
 
   return (
     <JimboDock
-      pyramid={{ filter: "filter", search: "search", results: "results", jamlyze: "jamlyze" }}
+      key={wide ? "wide" : "narrow"}
+      defaultLayout={
+        wide
+          ? defaultPyramidDock({ filter: "filter", search: "search", results: "results", jamlyze: "jamlyze" })
+          : stackedDock({ filter: "filter", search: "search", results: "results", jamlyze: "jamlyze" })
+      }
       panes={{
         filter: {
           label: "Filter",

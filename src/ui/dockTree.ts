@@ -57,6 +57,44 @@ export function defaultPyramidDock(keys: {
   };
 }
 
+/*
+ * Narrow screens: the pyramid's side-by-side entry row squeezes the IDE and the
+ * search controls into ~180px columns, which is the "cramped phone" look. A
+ * single column — filter, then search, then results — gives every pane the
+ * full width and lets the phone scroll the dock instead of squinting at it.
+ */
+export function stackedDock(keys: {
+  filter: string;
+  search: string;
+  results: string;
+  jamlyze: string;
+}): DockNode {
+  return {
+    type: "split",
+    id: "s-root",
+    dir: "column",
+    ratio: 0.5,
+    children: [
+      { type: "group", id: "g-filter", panes: [keys.filter], active: keys.filter },
+      {
+        type: "split",
+        id: "s-rest",
+        dir: "column",
+        ratio: 0.32,
+        children: [
+          { type: "group", id: "g-search", panes: [keys.search], active: keys.search },
+          {
+            type: "group",
+            id: "g-results",
+            panes: [keys.results, keys.jamlyze],
+            active: keys.results,
+          },
+        ],
+      },
+    ],
+  };
+}
+
 export function dockRemove(node: DockNode, key: string): DockNode {
   if (node.type === "group") {
     if (!node.panes.includes(key)) return node;
