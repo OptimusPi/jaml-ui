@@ -51,7 +51,6 @@
     "build": "vite build",
     "dev": "storybook dev",
     "dev:watch": "vite build --watch",
-    "jaml:mcp": "node scripts/jaml-mcp-server.mjs",
     "typecheck": "tsc --noEmit --pretty false",
     "vocab:check": "node --experimental-strip-types scripts/check-vocab-drift.mjs",
     "decode:check": "node scripts/check-decoder.mjs",
@@ -63,7 +62,8 @@
     "build-storybook": "pnpm run build && storybook build",
     "lint": "eslint .",
     "design:detect": "node .agents/skills/impeccable/scripts/detect.mjs --json src",
-    "design:doctor": "node .agents/skills/impeccable/scripts/doctor.mjs"
+    "design:doctor": "node .agents/skills/impeccable/scripts/doctor.mjs",
+    "gen:grammar": "node scripts/gen-engine-grammar.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -95,7 +95,6 @@
   "dependencies": {
     "@json-render/core": "^0.20.0",
     "@json-render/react": "^0.20.0",
-    "jaml-lang": "^3.14.2",
     "react-icons": "^5.7.0",
     "zod": "^4.6.5"
   },

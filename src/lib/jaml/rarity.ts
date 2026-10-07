@@ -1,5 +1,5 @@
 import { parseJamlDocument } from "./jaml.js";
-import { Vocab } from "jaml-lang";
+import { ENGINE_ENUMS } from "../../engineVocab.js";
 import { RARITY_DATA } from "./rarityData.generated.js";
 
 // Static rarity estimator for JAML seed filters.
@@ -124,20 +124,15 @@ function shopTypeShares(deck?: string): { joker: number; tarot: number; planet: 
 }
 
 // ---------------------------------------------------------------------------
-// Joker rarity membership — straight from jaml-lang's engine-generated vocab
-// (same source JokerPicker uses), so classification can never drift.
+// Joker rarity membership — straight from motely-wasm's enums (src/engineVocab.ts),
+// the same source JokerPicker uses, so classification can never drift.
 
 const normalizeKey = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]/g, "");
 const keySet = (names: readonly string[]): Set<string> => new Set(names.map(normalizeKey));
 
-const COMMON_KEYS = keySet(Vocab.Enums.MotelyJokerCommon);
-const UNCOMMON_KEYS = keySet(Vocab.Enums.MotelyJokerUncommon);
-const RARE_KEYS = keySet(Vocab.Enums.MotelyJokerRare);
-const LEGENDARY_KEYS = new Set(
-  Vocab.Enums.MotelyJoker.map(normalizeKey).filter(
-    (k) => !COMMON_KEYS.has(k) && !UNCOMMON_KEYS.has(k) && !RARE_KEYS.has(k),
-  ),
-);
+const UNCOMMON_KEYS = keySet(ENGINE_ENUMS.MotelyJokerUncommon);
+const RARE_KEYS = keySet(ENGINE_ENUMS.MotelyJokerRare);
+const LEGENDARY_KEYS = keySet(ENGINE_ENUMS.MotelyJokerLegendary);
 
 type JokerRarityName = "common" | "uncommon" | "rare" | "legendary";
 

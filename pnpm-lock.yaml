@@ -14,9 +14,6 @@ importers:
       '@json-render/react':
         specifier: ^0.20.0
         version: 0.20.0(react@19.3.0)(zod@4.6.5)
-      jaml-lang:
-        specifier: ^3.14.2
-        version: 3.14.2
       react-icons:
         specifier: ^5.7.0
         version: 5.7.0(react@19.3.0)
@@ -1766,9 +1763,6 @@ packages:
 
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
-
-  jaml-lang@3.14.2:
-    resolution: {integrity: sha512-n/gceNe8W8MRgLmWnqzvgRu5Yv+cqkouXpz3f5jnujgkgVXLkAdXahUsDUTOjXAF6fvUTTw8xzqoDF38AOT1IA==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -3806,8 +3800,6 @@ snapshots:
       is-inside-container: 1.0.0
 
   isexe@2.0.0: {}
-
-  jaml-lang@3.14.2: {}
 
   js-tokens@4.0.0: {}
 
