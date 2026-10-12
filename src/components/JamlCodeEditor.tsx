@@ -54,10 +54,7 @@ const balatroTheme = EditorView.theme(
     ".cm-activeLine": {
       backgroundColor: `${JimboColorOption.BLACK}20`,
     },
-    ".cm-selectionBackground": {
-      backgroundColor: `${JimboColorOption.WHITE}20 !important`,
-    },
-    "&.cm-focused .cm-selectionBackground": {
+    ".cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
       backgroundColor: `${JimboColorOption.WHITE}20`,
     },
     ".cm-cursor, .cm-dropCursor": {
