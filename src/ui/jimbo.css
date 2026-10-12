@@ -38,27 +38,6 @@
   color: var(--j-white);
 }
 
-/* Font Dance Animation */
-@keyframes j-font-dance {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  25% {
-    transform: translate(1px, -1px);
-  }
-
-  50% {
-    transform: translate(0, -2px);
-  }
-
-  75% {
-    transform: translate(-1px, -1px);
-  }
-}
-
 /* Sizes (snapped to m6x11 [16,32,48] and m6x11plus [18,36,54] pixel grids) */
 .j-text--display {
   font-size: 32px;
@@ -76,12 +55,6 @@
   letter-spacing: 0.04em;
 }
 
-.j-text--heading {
-  font-size: 16px;
-  letter-spacing: 0.08em;
-  line-height: 1.2;
-}
-
 .j-text--md {
   font-size: 16px;
 }
@@ -90,20 +63,8 @@
   font-size: 14px;
 }
 
-.j-text--body {
-  font-size: 13px;
-  letter-spacing: 0.05em;
-  line-height: 1.3;
-}
-
 .j-text--xs {
   font-size: 12px;
-}
-
-.j-text--label {
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  line-height: 1.15;
 }
 
 .j-text--micro {
@@ -213,168 +174,56 @@
 }
 
 /* ── Button ────────────────────────────────────────────────────────────── */
-/* Chunky 3D press: black underside via drop shadow,
-   press sinks the face +3px and collapses the shadow. */
 
 .j-btn {
-  /* Reserve room INSIDE the wrapper for the face's drop-shadow lip — so when
-     the parent (e.g. .j-app, .j-panel) uses overflow:hidden the lip doesn't
-     get clipped off, and the empty space below the face is part of the
-     button's own box, not the surrounding gap. */
   appearance: none;
-  -webkit-appearance: none;
   display: inline-block;
   position: relative;
   cursor: pointer;
-  border: none;
-  padding: 0 0 calc(var(--j-press-y) + 2px) 0;
-  background: transparent;
-  -webkit-user-select: none;
+  border: 0;
+  padding: 0 0 4px;
+  background: none;
   user-select: none;
 }
 
-/* Invisible stable hit target to prevent hover jitter when the child transforms */
-.j-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  z-index: 10;
-}
+.j-btn--full,
+.j-btn--full .j-btn__face { display: block; width: 100%; }
 
-.j-btn--full {
-  width: 100%;
-}
-
-/* A full-width button shows a full-width FACE (Balatro's own modal "Back"
-   convention). Without this the face is an inline span that shrink-wraps to
-   its label and floats centered in a stretched-but-invisible button box —
-   measured 74px of visible face inside a 320px hit target. */
-.j-btn--full .j-btn__face {
-  display: block;
-  width: 100%;
-}
-
-.j-btn--disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
+.j-btn--disabled { opacity: 0.55; cursor: not-allowed; }
 
 .j-btn__face {
-  position: relative;
-  /* Self-sufficient type: the face was tuned for the pixel font (see the
-     overflow note below), but nothing on .j-btn ever DECLARED it — the font
-     arrived by inheritance from .j-app/.j-page, so a button rendered outside
-     the shell (storybook, design previews, any bare page) silently fell back
-     to the UA default. Measured: Arial in both storybook and design previews. */
+  display: inline-block;
+  box-sizing: border-box;
   font-family: var(--j-font);
-  border-radius: var(--j-radius-md);
-  background: var(--j-btn-face-color, var(--j-orange));
+  line-height: 1;
   color: var(--j-white);
   text-align: center;
-  line-height: 1;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
-  /* Drop shadow at 30% opacity per design. Stacked solid offset, no blur. */
-  box-shadow: 0 calc(var(--j-press-y) + 2px) 0 0 rgba(0, 0, 0, 0.3);
-  transform: translate(0, 0);
-  /* Press position snaps — a real button doesn't glide into the pressed state,
-     it just is pressed. Only the color/shadow feedback eases. */
-  transition: box-shadow var(--j-press-speed) linear, background-color var(--j-press-speed) linear;
-  /* No overflow:hidden — it sheared pixel-font ascenders whenever padding ran
-     tight. Nothing inside the face bleeds, so clipping bought nothing. */
-  overflow: visible;
-  isolation: isolate;
+  background: var(--j-btn-face, var(--j-orange));
+  border-radius: var(--j-radius-md);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
 }
 
-.j-btn__face::before {
-  content: none;
-}
-
-.j-btn__face > * {
-  position: relative;
-  z-index: 1;
-}
+.j-btn:not(.j-btn--disabled):hover .j-btn__face { filter: brightness(1.1); }
 
 .j-btn[data-pressed="true"] .j-btn__face,
-.j-btn:active:not(:disabled):not(.j-btn--disabled) .j-btn__face {
-  background: var(--j-btn-shadow-color, var(--j-dark-orange));
-  transform: translateY(var(--j-press-y));
+.j-btn:active:not(.j-btn--disabled) .j-btn__face {
+  transform: translateY(4px);
   box-shadow: none;
+  filter: none;
 }
 
-.j-btn:not(.j-btn--disabled):hover .j-btn__face {
-  background: var(--j-btn-shadow-color, var(--j-dark-orange));
-}
+.j-btn--xs .j-btn__face { padding: 5px 10px;  font-size: 12px; }
+.j-btn--sm .j-btn__face { padding: 8px 16px;  font-size: 14px; }
+.j-btn--md .j-btn__face { padding: 12px 22px; font-size: 18px; min-height: 44px; }
+.j-btn--lg .j-btn__face { padding: 14px 24px; font-size: 22px; min-height: 52px; }
 
-/* Sizes. Text anchors to the TOP of the face: the smaller pad goes on top and
-   the slack sits under the glyphs, matching the in-game buttons where the label
-   hugs the top edge above the pressed lip. */
-.j-btn--xs .j-btn__face {
-  padding-top: 4px;
-  padding-right: 10px;
-  padding-bottom: 7px;
-  padding-left: 10px;
-  font-size: 12px;
-}
-
-.j-btn--sm .j-btn__face {
-  padding-top: 8px;
-  padding-right: 16px;
-  padding-bottom: 11px;
-  padding-left: 16px;
-  font-size: 14px;
-}
-
-.j-btn--md .j-btn__face {
-  padding-top: 10px;
-  padding-right: 22px;
-  padding-bottom: 14px;
-  padding-left: 22px;
-  font-size: 18px;
-  min-height: 44px;
-  box-sizing: border-box;
-}
-
-.j-btn--lg .j-btn__face {
-  padding-top: 12px;
-  padding-right: 24px;
-  padding-bottom: 16px;
-  padding-left: 24px;
-  font-size: 22px;
-  min-height: 52px;
-  box-sizing: border-box;
-}
-
-/* Tone colors — set via CSS custom properties */
-.j-btn--orange {
-  --j-btn-face-color: var(--j-orange);
-  --j-btn-shadow-color: var(--j-dark-orange);
-}
-
-.j-btn--red {
-  --j-btn-face-color: var(--j-red);
-  --j-btn-shadow-color: var(--j-dark-red);
-}
-
-.j-btn--blue {
-  --j-btn-face-color: var(--j-blue);
-  --j-btn-shadow-color: var(--j-dark-blue);
-}
-
-.j-btn--green {
-  --j-btn-face-color: var(--j-green);
-  --j-btn-shadow-color: var(--j-dark-green);
-}
-
-.j-btn--purple {
-  --j-btn-face-color: var(--j-purple);
-  --j-btn-shadow-color: var(--j-dark-purple);
-}
-
-.j-btn--grey {
-  --j-btn-face-color: var(--j-teal-grey);
-  --j-btn-shadow-color: var(--j-darkest);
-}
+.j-btn--orange { --j-btn-face: var(--j-orange); }
+.j-btn--red    { --j-btn-face: var(--j-red); }
+.j-btn--blue   { --j-btn-face: var(--j-blue); }
+.j-btn--green  { --j-btn-face: var(--j-green); }
+.j-btn--purple { --j-btn-face: var(--j-purple); }
+.j-btn--grey   { --j-btn-face: var(--j-teal-grey); }
 
 /* ── Badge ─────────────────────────────────────────────────────────────── */
 
@@ -662,9 +511,6 @@
 }
 
 /* Jimmolate: JS predicate editor for post-SIMD seed filtering. */
-.j-jimmolate { gap: var(--j-space-sm); }
-.j-jimmolate__sig { opacity: 0.6; }
-.j-jimmolate__input { width: 100%; font-family: var(--j-font-code); font-size: 11px; }
 
 /* Inline-edit: borderless transparent input that reads as text. */
 .j-inline-edit {
@@ -795,13 +641,6 @@
   .j-footer__line--wrap {
     font-size: 9px;
   }
-}
-
-/* ── Floating ─────────────────────────────────────────────────────────── */
-
-.j-floating {
-  position: absolute;
-  z-index: 20;
 }
 
 /* ── App Shell ────────────────────────────────────────────────────────── */
@@ -1514,7 +1353,6 @@
 @media (prefers-reduced-motion: reduce) {
   :root:not([data-j-motion="full"]) .j-panel::before,
   :root:not([data-j-motion="full"]) .j-inner-panel::before,
-  :root:not([data-j-motion="full"]) .j-btn__face::before,
   :root:not([data-j-motion="full"]) .j-footer__bar::before,
   :root:not([data-j-motion="full"]) .j-seed-input__shell::before {
     animation: none;
@@ -1522,7 +1360,6 @@
 }
 [data-j-motion="reduced"] .j-panel::before,
 [data-j-motion="reduced"] .j-inner-panel::before,
-[data-j-motion="reduced"] .j-btn__face::before,
 [data-j-motion="reduced"] .j-footer__bar::before,
 [data-j-motion="reduced"] .j-seed-input__shell::before {
   animation: none;
@@ -1817,42 +1654,6 @@
   text-align: center;
 }
 
-/* ── Font Dance Animation ─────────────────────────────────────────────── */
-
-@keyframes j-font-dance {
-  0% {
-    transform: translateY(0);
-  }
-
-  25% {
-    transform: translateY(-1px);
-  }
-
-  50% {
-    transform: translateY(0);
-  }
-
-  75% {
-    transform: translateY(1px);
-  }
-
-  100% {
-    transform: translateY(0);
-  }
-}
-
-.j-text--dance-container {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  white-space: pre-wrap;
-}
-
-.j-font-dance-char {
-  display: inline-block;
-  animation: j-font-dance 3s infinite ease-in-out;
-}
-
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -1860,15 +1661,6 @@
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-.j-juice-hover {
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.j-juice-hover:hover {
-  transform: translateY(-2px);
-  z-index: 5;
 }
 
 /* ── Layout primitives — JimboStack / JimboRow ─────────────────────────── */
@@ -1963,39 +1755,6 @@
   margin: 0 4px;
 }
 
-/* ── Marquee — SHOP sign with bulbs ──────────────────────────────────── */
-.j-marquee {
-  position: relative;
-  background: var(--j-red);
-  border-radius: var(--j-radius-md);
-  padding: 14px 24px 10px;
-  text-align: center;
-}
-.j-marquee__bulbs {
-  position: absolute;
-  inset: 4px;
-  border: 2px dotted var(--j-white);
-  border-radius: var(--j-radius-sm);
-  pointer-events: none;
-}
-.j-marquee__title {
-  font-family: var(--j-font);
-  font-size: 26px;
-  color: var(--j-gold);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-  letter-spacing: 0.06em;
-  position: relative;
-  z-index: 1;
-}
-.j-marquee__sub {
-  font-family: var(--j-font);
-  font-size: 10px;
-  color: var(--j-white);
-  margin-top: 2px;
-  position: relative;
-  z-index: 1;
-}
-
 /* ── Error Block ─────────────────────────────────────────────────────── */
 .j-error-block {
   background: var(--j-dark-red);
@@ -2040,102 +1799,9 @@
 .j-status-pill--error   { background: var(--j-red); }
 .j-status-pill--paused  { background: var(--j-grey); }
 
-/* ── Seed Row and Results Scroll (Curator V3) ────────────────────────── */
-.j-seed-row {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  background: var(--j-darkest);
-  border: 2px solid var(--j-inner-border);
-  border-radius: 4px;
-  cursor: pointer;
-  appearance: none;
-  color: inherit;
-  font-family: inherit;
-  text-align: left;
-  width: 100%;
-  animation: j-row-in 200ms ease-out;
-  transition: background 100ms ease, border-color 100ms ease;
-  text-decoration: none;
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
-}
-.j-seed-row:hover {
-  background: var(--j-dark-grey);
-  border-color: var(--j-border-silver);
-}
 @keyframes j-row-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-.j-seed-row__code {
-  font-family: var(--j-font-m6x11);
-  font-size: 16px;
-  color: #fff;
-  letter-spacing: 1.5px;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
-}
-.j-seed-row__score {
-  font-family: var(--j-font-m6x11);
-  font-size: 16px;
-  color: var(--j-gold);
-}
-
-/* ── Jamlyzer Stream Layout (Curator V3) ─────────────────────────────── */
-.j-stream {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 4px;
-  border-radius: 3px;
-  background: #0b1416;
-}
-.j-stream--hit {
-  background: rgba(228, 182, 67, 0.18);
-  box-shadow: inset 0 0 0 1px rgba(228, 182, 67, 0.4);
-}
-.j-stream__label {
-  font-family: var(--j-font-m6x11);
-  font-size: 8px;
-  color: #708386;
-  width: 56px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.j-stream__items {
-  display: grid;
-  gap: 3px;
-  grid-template-columns: repeat(auto-fill, max-content);
-}
-.j-stream-item {
-  background: #0b1416;
-  border: 1px solid var(--j-inner-border);
-  border-radius: 3px;
-  padding: 2px 5px;
-  font-family: var(--j-font-m6x11);
-  font-size: 8px;
-  color: var(--j-border-silver);
-  white-space: nowrap;
-}
-.j-stream-item--hit {
-  background: rgba(228, 182, 67, 0.25);
-  color: #fff;
-  border-color: var(--j-gold);
-  box-shadow: 0 0 4px rgba(228, 182, 67, 0.5);
-}
-.j-stream-item--must-hit {
-  background: rgba(0, 147, 255, 0.3);
-  border-color: #0093ff;
-}
-.j-stream-item--should-hit {
-  background: rgba(255, 76, 64, 0.3);
-  border-color: #ff4c40;
 }
 
 /* Mystery Slot Component */
