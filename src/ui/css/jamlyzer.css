@@ -1,0 +1,517 @@
+/* ── Jamlyzer ─────────────────────────────────────────────────────────── */
+
+.j-jamlyzer {
+  min-height: 0;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  justify-content: center;
+  gap: var(--j-space-sm);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--j-space-sm) 0;
+}
+
+.j-jamlyzer__panel {
+  width: 100%;
+}
+
+.j-jamlyzer__panel .j-panel__body {
+  padding: var(--j-space-sm) var(--j-space-md);
+}
+
+.j-jamlyzer__panel--hint .j-panel__body {
+  padding: var(--j-space-md) var(--j-space-sm);
+}
+
+.j-jamlyzer__details {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
+  margin-top: var(--j-space-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.j-jamlyzer-ante-head {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 16px;
+  align-items: start;
+}
+
+.j-jamlyzer-pack-line {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.j-ide__jamlyzer {
+  min-height: 0;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  padding: var(--j-space-sm) var(--j-space-md);
+  overflow: hidden;
+}
+
+/* ── Filter Browser ──────────────────────────────────────────────────── */
+
+/* Canonical clickable list row primitive — used by JimboListItem.
+   .j-filter-browser__item is kept as an alias for backward-compat with
+   consumers that style filter rows directly. */
+.j-list-item {
+  width: 100%;
+  border: none;
+  border-radius: var(--j-radius-md);
+  background: var(--j-darkest);
+  color: var(--j-white);
+  box-shadow: 0 var(--j-press-y) 0 var(--j-black);
+  cursor: pointer;
+  padding: var(--j-space-sm) var(--j-space-md);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--j-space-xs);
+  text-align: left;
+  font-family: var(--j-font);
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
+}
+
+.j-list-item[data-active="true"],
+.j-list-item:hover {
+  background: var(--j-dark-red);
+  box-shadow: 0 var(--j-press-y) 0 var(--j-darkest);
+}
+
+/* ── Pickers ─────────────────────────────────────────────────────────── */
+
+.j-picker {
+  max-height: 80vh;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+}
+
+.j-picker__section {
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid var(--j-panel-edge);
+}
+
+.j-picker__section-title {
+  display: block;
+  margin-bottom: var(--j-space-md);
+}
+
+.j-picker__search {
+  padding: 6px 10px 4px;
+}
+
+.j-picker__search-field {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  padding: 6px 10px;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
+}
+
+.j-picker__hint {
+  margin: 4px 10px 6px;
+  padding: 6px 10px;
+}
+
+.j-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--j-space-sm);
+  padding: 12px 8px 18px;
+  overflow-y: auto;
+  align-content: start;
+  scroll-padding: 12px 0 18px;
+  mask-image: linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 18px), transparent 100%);
+}
+
+.j-picker__grid--legendary {
+  padding: 0;
+  overflow: visible;
+  mask-image: none;
+}
+
+.j-picker__item {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border-radius: var(--j-radius-sm);
+  cursor: pointer;
+  position: relative;
+}
+
+.j-picker__item[data-muted="true"] {
+  opacity: 0.35;
+}
+
+.j-picker__item-label {
+  width: 100%;
+  color: var(--j-white);
+  text-align: center;
+  overflow-wrap: anywhere;
+  line-height: 1.05;
+}
+
+.j-picker__pair {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
+}
+
+.j-picker__empty {
+  grid-column: 1 / -1;
+  padding: var(--j-space-xl);
+  text-align: center;
+}
+
+/* ── Font Dance Animation ─────────────────────────────────────────────── */
+
+@keyframes j-font-dance {
+  0% {
+    transform: translateY(0);
+  }
+
+  25% {
+    transform: translateY(-1px);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
+
+  75% {
+    transform: translateY(1px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.j-text--dance-container {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  white-space: pre-wrap;
+}
+
+.j-font-dance-char {
+  display: inline-block;
+  animation: j-font-dance 3s infinite ease-in-out;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.j-juice-hover {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.j-juice-hover:hover {
+  transform: translateY(-2px);
+  z-index: 5;
+}
+
+/* ── Layout primitives — JimboStack / JimboRow ─────────────────────────── */
+/* Grid-based, not flex. The 320×568 canvas is fixed; we compose the surface
+   with named tracks rather than guess-and-checking flexbox flow.            */
+
+.j-stack { display: grid; grid-auto-flow: row; grid-auto-rows: max-content; }
+.j-row   { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; }
+
+.j-stack--gap-xs, .j-row--gap-xs { gap: var(--j-space-xs); }
+.j-stack--gap-sm, .j-row--gap-sm { gap: var(--j-space-sm); }
+.j-stack--gap-md, .j-row--gap-md { gap: var(--j-space-md); }
+.j-stack--gap-lg, .j-row--gap-lg { gap: var(--j-space-lg); }
+.j-stack--gap-xl, .j-row--gap-xl { gap: var(--j-space-xl); }
+
+.j-stack--align-start,   .j-row--align-start   { align-items: start; }
+.j-stack--align-center,  .j-row--align-center  { align-items: center; }
+.j-stack--align-end,     .j-row--align-end     { align-items: end; }
+.j-stack--align-stretch, .j-row--align-stretch { align-items: stretch; }
+
+.j-stack--justify-start,   .j-row--justify-start   { justify-content: start; }
+.j-stack--justify-center,  .j-row--justify-center  { justify-content: center; }
+.j-stack--justify-end,     .j-row--justify-end     { justify-content: end; }
+.j-stack--justify-between, .j-row--justify-between { justify-content: space-between; }
+
+/* Row-only: opt-in soft wrap. Stack is column-flow so wrap is meaningless. */
+.j-row--wrap { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, max-content); }
+
+/* ── Spinner — `< value >` cycler. Value is a display badge, NOT a button. ── */
+.j-spinner-wrap {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+.j-spinner__label {
+  text-align: center;
+  font-family: var(--j-font);
+  font-size: 12px;
+  color: var(--j-white);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.j-spinner {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+/* Value badge — flat red fill with dark-red south edge. No hover, no click. */
+.j-spinner__value {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  padding: 4px 14px 6px;
+  background: var(--j-red);
+  border: none;
+  box-shadow: 0 3px 0 var(--j-dark-red);
+  border-radius: var(--j-radius-md);
+  color: var(--j-white);
+  font-family: var(--j-font);
+  font-size: 14px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+  user-select: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── Layout helpers ───────────────────────────────────────────────────── */
+
+.j-row { display: grid; grid-auto-flow: column;
+  grid-auto-columns: max-content; align-items: center; }
+.j-row--md { gap: 8px; }
+
+.j-divider {
+  border: none;
+  height: 1px;
+  background: var(--j-border-south);
+  opacity: 0.4;
+  margin: 4px 0;
+}
+.j-divider--vert {
+  width: 1px;
+  height: auto;
+  align-self: stretch;
+  margin: 0 4px;
+}
+
+/* ── Error Block ─────────────────────────────────────────────────────── */
+.j-error-block {
+  background: var(--j-dark-red);
+  border: var(--j-panel-border-width) solid var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 12px;
+  color: var(--j-white);
+  font-family: var(--j-font);
+  font-size: 12px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.j-error-block__title {
+  font-size: 14px;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Status Pill (specialization of badge — short single-word state) ── */
+.j-status-pill {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--j-radius-pill);
+  font-family: var(--j-font);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--j-white);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.j-status-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.j-status-pill--idle    { background: var(--j-teal-grey); }
+.j-status-pill--running { background: var(--j-blue); }
+.j-status-pill--ok      { background: var(--j-green); }
+.j-status-pill--error   { background: var(--j-red); }
+.j-status-pill--paused  { background: var(--j-grey); }
+
+/* ── Seed Row and Results Scroll (Curator V3) ────────────────────────── */
+.j-seed-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-inner-border);
+  border-radius: 4px;
+  cursor: pointer;
+  appearance: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  animation: j-row-in 200ms ease-out;
+  transition: background 100ms ease, border-color 100ms ease;
+  text-decoration: none;
+  /* width:100% with horizontal padding: without this the box is its
+     padding wider than its container and overhangs. */
+  box-sizing: border-box;
+}
+.j-seed-row:hover {
+  background: var(--j-dark-grey);
+  border-color: var(--j-border-silver);
+}
+@keyframes j-row-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.j-seed-row__code {
+  font-family: var(--j-font-m6x11);
+  font-size: 16px;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.j-seed-row__score {
+  font-family: var(--j-font-m6x11);
+  font-size: 16px;
+  color: var(--j-gold);
+}
+
+/* Mystery Slot Component */
+.j-mystery-slot {
+  position: relative;
+  width: var(--j-mystery-slot-w);
+  height: var(--j-mystery-slot-h);
+  cursor: var(--j-mystery-slot-cursor, default);
+}
+
+.j-mystery-slot__card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: var(--j-mystery-slot-border);
+  background: var(--j-mystery-slot-bg);
+  transform: var(--j-mystery-slot-transform);
+  transform-style: preserve-3d;
+  transition: var(--j-mystery-slot-transition);
+  box-shadow: var(--j-mystery-slot-shadow);
+  z-index: var(--j-mystery-slot-z-index, 1);
+  pointer-events: none;
+}
+
+.j-mystery-slot__clear {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff4c40; /* C.RED */
+  color: #fff; /* C.WHITE */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-family: var(--j-font);
+  cursor: pointer;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  transform: translateZ(10px);
+  pointer-events: auto; /* let it be clickable */
+}
+
+.j-mystery-slot__label {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%) translateZ(10px);
+  font-family: var(--j-font);
+  font-size: 10px;
+  color: var(--j-mystery-slot-label-color);
+  white-space: nowrap;
+  letter-spacing: 1px;
+}
+
+.j-mystery-slot img,
+.j-mystery-slot canvas {
+  transition: opacity 200ms, filter 200ms;
+}
+
+/* ── Jammy mascot motion (class names used by json-render mascot) ───────── */
+
+@keyframes jammy-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(1deg); }
+}
+
+@keyframes jammy-happy {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-16px) scale(1.08); }
+  60% { transform: translateY(4px) scale(0.96); }
+}
+
+@keyframes jammy-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px) rotate(-3deg); }
+  40% { transform: translateX(4px) rotate(3deg); }
+  60% { transform: translateX(-3px) rotate(-2deg); }
+  80% { transform: translateX(3px) rotate(2deg); }
+}
+
+.jammy-idle { animation: jammy-idle 2.5s ease-in-out infinite; }
+.jammy-happy { animation: jammy-happy 0.6s ease-out; }
+.jammy-shake { animation: jammy-shake 0.4s ease-in-out; }
+
+.j-mystery-slot__sprite--empty {
+  opacity: 0.5;
+  filter: saturate(0.3);
+}

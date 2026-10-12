@@ -69,14 +69,4 @@
   --j-panel-border-width: 3px;
   --j-panel-border-width-heavy: 6px;
   --j-surface-shadow-depth: 4px;
-  --j-transition: 0.15s ease-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root:not([data-j-motion="full"]) {
-    --j-transition: 1ms linear;
-  }
-}
-[data-j-motion="reduced"] {
-  --j-transition: 1ms linear;
 }

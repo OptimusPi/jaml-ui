@@ -1,0 +1,330 @@
+/* ── Badge ─────────────────────────────────────────────────────────────── */
+
+.j-badge {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  border-radius: var(--j-radius-sm);
+  font-family: var(--j-font);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+  border: none;
+  box-shadow: 0 2px 0 0 var(--j-badge-south, rgba(0, 0, 0, 0.4));
+}
+
+.j-badge--sm {
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.j-badge--md {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Badge tones — chips with dark-color-variant south edge */
+.j-badge--dark {
+  background: var(--j-darkest);
+  color: var(--j-white);
+  --j-badge-south: var(--j-black);
+}
+
+.j-badge--blue {
+  background: var(--j-blue);
+  color: var(--j-white);
+  --j-badge-south: var(--j-dark-blue);
+}
+
+.j-badge--red {
+  background: var(--j-red);
+  color: var(--j-white);
+  --j-badge-south: var(--j-dark-red);
+}
+
+.j-badge--green {
+  background: var(--j-green);
+  color: var(--j-white);
+  --j-badge-south: var(--j-dark-green);
+}
+
+.j-badge--orange {
+  background: var(--j-orange);
+  color: var(--j-white);
+  --j-badge-south: var(--j-dark-orange);
+}
+
+.j-badge--purple {
+  background: var(--j-purple);
+  color: var(--j-white);
+  --j-badge-south: var(--j-dark-purple);
+}
+
+.j-badge--grey {
+  background: var(--j-teal-grey);
+  color: var(--j-white);
+  --j-badge-south: var(--j-darkest);
+}
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+
+.j-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: var(--j-space-sm);
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  /* No overflow clipping. Setting overflow-x:auto forces overflow-y to clip
+     too (CSS spec), which decapitates the bouncing arrow at its apex. The
+     tab row is sized to fit 320px, so horizontal scroll is not needed. */
+  overflow: visible;
+  /* Headroom for the arrow's apex (-6px translate) plus a hair of cushion. */
+  padding-top: 10px;
+}
+
+.j-tab {
+  /* Stack: indicator arrow on top, JimboButton below. The button does its
+     own styling — this wrapper just positions the indicator above it. */
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: center;
+  position: relative;
+  gap: 2px;
+}
+
+.j-tab__indicator {
+  height: 10px;
+  margin-bottom: 3px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  justify-content: center;
+  align-items: end;
+}
+
+.j-tab__indicator svg {
+  fill: var(--j-red);
+  display: block;
+}
+
+.j-tab__indicator[data-active="true"] {
+  /* Arrow rests on top of the tab for ~30% of the cycle, then pops up and
+     falls back. Per-keyframe easing gives it gravity (fast off the rest,
+     slow at apex, fast on the fall) instead of a sleepy linear sine. */
+  animation: jimbo-tab-indicator 0.55s infinite;
+}
+
+.j-tab__indicator[data-active="false"] {
+  visibility: hidden;
+}
+
+/* Tabs render real JimboButtons (.j-btn--sm .j-btn--red) — no bespoke tab
+   button. The selected tab is marked only by the bouncing arrow above it;
+   the buttons themselves hold still so the row reads as a fixed baseline. */
+
+@keyframes jimbo-tab-indicator {
+
+  /* Rest on top of the tab for the first ~30% of the cycle. */
+  0%,
+  30% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.3, 1);
+  }
+
+  /* Apex — pops up fast, decelerates into the top. */
+  65% {
+    transform: translateY(-6px);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.4);
+  }
+
+  /* Fall back down to rest. */
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ── Layout Utilities ─────────────────────────────────────────────────── */
+
+.j-text-center { text-align: center; }
+
+/* ── Flank Nav ────────────────────────────────────────────────────────── */
+
+.j-flank {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--j-space-md);
+  width: 100%;
+  position: relative;
+}
+
+.j-flank__content {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+}
+
+.j-flank__btn {
+  /* The flanking buttons span the FULL height of the content beside them —
+     no top/bottom margin. align-items:stretch on .j-flank then makes them
+     match content height exactly. */
+  align-self: stretch;
+  width: 40px;
+  border: none;
+  border-radius: var(--j-radius-lg);
+  cursor: pointer;
+  background-color: var(--j-red);
+  color: var(--j-white);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 var(--j-press-y) 0 0 var(--j-dark-red);
+}
+
+.j-flank__btn[data-pressed="true"] {
+  transform: translateY(var(--j-press-y));
+  box-shadow: none;
+}
+
+.j-flank__btn:disabled {
+  background-color: var(--j-dark-red);
+  cursor: default;
+  box-shadow: none;
+}
+
+/* ── Code Block ───────────────────────────────────────────────────────── */
+
+/* Host element for an editor view mounted by JS (CodeMirror). The view paints
+   its own chrome; this only fixes the background and the height floor so the
+   surface doesn't collapse before the view attaches. */
+.j-code-surface {
+  width: 100%;
+  min-height: var(--j-code-surface-min-height, 320px);
+  background: var(--j-darkest);
+}
+
+/* ── Modal ────────────────────────────────────────────────────────────── */
+
+@keyframes jimbo-modal-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.j-modal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  padding: var(--j-space-md);
+  background: rgba(8, 18, 22, 0.55);
+}
+
+.j-modal {
+  width: 100%;
+  max-width: 345px;
+  max-height: calc(100% - 32px);
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  overflow: hidden;
+  border-radius: var(--j-radius-lg);
+  animation: jimbo-modal-in 140ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.j-modal .j-panel__body {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.j-modal__title {
+  margin: 0 0 var(--j-space-sm);
+  font-family: var(--j-font);
+  font-size: var(--j-text-lg);
+  color: var(--j-white);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.j-text-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--j-darkest);
+  color: var(--j-white);
+  border: 1px solid var(--j-panel-edge);
+  border-radius: var(--j-radius-sm);
+  font-size: 13px;
+  font-family: var(--j-font);
+  letter-spacing: 1px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.j-text-input[aria-invalid="true"],
+.j-text-input[data-invalid="true"] {
+  border-color: var(--j-red);
+}
+
+/* Inline-edit: borderless transparent input that reads as text. */
+.j-inline-edit {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--j-font);
+  letter-spacing: 1px;
+  line-height: 1.35;
+  outline: none;
+}
+.j-inline-edit::placeholder {
+  color: var(--j-grey);
+  opacity: 0.7;
+}
+.j-inline-edit:focus-visible {
+  outline: 2px solid var(--j-gold);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+.j-inline-edit--xs { font-size: 11px; }
+.j-inline-edit--sm { font-size: 12px; }
+.j-inline-edit--md { font-size: 14px; }
+.j-inline-edit--lg { font-size: 18px; }
+.j-inline-edit--white { color: var(--j-white); }
+.j-inline-edit--gold  { color: var(--j-gold); }
+.j-inline-edit--grey  { color: var(--j-grey); }
+.j-inline-edit--dim   { opacity: 0.8; }
+
+/* JamlIdeVisual: filter metadata header (name / byline / description). */
+.j-jaml-ide-visual__top-matter {
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+.j-jaml-ide-visual__byline {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 8px;
+  align-items: center;
+}
+.j-jaml-ide-visual__by-label {
+  font-family: var(--j-font);
+  font-size: 10px;
+  color: var(--j-white);
+}
