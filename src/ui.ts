@@ -123,5 +123,6 @@ export { JimboFlankNav, type JimboFlankNavProps } from "./ui/jimboFlankNav.js";
 export { JimboTabs, type JimboTabsProps, type JimboTabDef } from "./ui/jimboTabs.js";
 export { JimboSprite, type JimboSpriteProps } from "./ui/sprites.js";
 export { JimboSwipeDeck, type JimboSwipeDeckProps } from "./ui/JimboSwipeDeck.js";
+export { JimboPager, type JimboPagerProps } from "./ui/JimboPager.js";
 export { JimboShopBelt, type JimboShopBeltProps } from "./ui/JimboShopBelt.js";
 export { type JimboTone } from "./ui/panel.js";
