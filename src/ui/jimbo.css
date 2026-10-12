@@ -16,7 +16,6 @@
   display: none !important;
 }
 
-
 /* ── Jimbo context roots ──────────────────────────────────────────────── */
 /* Every container that says "you are inside the Jimbo world" declares the
    pixel font at zero specificity, so raw text dropped into a panel/picker
@@ -39,26 +38,7 @@
   color: var(--j-white);
 }
 
-.j-text--no-shadow {
-  text-shadow: none;
-}
-
-.j-text--upper {
-
-  letter-spacing: 0.08em;
-}
-
 /* Font Dance Animation */
-.j-text--dance-container {
-  display: inline-block;
-  white-space: pre-wrap;
-}
-
-.j-font-dance-char {
-  display: inline-block;
-  animation: j-font-dance 1.5s infinite steps(2, end);
-}
-
 @keyframes j-font-dance {
 
   0%,
@@ -133,16 +113,11 @@
 }
 
 /* Tones */
-.j-text--default {
-  color: var(--j-white);
-}
 
-.j-text--mult,
 .j-text--red {
   color: var(--j-red);
 }
 
-.j-text--chips,
 .j-text--blue {
   color: var(--j-blue);
 }
@@ -170,7 +145,6 @@
 .j-text--white {
   color: var(--j-white);
 }
-
 
 /* ── Panel ─────────────────────────────────────────────────────────────── */
 
@@ -228,22 +202,6 @@
   gap: var(--j-space-md);
 }
 
-.j-panel__back {
-  margin-top: var(--j-space-md);
-  padding-top: var(--j-space-sm);
-  position: relative;
-  z-index: 1;
-}
-
-.j-back-btn .j-btn__face {
-  padding-top: 4px;
-  padding-bottom: 6px;
-}
-
-.j-back-btn-wrap {
-  padding: 0;
-}
-
 .j-inner-panel {
   /* Subtle sunken inset on the outer panel face — NOT another framed modal.
      Balatro never nests modal-style frames; content sections sit flat or
@@ -253,7 +211,6 @@
   border-radius: var(--j-radius-md);
   padding: var(--j-space-md);
 }
-
 
 /* ── Button ────────────────────────────────────────────────────────────── */
 /* Chunky 3D press: black underside via drop shadow,
@@ -419,7 +376,6 @@
   --j-btn-shadow-color: var(--j-darkest);
 }
 
-
 /* ── Badge ─────────────────────────────────────────────────────────────── */
 
 .j-badge {
@@ -489,7 +445,6 @@
   color: var(--j-white);
   --j-badge-south: var(--j-darkest);
 }
-
 
 /* ── Tabs ──────────────────────────────────────────────────────────────── */
 
@@ -571,243 +526,9 @@
   }
 }
 
-@keyframes j-surface-sheen {
-
-  0%,
-  100% {
-    background-position: 0% 0%, 10% 20%;
-    opacity: 0.52;
-  }
-
-  50% {
-    background-position: 100% 100%, 88% 74%;
-    opacity: 0.8;
-  }
-}
-
-@keyframes j-idle-bob {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-1px);
-  }
-}
-
-/* Vertical tabs */
-.j-vtabs {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-}
-
-.j-vtab {
-  border: none;
-  cursor: pointer;
-  border-radius: 8px 0 0 8px;
-  padding: 16px 8px;
-  background-color: transparent;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  transition: none;
-}
-
-.j-vtab[data-active="true"] {
-  background-color: var(--j-gold, #e4b643);
-  color: var(--j-black, #000000);
-}
-
-
-/* ── Toggle List ──────────────────────────────────────────────────────── */
-
-.j-toggle-list {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-}
-
-.j-toggle-list__title {
-  font-family: var(--j-font);
-  font-size: 12px;
-  color: var(--j-grey);
-
-  letter-spacing: 0.04em;
-  margin-bottom: var(--j-space-sm);
-}
-
-.j-toggle-item {
-  /* Plain seated row inside the outer panel. No row backdrop — items rest
-     directly on the panel surface; the checkbox alone carries the visual
-     weight. Label fills, checkbox pinned right so columns align. */
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--j-space-md);
-  padding: 4px 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: var(--j-font);
-  color: var(--j-white);
-  text-align: left;
-}
-
-.j-toggle-item__label {
-  min-width: 0;
-}
-
-.j-toggle-item[data-variant="stacked"] {
-  justify-content: center;
-  gap: var(--j-space-xs);
-  background: transparent;
-  border: none;
-  padding: 4px 0;
-}
-
-.j-toggle-item[data-variant="stacked"] .j-toggle-item__label {
-  text-align: center;
-
-  letter-spacing: 0.04em;
-  text-align: left;
-  justify-content: flex-start;
-}
-
-.j-toggle-check {
-  /* Balatro checkbox: white outer square frame, dark inner well that fills
-     red when on with a white checkmark on top. The white outline IS the
-     box; the inner well sits inset from it so it reads as a chunky frame
-     around the empty/checked state. */
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  background: var(--j-white);
-  padding: 2px;
-  box-sizing: border-box;
-  position: relative;
-}
-
-.j-toggle-check::before {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  background: var(--j-teal-grey);
-  border-radius: 3px;
-}
-
-.j-toggle-check[data-on="true"]::before {
-  background: var(--j-red);
-}
-
-.j-toggle-check[data-on="true"]::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><polyline points='3,9 7,13 13,4' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 92% 92% no-repeat;
-          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><polyline points='3,9 7,13 13,4' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 92% 92% no-repeat;
-  background: var(--j-white);
-}
-
-
-/* ── Tooltip ──────────────────────────────────────────────────────────── */
-
-.j-tooltip {
-  position: fixed;
-  max-width: 280px;
-  padding: 6px 10px;
-  border-radius: var(--j-radius-md);
-  background: var(--j-darkest);
-  border: var(--j-panel-border-width) solid var(--j-border-silver);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
-  color: var(--j-white);
-  pointer-events: none;
-  z-index: 9999;
-  transition: opacity 120ms ease;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  align-items: center;
-  gap: 4px;
-}
-
-.j-tooltip--dark { background: var(--j-darkest); color: var(--j-white); }
-
-.j-tooltip--card {
-  background: var(--j-white);
-  color: var(--j-darkest);
-  border-color: var(--j-border-silver);
-  text-shadow: none;
-}
-
-.j-tooltip__body {
-  width: 100%;
-  text-align: center;
-  font-family: var(--j-font);
-}
-
-.j-tooltip--card .j-tooltip__body { color: var(--j-darkest); }
-
-.j-tooltip__badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: var(--j-radius-sm);
-  font-family: var(--j-font);
-  font-size: 11px;
-  color: var(--j-white);
-  text-shadow: var(--j-text-shadow);
-  letter-spacing: 1px;
-  margin-bottom: -2px;
-}
-
-
-
 /* ── Layout Utilities ─────────────────────────────────────────────────── */
 
-.j-flex {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-}
-
-.j-flex-col {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-}
-
-.j-items-center {
-  align-items: center;
-}
-
-.j-items-start {
-  align-items: flex-start;
-}
-
-.j-justify-center {
-  justify-content: center;
-}
-
-.j-justify-between {
-  justify-content: space-between;
-}
-
-.j-gap-xs { gap: var(--j-space-xs); }
-.j-gap-sm { gap: var(--j-space-sm); }
-.j-gap-md { gap: var(--j-space-md); }
-.j-gap-lg { gap: var(--j-space-lg); }
-
-.j-w-full { width: 100%; }
-.j-h-full { height: 100%; }
-
 .j-text-center { text-align: center; }
-
 
 /* ── Flank Nav ────────────────────────────────────────────────────────── */
 
@@ -864,130 +585,7 @@
   box-shadow: none;
 }
 
-
-/* ── Copy Row ─────────────────────────────────────────────────────────── */
-
-.j-copy-row {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-}
-
-.j-copy-row__field {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: var(--j-space-md);
-}
-
-.j-copy-row__value {
-  padding: 6px 10px;
-  background: var(--j-darkest);
-  border: var(--j-panel-border-width) solid var(--j-panel-edge);
-  border-radius: var(--j-radius-sm);
-  word-break: break-all;
-}
-
-.j-copy-row__btn {
-  font-family: var(--j-font);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  border-radius: var(--j-radius-sm);
-  padding: 4px 12px;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
-}
-
-.j-copy-row__btn[data-copied="false"] {
-  /* Red, not gold — there are no gold buttons in Balatro. */
-  color: var(--j-white);
-  background: var(--j-red);
-  border: none;
-}
-
-.j-copy-row__btn[data-copied="true"] {
-  color: var(--j-green-text);
-  background: rgba(53, 189, 134, 0.12);
-  border: 1px solid var(--j-green-text);
-}
-
-
 /* ── Code Block ───────────────────────────────────────────────────────── */
-
-.j-code-block {
-  background-color: var(--j-darkest);
-  border: var(--j-panel-border-width) solid var(--j-panel-edge);
-  border-radius: var(--j-radius-lg);
-  box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-}
-
-.j-code-block__header {
-  padding: 8px 12px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--j-inner-border);
-}
-
-.j-code-block__meta {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: 8px;
-  align-items: center;
-}
-
-.j-code-block__filename {
-  /* JimboText handles the size + grey color now — this is just letter-spacing
-     and a small alignment hint. */
-  letter-spacing: 0.04em;
-}
-
-.j-code-block__lang {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.4);
-}
-
-/* Legacy hand-rolled copy button styles — no longer used; JimboCodeBlock
-   now renders a JimboIconButton. Left as a dead rule until a sweep removes
-   it (kept so any leftover usages don't break visually overnight). */
-.j-code-block__copy--legacy {
-  padding: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-}
-
-.j-code-block__copy[data-copied="false"] {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.j-code-block__copy[data-copied="true"] {
-  color: #4ade80;
-}
-
-.j-code-block__pre {
-  padding: 12px;
-  overflow-x: auto;
-  font-family: var(--j-font-code);
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: #f6f0d5;
-  margin: 0;
-}
 
 /* Host element for an editor view mounted by JS (CodeMirror). The view paints
    its own chrome; this only fixes the background and the height floor so the
@@ -996,101 +594,6 @@
   width: 100%;
   min-height: var(--j-code-surface-min-height, 320px);
   background: var(--j-darkest);
-}
-
-
-/* ── Filter Bar ───────────────────────────────────────────────────────── */
-
-.j-filter-bar {
-  display: grid;
-  grid-auto-flow: row;
-  gap: 24px;
-  padding: var(--j-space-xl);
-  background-color: var(--j-dark-grey);
-  border: 4px solid var(--j-border-silver);
-  box-shadow: 0 3px 0 0 var(--j-border-south);
-  border-radius: var(--j-radius-lg);
-  position: relative;
-  grid-template-columns: repeat(auto-fill, max-content);
-}
-
-.j-filter-bar__field {
-  min-width: 200px;
-  position: relative;
-  margin-top: 10px;
-}
-
-.j-filter-bar__pill {
-  position: absolute;
-  top: -14px;
-  left: 16px;
-  background-color: var(--j-red);
-  border: 2px solid var(--j-dark-red);
-  border-radius: var(--j-radius-md);
-  padding: 4px 12px;
-  z-index: 2;
-}
-
-.j-filter-bar__input {
-  width: 100%;
-  padding: 14px 16px 14px 48px;
-  background-color: var(--j-darkest);
-  border: none;
-  box-shadow: 0 4px 0 var(--j-panel-edge);
-  border-radius: var(--j-radius-lg);
-  color: var(--j-white);
-  font-family: var(--j-font);
-  font-size: 20px;
-  letter-spacing: 0.08em;
-  outline: none;
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
-}
-
-.j-filter-bar__search-icon {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 48px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  color: var(--j-blue);
-  z-index: 1;
-}
-
-.j-filter-bar__select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: var(--j-orange);
-  color: var(--j-white);
-  border: none;
-  box-shadow: 0 4px 0 var(--j-dark-orange);
-  border-radius: var(--j-radius-lg);
-  cursor: pointer;
-  font-family: var(--j-font);
-  font-size: 18px;
-  letter-spacing: 0.08em;
-  padding: 14px 48px 14px 24px;
-  min-width: 200px;
-  text-align: center;
-  outline: none;
-}
-
-.j-filter-bar__sort-icon {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: var(--j-white);
-  opacity: 0.85;
 }
 
 /* ── Modal ────────────────────────────────────────────────────────────── */
@@ -1139,11 +642,6 @@
   letter-spacing: 0.5px;
 }
 
-.j-input-modal__message {
-  display: block;
-  margin-bottom: var(--j-space-md);
-}
-
 .j-text-input {
   width: 100%;
   padding: 8px 10px;
@@ -1161,11 +659,6 @@
 .j-text-input[aria-invalid="true"],
 .j-text-input[data-invalid="true"] {
   border-color: var(--j-red);
-}
-
-.j-text-input--code {
-  font-family: var(--j-font-code);
-  font-size: 11px;
 }
 
 /* Jimmolate: JS predicate editor for post-SIMD seed filtering. */
@@ -1222,21 +715,6 @@
   color: var(--j-white);
 }
 
-.j-input-modal__error {
-  display: block;
-  margin-top: 6px;
-}
-
-.j-input-modal__actions {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  justify-content: flex-end;
-  gap: var(--j-space-md);
-  margin-top: 14px;
-}
-
-
 /* ── Footer ───────────────────────────────────────────────────────────── */
 
 .j-footer {
@@ -1289,20 +767,14 @@
   gap: 0.25rem;
 }
 
-.j-footer__sep {
-  color: var(--j-grey);
-}
-
 /* JimboLink — canonical external link styling. j-footer__link kept as an alias
    for back-compat; new uses should be `j-link` via the JimboLink primitive. */
-.j-link,
-.j-footer__link {
+.j-link {
   color: var(--j-gold);
   text-decoration: none;
 }
 
-.j-link:hover,
-.j-footer__link:hover {
+.j-link:hover {
   text-decoration: underline;
 }
 
@@ -1325,113 +797,11 @@
   }
 }
 
-
 /* ── Floating ─────────────────────────────────────────────────────────── */
 
 .j-floating {
   position: absolute;
   z-index: 20;
-}
-
-
-/* ── Background (canvas is styled inline because it's fixed fullscreen) ── */
-
-
-/* ── GlowRing ─────────────────────────────────────────────────────────── */
-
-.j-glow--must {
-  box-shadow: 0 0 0 2px var(--j-blue), 0 0 10px var(--j-blue);
-  animation: j-glow-pulse 1.6s ease-in-out infinite;
-}
-
-.j-glow--should {
-  box-shadow: 0 0 0 2px var(--j-gold), 0 0 10px var(--j-gold);
-  animation: j-glow-pulse 1.6s ease-in-out infinite;
-}
-
-.j-glow--match {
-  box-shadow: 0 0 0 2px var(--j-green-text), 0 0 18px var(--j-green-text), 0 0 36px var(--j-green-text);
-  animation: j-glow-pulse 1.6s ease-in-out infinite;
-}
-
-@keyframes j-glow-pulse {
-
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
-
-/* ── Utility (extras not in the Layout Utilities block) ───────────────── */
-
-.j-gap-xl { gap: var(--j-space-xl); }
-.j-mt-sm { margin-top: var(--j-space-sm); }
-.j-min-w-0 { min-width: 0; }
-.j-overflow-hidden { overflow: hidden; }
-.j-overflow-auto { overflow: auto; }
-.j-relative { position: relative; }
-
-/* Tone border utilities */
-.j-border--red {
-  border-color: var(--j-red);
-}
-
-.j-border--blue {
-  border-color: var(--j-blue);
-}
-
-.j-border--green {
-  border-color: var(--j-green);
-}
-
-.j-border--gold {
-  border-color: var(--j-gold);
-}
-
-.j-border--orange {
-  border-color: var(--j-orange);
-}
-
-.j-border--purple {
-  border-color: var(--j-purple);
-}
-
-/* Tone background utilities */
-.j-bg--red {
-  background-color: var(--j-red);
-}
-
-.j-bg--blue {
-  background-color: var(--j-blue);
-}
-
-.j-bg--green {
-  background-color: var(--j-green);
-}
-
-.j-bg--gold {
-  background-color: var(--j-gold);
-}
-
-.j-bg--orange {
-  background-color: var(--j-orange);
-}
-
-.j-bg--purple {
-  background-color: var(--j-purple);
-}
-
-.j-bg--dark-grey {
-  background-color: var(--j-dark-grey);
-}
-
-.j-bg--darkest {
-  background-color: var(--j-darkest);
 }
 
 /* ── App Shell ────────────────────────────────────────────────────────── */
@@ -1585,9 +955,9 @@
 
 .j-section-header {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
+  width: 100%;
   gap: var(--j-space-md);
   margin-bottom: var(--j-space-md);
 }
@@ -1671,351 +1041,6 @@
   box-sizing: border-box;
 }
 
-.j-page__row {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-lg);
-}
-
-@media (min-width: 720px) {
-  .j-page__row {
-    align-items: stretch;
-  }
-
-  .j-page__row > .j-panel {
-    min-width: 0;
-  }
-}
-
-/* Code / copy row inside a panel */
-.j-copy-row {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: var(--j-space-sm);
-  min-width: 0;
-}
-
-.j-copy-row__code {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--j-font-code);
-  font-size: 12px;
-  color: var(--j-white);
-  letter-spacing: 0;
-}
-
-
-/* ── Stepper ─────────────────────────────────────────────────────────── */
-/* < value > control matching Balatro settings rows. */
-
-.j-spinner-wrap {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  align-items: center;
-  gap: var(--j-space-xs);
-}
-
-.j-spinner__label {
-  text-align: center;
-}
-
-.j-spinner {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: stretch;
-  gap: var(--j-space-sm);
-}
-
-.j-spinner__value {
-  min-width: 96px;
-  padding: 4px 12px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  background: var(--j-red);
-  border-radius: var(--j-radius-md);
-  box-shadow: 0 3px 0 var(--j-dark-red);
-}
-
-
-/* ── Stepper (page-dots) ─────────────────────────────────────────────── */
-/* Row of small dots. Active page = filled white circle; other pages = a
-   dim grey circle. Carousel page indicator pattern. */
-
-.j-stepper {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.j-stepper__hit {
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-}
-
-.j-stepper__dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--j-teal-grey);
-}
-
-.j-stepper__dot[data-active="true"] {
-  background: var(--j-white);
-}
-
-
-/* ── Slider ──────────────────────────────────────────────────────────── */
-
-.j-slider-wrap {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  align-items: stretch;
-  gap: var(--j-space-xs);
-  width: 100%;
-}
-
-.j-slider__label {
-  text-align: center;
-}
-
-/* Slider — track is the dark inset surface, fill is bright red (filled
-   portion), and the JimboValueBadge sits as the thumb at the fill boundary.
-   Matches Balatro audio settings (IMG_3679): red fill on dark trough, red
-   value pill riding the boundary. */
-.j-slider {
-  position: relative;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  height: 28px;
-  /* Reserve half-badge width on each side so the thumb doesn't clip when
-     value is at min or max. */
-  padding: 0 20px;
-}
-
-.j-slider__track {
-  position: relative;
-  height: 14px;
-  background: var(--j-surface-inset);
-  border-radius: var(--j-radius-pill);
-  overflow: hidden;
-}
-
-.j-slider__fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: var(--j-red);
-  border-radius: var(--j-radius-pill) 0 0 var(--j-radius-pill);
-}
-
-.j-slider__input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  margin: 0;
-  cursor: pointer;
-}
-
-/* Absolute thumb wrapper positioned at the fill boundary. The badge inside
-   centers via translateX(-50%) so the pill straddles the boundary line. */
-.j-slider__thumb {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: auto;
-}
-
-
-/* ── Value Badge ─────────────────────────────────────────────────────── */
-/* Red pill displaying a numeric value. Click to edit inline. */
-
-.j-value-badge {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  padding: 2px 8px;
-  background: var(--j-red);
-  color: var(--j-white);
-  border: none;
-  border-radius: var(--j-radius-pill);
-  cursor: pointer;
-  font-family: var(--j-font);
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.j-value-badge--static {
-  cursor: default;
-}
-
-.j-value-badge--editing {
-  padding: 0;
-}
-
-.j-value-badge__input {
-  width: 56px;
-  padding: 2px 8px;
-  background: var(--j-red);
-  color: var(--j-white);
-  border: none;
-  border-radius: var(--j-radius-pill);
-  font-family: var(--j-font);
-  font-size: 12px;
-  text-align: center;
-  outline: none;
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-
-.j-value-badge__input::-webkit-outer-spin-button,
-.j-value-badge__input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-
-/* ── Dual Chip ───────────────────────────────────────────────────────── */
-/* Two stat halves joined into one pill — used for Hands × Discards. */
-
-.j-dual-chip {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: stretch;
-  border-radius: var(--j-radius-md);
-  overflow: hidden;
-  box-shadow: 0 2px 0 var(--j-black);
-}
-
-.j-dual-chip__half {
-  min-width: 40px;
-  padding: 6px 14px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  color: var(--j-white);
-}
-
-.j-dual-chip__half--left {
-  border-right: 1px solid var(--j-black);
-}
-
-.j-dual-chip__half--blue { background: var(--j-blue); }
-.j-dual-chip__half--red { background: var(--j-red); }
-.j-dual-chip__half--green { background: var(--j-green); }
-.j-dual-chip__half--gold { background: var(--j-gold); color: var(--j-black); }
-.j-dual-chip__half--dark { background: var(--j-darkest); }
-
-
-/* ── Stat Grid ───────────────────────────────────────────────────────── */
-/* 3-column stat bar — reusable primitive. */
-
-.j-stat-grid {
-  background: var(--j-surface-inset);
-  border-radius: var(--j-radius-md);
-  padding: var(--j-space-md);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--j-space-md);
-  text-align: center;
-}
-
-.j-stat-grid__value {
-  font-family: var(--j-font);
-  font-size: 16px;
-  color: var(--j-gold);
-  text-shadow: var(--j-text-shadow);
-}
-
-.j-stat-grid__label {
-  font-family: var(--j-font);
-  font-size: 10px;
-  color: var(--j-white);
-  letter-spacing: 1px;
-  margin-top: 2px;
-  opacity: 0.85;
-}
-
-
-/* ── Info Card ───────────────────────────────────────────────────────── */
-/* Generic clickable row card — used for filter lists, seed lists, etc. */
-
-.j-info-card {
-  background: var(--j-surface-inset);
-  border-radius: var(--j-radius-md);
-  padding: var(--j-space-md);
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: var(--j-space-md);
-  cursor: pointer;
-}
-
-.j-info-card:hover {
-  filter: brightness(1.08);
-}
-
-.j-info-card__body {
-  min-width: 0;
-}
-
-.j-info-card__title {
-  font-family: var(--j-font);
-  font-size: 13px;
-  color: var(--j-white);
-  letter-spacing: 1px;
-  text-shadow: var(--j-text-shadow);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.j-info-card__sub {
-  font-family: var(--j-font);
-  font-size: 9px;
-  color: var(--j-gold);
-  letter-spacing: 1px;
-  margin-top: 2px;
-}
-
-.j-info-card__aside {
-  text-align: right;
-}
-
-
 /* ── Inset Box ───────────────────────────────────────────────────────── */
 /* Dark recessed content area — for log output, recent finds, etc. */
 
@@ -2029,7 +1054,6 @@
   letter-spacing: 1px;
   line-height: 1.7;
 }
-
 
 /* ── Wordmark ────────────────────────────────────────────────────────── */
 /* Title + subtitle hero block. */
@@ -2057,23 +1081,10 @@
   text-shadow: var(--j-text-shadow);
 }
 
-
 /* ── Cards ────────────────────────────────────────────────────────────── */
 
 .j-game-card {
   width: var(--j-card-width, 71px);
-}
-
-.j-game-card--unknown {
-  aspect-ratio: 0.75;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 4px;
 }
 
 .j-card-renderer {
@@ -2135,7 +1146,6 @@
 .j-card-renderer[data-hover-tilt="true"] .j-card-renderer__hit {
   cursor: pointer;
 }
-
 
 /* ── Panel Spinner ───────────────────────────────────────────────────── */
 
@@ -2229,7 +1239,6 @@
 }
 
 .j-panel-spinner__title,
-.j-panel-spinner__meta,
 .j-panel-spinner__description {
   width: 100%;
   min-width: 0;
@@ -2252,7 +1261,6 @@
   overflow-wrap: anywhere;
   text-align: center;
 }
-
 
 /* ── IDE ─────────────────────────────────────────────────────────────── */
 
@@ -2358,14 +1366,6 @@
   background: var(--j-darkest);
 }
 
-.j-ide__body--map {
-  overflow: hidden;
-}
-
-.j-ide__results {
-  padding: 12px;
-}
-
 .j-ide-results {
   display: grid;
   grid-auto-flow: row;
@@ -2385,7 +1385,6 @@
   text-align: center;
   line-height: 1.2;
 }
-
 
 /* ── Seed Input ───────────────────────────────────────────────────────── */
 
@@ -2516,250 +1515,18 @@
   :root:not([data-j-motion="full"]) .j-panel::before,
   :root:not([data-j-motion="full"]) .j-inner-panel::before,
   :root:not([data-j-motion="full"]) .j-btn__face::before,
-  :root:not([data-j-motion="full"]) .j-tab__btn::before,
   :root:not([data-j-motion="full"]) .j-footer__bar::before,
-  :root:not([data-j-motion="full"]) .j-seed-input__shell::before,
-  :root:not([data-j-motion="full"]) .j-tab__btn[data-active="true"] {
+  :root:not([data-j-motion="full"]) .j-seed-input__shell::before {
     animation: none;
   }
 }
 [data-j-motion="reduced"] .j-panel::before,
 [data-j-motion="reduced"] .j-inner-panel::before,
 [data-j-motion="reduced"] .j-btn__face::before,
-[data-j-motion="reduced"] .j-tab__btn::before,
 [data-j-motion="reduced"] .j-footer__bar::before,
-[data-j-motion="reduced"] .j-seed-input__shell::before,
-[data-j-motion="reduced"] .j-tab__btn[data-active="true"] {
+[data-j-motion="reduced"] .j-seed-input__shell::before {
   animation: none;
 }
-
-
-/* ── Aesthetic Selector ──────────────────────────────────────────────── */
-
-.j-aesthetic-selector {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-}
-
-.j-aesthetic-selector__list {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, max-content);
-  gap: var(--j-space-sm);
-}
-
-.j-aesthetic-pill {
-  padding: 4px 10px;
-  border-radius: var(--j-radius-md);
-  border: 2px solid var(--j-panel-edge);
-  background: var(--j-darkest);
-  color: var(--j-grey);
-  cursor: pointer;
-  font-size: 11px;
-  font-family: var(--j-font);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  text-shadow: var(--j-text-shadow);
-  transition: border-color 100ms ease, background 100ms ease, color 100ms ease;
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.3);
-}
-
-.j-aesthetic-pill:hover {
-  border-color: var(--j-gold);
-  color: var(--j-gold);
-}
-
-.j-aesthetic-pill[data-active="true"] {
-  border-color: var(--j-gold);
-  background: rgba(228, 182, 67, 0.13);
-  color: var(--j-gold);
-  box-shadow: 0 0 0 1px var(--j-gold), 0 2px 0 0 rgba(0, 0, 0, 0.3);
-}
-
-
-/* ── Showcase ─────────────────────────────────────────────────────────── */
-
-.j-showcase {
-  width: 100%;
-  height: 100%;
-  background: var(--j-darkest);
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  font-family: var(--j-font);
-  color: var(--j-white);
-  overflow: hidden;
-}
-
-.j-showcase__scroll {
-  min-height: 0;
-  overflow-y: auto;
-  padding: 18px 14px 10px;
-}
-
-.j-showcase__wordmark {
-  text-align: center;
-  margin-bottom: 18px;
-}
-
-.j-showcase__wordmark-title {
-  font-size: 32px;
-  letter-spacing: 3px;
-  line-height: 1.15;
-  color: var(--j-gold);
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
-}
-
-.j-showcase__wordmark-sub {
-  font-size: 14px;
-  letter-spacing: 4px;
-  color: var(--j-grey);
-  margin-top: 4px;
-  text-shadow: var(--j-text-shadow);
-}
-
-.j-showcase__stats {
-  background: var(--j-surface-inset);
-  border-radius: var(--j-radius-md);
-  padding: 10px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--j-space-md);
-  text-align: center;
-  margin-bottom: var(--j-space-xl);
-}
-
-.j-showcase__stat-value {
-  font-size: 16px;
-  color: var(--j-gold);
-  text-shadow: var(--j-text-shadow);
-}
-
-.j-showcase__stat-label {
-  font-size: 9px;
-  color: var(--j-grey);
-  letter-spacing: 2px;
-  margin-top: 2px;
-}
-
-.j-showcase__section-header {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: var(--j-space-md);
-  margin-bottom: var(--j-space-md);
-}
-
-.j-showcase__section-tag {
-  font-size: 11px;
-  letter-spacing: 2px;
-  padding: 2px 8px;
-  color: var(--j-white);
-  border-radius: 3px;
-  text-shadow: var(--j-text-shadow);
-}
-
-.j-showcase__section-rule {
-  height: 2px;
-  border-radius: 1px;
-}
-
-.j-showcase__filter-list {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-md);
-  margin-bottom: var(--j-space-xl);
-}
-
-.j-showcase__filter-card {
-  background: var(--j-surface-inset);
-  border-radius: var(--j-radius-md);
-  padding: 10px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.j-showcase__filter-sprites {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: 2px;
-}
-
-.j-showcase__filter-sprite {
-  width: 30px;
-  height: 40px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-}
-
-.j-showcase__filter-info {
-  min-width: 0;
-}
-
-.j-showcase__filter-name {
-  font-size: 13px;
-  color: var(--j-white);
-  letter-spacing: 1px;
-  text-shadow: var(--j-text-shadow);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.j-showcase__filter-author {
-  font-size: 9px;
-  color: var(--j-gold);
-  letter-spacing: 1px;
-  margin-top: 2px;
-}
-
-.j-showcase__filter-hits {
-  text-align: right;
-}
-
-.j-showcase__filter-hits-value {
-  font-size: 14px;
-  text-shadow: var(--j-text-shadow);
-}
-
-.j-showcase__filter-hits-label {
-  font-size: 8px;
-  color: var(--j-grey);
-  letter-spacing: 1px;
-}
-
-.j-showcase__recent {
-  background: var(--j-surface-inset);
-  border-radius: var(--j-radius-md);
-  padding: 8px 10px;
-  font-size: 11px;
-  color: var(--j-grey);
-  letter-spacing: 1px;
-  line-height: 1.7;
-}
-
-.j-showcase__actions {
-  padding: 8px 10px 10px;
-  border-top: 2px solid var(--j-black);
-  background: var(--j-dark-grey);
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: 6px;
-}
-
 
 /* ── Footer suit animation ────────────────────────────────────────────── */
 
@@ -2812,12 +1579,7 @@
   height: 0.95em;
 }
 
-
 /* ── Copy row label ───────────────────────────────────────────────────── */
-
-.j-copy-row__label {
-  letter-spacing: 2px;
-}
 
 /* Tap icon + seed, green flash on copy. Chrome is .j-btn's — this block only
    re-themes the face and lays out the two children inside it. */
@@ -2869,24 +1631,6 @@
   color: var(--j-green-text);
 }
 
-
-/* ── Motely version badge ─────────────────────────────────────────────── */
-
-.j-motely-badge {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: 6px;
-}
-
-.j-motely-badge--chip {
-  padding: 3px 8px;
-  border-radius: var(--j-radius-sm);
-  background: var(--j-darkest);
-  border: 1px solid var(--j-panel-edge);
-}
-
 /* ── Jamlyzer ─────────────────────────────────────────────────────────── */
 
 .j-jamlyzer {
@@ -2902,14 +1646,6 @@
   padding: var(--j-space-sm) 0;
 }
 
-.j-jamlyzer__stats {
-  letter-spacing: 0.04em;
-}
-
-.j-jamlyzer__spinner {
-  width: 100%;
-}
-
 .j-jamlyzer__panel {
   width: 100%;
 }
@@ -2918,25 +1654,8 @@
   padding: var(--j-space-sm) var(--j-space-md);
 }
 
-.j-jamlyzer__panel--verdict .j-panel__body {
-  padding: var(--j-space-md);
-}
-
-.j-jamlyzer__panel--match {
-  background: var(--j-dark-green);
-}
-
-.j-jamlyzer__panel--miss {
-  background: var(--j-darkest);
-}
-
 .j-jamlyzer__panel--hint .j-panel__body {
   padding: var(--j-space-md) var(--j-space-sm);
-}
-
-.j-jamlyzer__tallies {
-  width: 100%;
-  text-align: center;
 }
 
 .j-jamlyzer__details {
@@ -2964,48 +1683,6 @@
   align-items: start;
 }
 
-.j-jamlyzer__details-section {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-xs);
-  background: var(--j-surface-inset);
-  padding: var(--j-space-sm);
-  border-radius: var(--j-radius-md);
-  border: 1px solid var(--j-panel-edge);
-}
-
-.j-jamlyzer__cards-grid {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, max-content);
-  gap: var(--j-space-xs);
-  justify-content: center;
-}
-
-.j-jamlyzer__card-wrap {
-  position: relative;
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  border-radius: var(--j-radius-sm);
-  box-sizing: border-box;
-  padding: 2px;
-}
-
-.j-jamlyzer__card-wrap--matched {
-  box-shadow: 0 0 10px var(--j-gold), inset 0 0 3px var(--j-gold);
-  border: 1px solid var(--j-gold);
-  animation: j-card-pulse 2s infinite ease-in-out;
-  border-radius: var(--j-radius-sm);
-}
-
-@keyframes j-card-pulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 1px var(--j-gold)); }
-  50% { transform: scale(1.05); filter: drop-shadow(0 0 5px var(--j-gold)); }
-}
-
-
 .j-ide__jamlyzer {
   min-height: 0;
   display: grid;
@@ -3017,41 +1694,10 @@
 
 /* ── Filter Browser ──────────────────────────────────────────────────── */
 
-.j-filter-browser {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: var(--j-space-md);
-}
-
-.j-filter-browser__list-panel {
-  min-height: 0;
-}
-
-.j-filter-browser__list-panel .j-panel__body {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  min-height: 0;
-}
-
-.j-filter-browser__list {
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-}
-
 /* Canonical clickable list row primitive — used by JimboListItem.
    .j-filter-browser__item is kept as an alias for backward-compat with
    consumers that style filter rows directly. */
-.j-list-item,
-.j-filter-browser__item {
+.j-list-item {
   width: 100%;
   border: none;
   border-radius: var(--j-radius-md);
@@ -3071,87 +1717,9 @@
 }
 
 .j-list-item[data-active="true"],
-.j-list-item:hover,
-.j-filter-browser__item[data-active="true"],
-.j-filter-browser__item:hover {
+.j-list-item:hover {
   background: var(--j-dark-red);
   box-shadow: 0 var(--j-press-y) 0 var(--j-darkest);
-}
-
-.j-filter-browser__item-main {
-  min-width: 0;
-}
-
-.j-filter-browser__deck-stake,
-.j-filter-browser__name {
-  display: block;
-  overflow-wrap: anywhere;
-}
-
-.j-filter-browser__targets {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, max-content);
-  gap: var(--j-space-xs);
-}
-
-.j-filter-browser__target {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  padding: 2px 5px;
-  border-radius: var(--j-radius-sm);
-  background: var(--j-teal-grey);
-  color: var(--j-white);
-  font-family: var(--j-font);
-  font-size: 10px;
-  text-shadow: var(--j-text-shadow);
-}
-
-.j-filter-browser__pager {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  justify-content: center;
-  padding-top: var(--j-space-md);
-}
-
-.j-filter-browser__page-chip {
-  min-width: 110px;
-  padding: 6px 16px;
-  border-radius: var(--j-radius-md);
-  background: var(--j-red);
-  box-shadow: 0 3px 0 var(--j-dark-red);
-  text-align: center;
-}
-
-.j-filter-browser__details {
-  min-height: 160px;
-  justify-content: center;
-}
-
-.j-filter-browser__details-body,
-.j-filter-browser__meta,
-.j-filter-browser__actions {
-  width: 100%;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  align-items: center;
-  gap: var(--j-space-sm);
-}
-
-.j-filter-browser__targets--details {
-  justify-content: center;
-}
-
-.j-filter-browser__actions .j-btn {
-  width: 100%;
-}
-
-.j-filter-browser__meta {
-  opacity: 0.78;
-  gap: var(--j-space-xs);
 }
 
 /* ── Pickers ─────────────────────────────────────────────────────────── */
@@ -3249,22 +1817,6 @@
   text-align: center;
 }
 
-.j-story-phone {
-  width: var(--j-app-w);
-  height: var(--j-app-h);
-}
-
-.j-story-panel-grid {
-  width: var(--j-app-w);
-}
-
-.j-story-card-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--j-space-md);
-  justify-items: center;
-}
-
 /* ── Font Dance Animation ─────────────────────────────────────────────── */
 
 @keyframes j-font-dance {
@@ -3293,6 +1845,7 @@
   display: inline-grid;
   grid-auto-flow: column;
   grid-auto-columns: max-content;
+  white-space: pre-wrap;
 }
 
 .j-font-dance-char {
@@ -3317,7 +1870,6 @@
   transform: translateY(-2px);
   z-index: 5;
 }
-
 
 /* ── Layout primitives — JimboStack / JimboRow ─────────────────────────── */
 /* Grid-based, not flex. The 320×568 canvas is fixed; we compose the surface
@@ -3344,16 +1896,6 @@
 
 /* Row-only: opt-in soft wrap. Stack is column-flow so wrap is meaningless. */
 .j-row--wrap { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, max-content); }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   jimbo-addons.css — additions to the canonical jimbo.css
-   New primitives: StatCallout, SectionHeader, SidewaysLabel, PriceTag,
-   Toggle, Tooltip, Marquee, Toast, ProgressBar, ConfirmPrompt, ErrorBlock,
-   Stack/Row/Divider layout helpers.
-
-   All flat fills, m6x11plus font, design-token colors. No gradients,
-   no glass, no neumorphism. Balatro is chunky and pixel.
-   ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Spinner — `< value >` cycler. Value is a display badge, NOT a button. ── */
 .j-spinner-wrap {
@@ -3402,22 +1944,10 @@
 }
 
 /* ── Layout helpers ───────────────────────────────────────────────────── */
-.j-stack--xs { gap: 2px; }
-.j-stack--sm { gap: 4px; }
-.j-stack--md { gap: 8px; }
-.j-stack--lg { gap: 12px; }
-.j-stack--xl { gap: 16px; }
 
 .j-row { display: grid; grid-auto-flow: column;
   grid-auto-columns: max-content; align-items: center; }
-.j-row--xs { gap: 2px; }
-.j-row--sm { gap: 4px; }
 .j-row--md { gap: 8px; }
-.j-row--lg { gap: 12px; }
-.j-row--xl { gap: 16px; }
-.j-row--center { justify-content: center; }
-.j-row--end { justify-content: end; }
-.j-row--between { justify-content: space-between; }
 
 .j-divider {
   border: none;
@@ -3431,217 +1961,6 @@
   height: auto;
   align-self: stretch;
   margin: 0 4px;
-}
-
-/* ── Stat Callout — label strip + big pixel number ────────────────────── */
-.j-stat {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  align-items: stretch;
-  background: var(--j-darkest);
-  border-radius: var(--j-radius-md);
-  overflow: hidden;
-  min-width: 56px;
-}
-.j-stat__label {
-  padding: 2px 6px;
-  font-family: var(--j-font);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-align: center;
-  color: var(--j-white);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
-}
-.j-stat__label--red    { background: var(--j-red); }
-.j-stat__label--blue   { background: var(--j-blue); }
-.j-stat__label--green  { background: var(--j-green); }
-.j-stat__label--orange { background: var(--j-orange); }
-.j-stat__label--gold   { background: var(--j-gold); color: #1e1e1e; text-shadow: none; }
-.j-stat__label--purple { background: var(--j-purple); }
-.j-stat__label--grey   { background: var(--j-teal-grey); }
-.j-stat__value {
-  padding: 4px 8px 6px;
-  font-family: var(--j-font);
-  font-size: 22px;
-  line-height: 1;
-  text-align: center;
-  color: var(--j-white);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-}
-.j-stat__value--gold { color: var(--j-gold); }
-.j-stat__value--red  { color: var(--j-red); }
-.j-stat__value--blue { color: var(--j-blue); }
-
-/* ── Section Header — red strip + title + downward triangle ──────────── */
-.j-section-header {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  align-items: center;
-  width: 100%;
-}
-.j-section-header__bar {
-  width: 100%;
-  background: var(--j-red);
-  padding: 6px 12px;
-  text-align: center;
-  border-radius: var(--j-radius-md) var(--j-radius-md) 0 0;
-  color: var(--j-white);
-  font-family: var(--j-font);
-  font-size: 14px;
-  letter-spacing: 0.04em;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
-}
-.j-section-header__bar--orange  { background: var(--j-orange); }
-.j-section-header__bar--blue    { background: var(--j-blue); }
-.j-section-header__bar--green   { background: var(--j-green); }
-.j-section-header__bar--purple  { background: var(--j-purple); }
-.j-section-header__bar--gold    { background: var(--j-gold); color: #1e1e1e; text-shadow: none; }
-.j-section-header__triangle {
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid var(--j-red);
-}
-.j-section-header__triangle--orange { border-top-color: var(--j-orange); }
-.j-section-header__triangle--blue   { border-top-color: var(--j-blue); }
-.j-section-header__triangle--green  { border-top-color: var(--j-green); }
-.j-section-header__triangle--purple { border-top-color: var(--j-purple); }
-.j-section-header__triangle--gold   { border-top-color: var(--j-gold); }
-
-/* ── Sideways Label — vertical ALL-CAPS edge label ───────────────────── */
-.j-sideways-label {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-family: var(--j-font);
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--j-grey);
-  white-space: nowrap;
-  padding: 4px 2px;
-  user-select: none;
-}
-
-/* ── Price Tag — yellow $X badge ─────────────────────────────────────── */
-.j-price-tag {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  background: var(--j-gold);
-  color: #1e1e1e;
-  font-family: var(--j-font);
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: var(--j-radius-sm);
-  text-shadow: none;
-  white-space: nowrap;
-}
-.j-price-tag--float {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-}
-
-/* ── Toggle / Checkbox ───────────────────────────────────────────────── */
-.j-toggle {
-  appearance: none;
-  -webkit-appearance: none;
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  background: var(--j-darkest);
-  border: 2px solid var(--j-border-south);
-  border-radius: var(--j-radius-sm);
-  cursor: pointer;
-  padding: 0;
-  position: relative;
-  transition: background 60ms linear;
-}
-.j-toggle[data-on="true"] {
-  background: var(--j-blue);
-  border-color: var(--j-dark-blue);
-}
-.j-toggle[data-on="true"]::after {
-  content: '✓';
-  font-family: var(--j-font);
-  font-size: 14px;
-  color: var(--j-white);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
-  line-height: 1;
-}
-.j-toggle--green[data-on="true"]  { background: var(--j-green); border-color: var(--j-dark-green); }
-.j-toggle--red[data-on="true"]    { background: var(--j-red); border-color: var(--j-dark-red); }
-.j-toggle--orange[data-on="true"] { background: var(--j-orange); border-color: var(--j-dark-orange); }
-
-.j-toggle-row {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-  cursor: pointer;
-}
-
-/* ── Tooltip ─────────────────────────────────────────────────────────── */
-.j-tooltip {
-  position: relative;
-  display: inline-block;
-}
-.j-tooltip__bubble {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--j-darkest);
-  border: 2px solid var(--j-border-silver);
-  border-radius: var(--j-radius-md);
-  padding: 6px 10px;
-  min-width: 80px;
-  max-width: 200px;
-  font-family: var(--j-font);
-  font-size: 11px;
-  color: var(--j-white);
-  text-align: center;
-  white-space: normal;
-  pointer-events: none;
-  z-index: 100;
-}
-.j-tooltip__pointer {
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid var(--j-border-silver);
-}
-.j-tooltip__pointer::after {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: -5px;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid var(--j-darkest);
 }
 
 /* ── Marquee — SHOP sign with bulbs ──────────────────────────────────── */
@@ -3675,67 +1994,6 @@
   margin-top: 2px;
   position: relative;
   z-index: 1;
-}
-
-/* ── Toast ───────────────────────────────────────────────────────────── */
-.j-toast-host {
-  position: absolute;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  z-index: 1000;
-  pointer-events: none;
-}
-.j-toast {
-  background: var(--j-darkest);
-  border: 2px solid var(--j-border-silver);
-  border-radius: var(--j-radius-md);
-  padding: 6px 12px;
-  color: var(--j-white);
-  font-family: var(--j-font);
-  font-size: 12px;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
-  white-space: nowrap;
-  animation: j-toast-in 200ms ease-out;
-}
-.j-toast--green  { border-color: var(--j-green);  background: var(--j-dark-green); }
-.j-toast--red    { border-color: var(--j-red);    background: var(--j-dark-red); }
-.j-toast--blue   { border-color: var(--j-blue);   background: var(--j-dark-blue); }
-.j-toast--orange { border-color: var(--j-orange); background: var(--j-dark-orange); }
-@keyframes j-toast-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Progress Bar ────────────────────────────────────────────────────── */
-.j-progress {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: 2px;
-  width: 100%;
-}
-.j-progress__track {
-  width: 100%;
-  height: 12px;
-  background: var(--j-darkest);
-  border-radius: var(--j-radius-pill);
-  overflow: hidden;
-  position: relative;
-}
-.j-progress__fill {
-  height: 100%;
-  background: var(--j-blue);
-}
-.j-progress__fill--red    { background: var(--j-red); }
-.j-progress__fill--green  { background: var(--j-green); }
-.j-progress__fill--orange { background: var(--j-orange); }
-.j-progress__fill--gold   { background: var(--j-gold); }
-.j-progress__caption {
-  font-family: var(--j-font);
-  font-size: 10px;
-  color: var(--j-grey);
-  text-align: right;
 }
 
 /* ── Error Block ─────────────────────────────────────────────────────── */
@@ -3826,58 +2084,8 @@
   font-size: 16px;
   color: var(--j-gold);
 }
-.j-results-scroll {
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: 4px;
-}
-.j-results-scroll::-webkit-scrollbar {
-  display: none;
-}
 
 /* ── Jamlyzer Stream Layout (Curator V3) ─────────────────────────────── */
-.j-ante-scroll {
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
-  scroll-snap-type: y mandatory;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: 8px;
-}
-.j-ante-scroll::-webkit-scrollbar {
-  display: none;
-}
-.j-ante-section {
-  scroll-snap-align: start;
-  background: var(--j-darkest);
-  border: 2px solid var(--j-inner-border);
-  border-radius: 6px;
-  padding: 6px 8px;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: 4px;
-}
-.j-ante-section__head {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2px;
-}
-.j-ante-section__title {
-  font-family: var(--j-font-m6x11);
-  font-size: 16px;
-  color: var(--j-gold);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
-}
 .j-stream {
   display: grid;
   grid-auto-flow: column;
@@ -4027,7 +2235,6 @@
   filter: saturate(0.3) !important;
 }
 
-
 /* ── JamlyzerView layout ─────────────────────────────────────────────────
    Two named tracks: ante rail on the left, ante detail on the right.
    The rail scrolls independently; below 560px (narrow MCP host iframes)
@@ -4038,18 +2245,9 @@
   gap: var(--j-space-md);
 }
 
-.j-jamlyzer-view__rail {
-  max-height: 26rem;
-  min-width: 4.5rem;
-}
-
 @media (max-width: 560px) {
   .j-jamlyzer-view {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .j-jamlyzer-view__rail {
-    max-height: 12rem;
-    min-width: 0;
   }
 }
 
@@ -4138,18 +2336,6 @@
   grid-auto-columns: max-content;
   gap: var(--j-space-xs);
   align-items: center;
-}
-
-.j-jamlyzer-sort-select {
-  background: var(--j-darkest);
-  color: var(--j-white);
-  border: 1px solid var(--j-panel-edge);
-  border-radius: var(--j-radius-sm);
-  font-family: var(--j-font);
-  font-size: 11px;
-  padding: 4px 8px;
-  outline: none;
-  cursor: pointer;
 }
 
 .j-jamlyzer-split {
@@ -4282,7 +2468,7 @@
 }
 
 /* One shared positioning rule for every pill. The excavated version injected a
-   <style> tag per pill, which thrashed the CSSOM on every menu change.
+   \3c style> tag per pill, which thrashed the CSSOM on every menu change.
 
    The easing is the whole "magnetic snap": fast out, long settle. Paired with
    the even angle steps in orbitalLayout.ts, pills read as landing in detents.
@@ -4398,32 +2584,6 @@
   display: block;
 }
 
-/* ── Interactive seed card (json-render SeedCard) ──────────────────────── */
-.j-seed-card--interactive {
-  cursor: pointer;
-  transition: var(--j-transition);
-}
-.j-seed-card--interactive:hover {
-  border: 1px solid var(--j-blue);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
-}
-
-/* ── Code snippet (inline JAML / filter fragments) ─────────────────────── */
-.j-code-snippet {
-  font-family: var(--j-font-code);
-  font-size: 12px;
-  color: var(--j-grey);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-
-/* ── Storybook stage — breathing room for overlays in docs stories ─────── */
-.j-story-stage {
-  padding: 120px;
-}
-
 /* ── Outer tab — grabbable tear-off pane chrome (JimboOuterTab) ────────── */
 .j-outer-tab {
   display: grid;
@@ -4462,7 +2622,6 @@
 .j-outer-tab--green { color: var(--j-green-text); }
 .j-outer-tab--purple { color: var(--j-purple); }
 .j-outer-tab--gold { color: var(--j-gold); }
-
 
 /* ── JamlMapPreview ────────────────────────────────────────────────────── */
 
@@ -5043,13 +3202,6 @@
   border: 2px solid var(--j-inner-border);
   border-radius: 0 0 8px 8px;
 }
-.j-dock-story-root {
-  height: 100vh;
-  padding: 10px;
-}
-.j-dock-story-pane {
-  padding: 12px;
-}
 
 .j-jaml-ide-visual__drag-ghost {
     position: fixed;
@@ -5089,8 +3241,7 @@
 .j-jaml-map-editor__row { padding: 0 4px; }
 .j-jaml-map-editor__section-title { letter-spacing: 1px; padding: 0 4px; }
 /* Shop = Blueprint belt: one row of pixel cards, scroll sideways. Never wrap. */
-.j-shop-belt,
-.j-jaml-map-editor__shop-row {
+.j-shop-belt {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: max-content;
@@ -5127,16 +3278,6 @@
 .j-shop-belt--snap > * {
   scroll-snap-align: center;
 }
-
-.j-shop-belt-story-tile {
-  width: 71px;
-  height: 95px;
-  background: var(--j-dark);
-  border: 2px solid var(--j-inner-border);
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
-}
 .j-jaml-map-editor__pack-row { padding: 0 4px; }
 .j-category-menu { display: grid; gap: 12px; padding: 12px 0; max-height: 70vh; overflow-y: auto; }
 .j-category-menu__item { display: grid; grid-auto-flow: column; grid-template-columns: auto 1fr; align-items: center; gap: 10px; width: 100%; text-align: left; }
@@ -5161,7 +3302,6 @@
 .j-picker:focus-visible,
 .j-seed-copy:focus-visible,
 .j-category-menu__item:focus-visible,
-.j-orbital-menu__item:focus-visible,
 .j-text-input:focus-visible,
 .j-textarea:focus-visible,
 .j-seed-input__field:focus-visible {
@@ -5499,4 +3639,17 @@
   font-size: 9px;
   color: var(--j-white);
   line-height: 1.3;
+}
+
+/* Named from TS, not from any rule here: JamlMapPreview sets it on --j-map-pill-anim. */
+@keyframes j-glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
