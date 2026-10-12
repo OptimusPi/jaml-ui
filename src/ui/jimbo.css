@@ -100,12 +100,7 @@
   font-size: 12px;
 }
 
-.j-text--label {
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  line-height: 1.15;
-}
-
+.j-text--label,
 .j-text--micro {
   font-size: 10px;
   letter-spacing: 0.04em;
@@ -149,14 +144,6 @@
 /* ── Panel ─────────────────────────────────────────────────────────────── */
 
 .j-panel {
-  /* Rounded rectangle, light solid outline, no dashed border, no soft
-     shadow — matches IMG_3678 / IMG_3725 / IMG_3693 panel chrome. The
-     corner radius is intentionally generous (--j-radius-lg) so the panel
-     reads as a Balatro card-modal, not a 4px-rounded utility surface.
-     NOTE: overflow is intentionally visible (NOT hidden). In Balatro,
-     content frequently spills slightly past the panel edges — joker
-     stickers, card stacks, hovered cards lifting up. Clipping with
-     overflow:hidden was decapitating those bleed-outs. */
   background-color: var(--j-dark-grey);
   border: var(--j-panel-border-width) solid var(--j-border-silver);
   border-radius: var(--j-radius-lg);
@@ -172,9 +159,6 @@
   position: relative;
   isolation: isolate;
 }
-
-/* No glass-sheen overlay. Balatro panels are flat solid color with a
-   chunky border + drop shadow — no diagonal sheen pass. */
 
 .j-textarea {
   background-color: var(--j-darkest);
@@ -203,10 +187,6 @@
 }
 
 .j-inner-panel {
-  /* Subtle sunken inset on the outer panel face — NOT another framed modal.
-     Balatro never nests modal-style frames; content sections sit flat or
-     drop into a darker well. No silver border, no sheen — those belong to
-     the outer .j-panel alone. */
   background-color: var(--j-surface-inset);
   border-radius: var(--j-radius-md);
   padding: var(--j-space-md);
@@ -217,10 +197,6 @@
    press sinks the face +3px and collapses the shadow. */
 
 .j-btn {
-  /* Reserve room INSIDE the wrapper for the face's drop-shadow lip — so when
-     the parent (e.g. .j-app, .j-panel) uses overflow:hidden the lip doesn't
-     get clipped off, and the empty space below the face is part of the
-     button's own box, not the surrounding gap. */
   appearance: none;
   -webkit-appearance: none;
   display: inline-block;
@@ -262,11 +238,6 @@
 
 .j-btn__face {
   position: relative;
-  /* Self-sufficient type: the face was tuned for the pixel font (see the
-     overflow note below), but nothing on .j-btn ever DECLARED it — the font
-     arrived by inheritance from .j-app/.j-page, so a button rendered outside
-     the shell (storybook, design previews, any bare page) silently fell back
-     to the UA default. Measured: Arial in both storybook and design previews. */
   font-family: var(--j-font);
   border-radius: var(--j-radius-md);
   background: var(--j-btn-face-color, var(--j-orange));
@@ -274,20 +245,10 @@
   text-align: center;
   line-height: 1;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
-  /* Drop shadow at 30% opacity per design. Stacked solid offset, no blur. */
   box-shadow: 0 calc(var(--j-press-y) + 2px) 0 0 rgba(0, 0, 0, 0.3);
   transform: translate(0, 0);
-  /* Press position snaps — a real button doesn't glide into the pressed state,
-     it just is pressed. Only the color/shadow feedback eases. */
-  transition: box-shadow var(--j-press-speed) linear, background-color var(--j-press-speed) linear;
-  /* No overflow:hidden — it sheared pixel-font ascenders whenever padding ran
-     tight. Nothing inside the face bleeds, so clipping bought nothing. */
   overflow: visible;
   isolation: isolate;
-}
-
-.j-btn__face::before {
-  content: none;
 }
 
 .j-btn__face > * {
@@ -306,40 +267,26 @@
   background: var(--j-btn-shadow-color, var(--j-dark-orange));
 }
 
-/* Sizes. Text anchors to the TOP of the face: the smaller pad goes on top and
-   the slack sits under the glyphs, matching the in-game buttons where the label
-   hugs the top edge above the pressed lip. */
+/* Sizes: label sits at the top of the face, slack below. */
 .j-btn--xs .j-btn__face {
-  padding-top: 4px;
-  padding-right: 10px;
-  padding-bottom: 7px;
-  padding-left: 10px;
+  padding: 4px 10px 7px;
   font-size: 12px;
 }
 
 .j-btn--sm .j-btn__face {
-  padding-top: 8px;
-  padding-right: 16px;
-  padding-bottom: 11px;
-  padding-left: 16px;
+  padding: 8px 16px 11px;
   font-size: 14px;
 }
 
 .j-btn--md .j-btn__face {
-  padding-top: 10px;
-  padding-right: 22px;
-  padding-bottom: 14px;
-  padding-left: 22px;
+  padding: 10px 22px 14px;
   font-size: 18px;
   min-height: 44px;
   box-sizing: border-box;
 }
 
 .j-btn--lg .j-btn__face {
-  padding-top: 12px;
-  padding-right: 24px;
-  padding-bottom: 16px;
-  padding-left: 24px;
+  padding: 12px 24px 16px;
   font-size: 22px;
   min-height: 52px;
   box-sizing: border-box;
@@ -569,9 +516,6 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 var(--j-press-y) 0 0 var(--j-dark-red);
-  /* Same rule as .j-btn__face: press snaps, only color/shadow ease. */
-  transition: box-shadow var(--j-press-speed) ease,
-    background-color var(--j-press-speed) ease;
 }
 
 .j-flank__btn[data-pressed="true"] {
