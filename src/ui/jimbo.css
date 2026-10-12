@@ -786,7 +786,7 @@
   margin-left: 0.25rem;
 }
 
-@media (max-width: 320px) {
+@media (max-width: 560px) {
   .j-footer__bar {
     padding: 4px 6px 5px;
   }
@@ -3354,14 +3354,14 @@
   display: grid; gap: var(--j-space-lg);
   grid-template-columns: 1fr;
 }
-@media (min-width: 520px) { .j-seedcalc__dials { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 561px) { .j-seedcalc__dials { grid-template-columns: 1fr 1fr; } }
 .j-seedcalc__dial { display: flex; flex-direction: column; gap: var(--j-space-sm); }
 
 .j-seedcalc__tiles {
   display: grid; gap: var(--j-space-md);
   grid-template-columns: repeat(2, 1fr);
 }
-@media (min-width: 640px) { .j-seedcalc__tiles { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 720px) { .j-seedcalc__tiles { grid-template-columns: repeat(4, 1fr); } }
 .j-seedcalc__tile {
   position: relative;
   background: var(--j-darkest);
