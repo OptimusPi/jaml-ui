@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import type { MotelyItem } from "motely-wasm";
 import { JamlGameCard } from "../GameCard.js";
 import { JimboBadge } from "../../ui/JimboBadge.js";
+import { JimboStack } from "../../ui/JimboLayout.js";
+import { JimboText } from "../../ui/jimboText.js";
 import { decodeMotelyItemToJamlCard } from "../../decode/motelyItemDecoder.js";
 
 export interface JamlyzerItemCardProps {
@@ -13,7 +15,7 @@ export interface JamlyzerItemCardProps {
   highlight?: string;
 }
 
-/** One decoded Motely item rendered as a game card, with clause-match glow. */
+/** One decoded Motely item as a game card with its name under it, plus clause-match glow. */
 export function JamlyzerItemCard({ item, scale = 0.85, highlight }: JamlyzerItemCardProps) {
   const resolved = useMemo(() => decodeMotelyItemToJamlCard(item, scale), [item, scale]);
   if (!resolved) {
@@ -24,6 +26,11 @@ export function JamlyzerItemCard({ item, scale = 0.85, highlight }: JamlyzerItem
     );
   }
   return (
-    <JamlGameCard type={resolved.type} card={resolved.card} hoverTilt className={highlight ?? ""} />
+    <JimboStack gap="xs" align="center">
+      <JamlGameCard type={resolved.type} card={resolved.card} hoverTilt className={highlight ?? ""} />
+      <JimboText size="micro" tone="white" className="j-text-center">
+        {resolved.card.name}
+      </JimboText>
+    </JimboStack>
   );
 }

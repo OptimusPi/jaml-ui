@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { MotelyJamlyzerSeedResult } from "motely-wasm";
 import { MotelyDeck, MotelyStake } from "motely-wasm";
 import { JimboPanel } from "../ui/JimboPanel.js";
@@ -50,13 +50,21 @@ export function JamlyzerView({
     );
   }
 
+  const stepAnte = (delta: number) =>
+    setSelectedAnte((a) => Math.max(0, Math.min(maxAnte, a + delta)));
+
+  const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowUp") { e.preventDefault(); stepAnte(-1); }
+    if (e.key === "ArrowDown") { e.preventDefault(); stepAnte(1); }
+  };
+
   const smallTag = tagDisplayName(ante.smallBlindTag);
   const bigTag = tagDisplayName(ante.bigBlindTag);
   const boss = bossDisplayName(ante.boss);
   const voucher = voucherDisplayName(ante.voucher);
 
   return (
-    <JimboPanel body={false} className="j-jamlyzer-view">
+    <JimboPanel body={false} className="j-jamlyzer-view" tabIndex={0} onKeyDown={onKeyDown}>
       <JimboStack gap="md" align="stretch">
         <JimboSpinner
           value={`Ante ${selectedAnte}`}

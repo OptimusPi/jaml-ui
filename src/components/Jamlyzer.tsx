@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import bootsharp, { JamlConfigLoader, MotelyJamlyzer, type MotelyJamlyzerSeedResult, MotelyDeck, MotelyStake, Errors } from "motely-wasm";
 import { parseJaml } from "../lib/jaml/jaml.js";
 import { JimboPanel } from "../ui/JimboPanel.js";
@@ -213,6 +213,34 @@ export function Jamlyzer({
     onSelectSeed?.(seed);
   };
 
+  const stepSeed = (delta: number) => {
+    if (pagedRows.length === 0) return;
+    const at = pagedRows.findIndex((r) => r.seed === activeResult?.seed);
+    const next = pagedRows[Math.max(0, Math.min(pagedRows.length - 1, at + delta))];
+    if (next && next.seed !== activeResult?.seed) handleSelectSeed(next.seed);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest("input, textarea, select")) return;
+    if (e.key === "ArrowLeft") { e.preventDefault(); stepSeed(-1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); stepSeed(1); }
+  };
+
+  // A sideways swipe on the inspector turns to the next or previous seed.
+  const swipe = useRef<{ x: number; y: number } | null>(null);
+  const onPointerDown = (e: React.PointerEvent) => {
+    swipe.current = { x: e.clientX, y: e.clientY };
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    const s = swipe.current;
+    swipe.current = null;
+    if (!s) return;
+    const dx = e.clientX - s.x;
+    const dy = e.clientY - s.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    stepSeed(dx < 0 ? 1 : -1);
+  };
+
   const handleExportFiltered = async () => {
     const payload = {
       timestamp: new Date().toISOString(),
@@ -269,7 +297,7 @@ export function Jamlyzer({
   const { elapsedMs } = load;
 
   return (
-    <JimboStack gap="md" align="stretch" className={rootClass} style={style}>
+    <JimboStack gap="md" align="stretch" className={rootClass} style={style} tabIndex={0} onKeyDown={onKeyDown}>
       <JimboInnerPanel className="j-jamlyzer-header">
         <JimboRow wrap gap="md" align="center" justify="between">
           <JimboRow gap="sm" align="center">
@@ -452,7 +480,7 @@ export function Jamlyzer({
           </JimboBox>
         </JimboBox>
 
-        <JimboBox className="j-jamlyzer-inspector-pane">
+        <JimboBox className="j-jamlyzer-inspector-pane" onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
           {activeResult ? (
             <JamlyzerView
               result={activeResult}
