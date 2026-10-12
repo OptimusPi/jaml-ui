@@ -2324,6 +2324,10 @@
 .j-ide-toolbar {
   display: grid;
   grid-auto-flow: column;
+  /* The tabs column gives way (it scrolls inside itself); the actions never
+     shrink or leave the row. With max-content on every column the row grew past
+     a 320px frame and pushed the last action off the edge. */
+  grid-template-columns: minmax(0, 1fr);
   grid-auto-columns: max-content;
   align-items: center;
   gap: 6px;
@@ -2333,10 +2337,19 @@
   min-width: 0;
 }
 
+/* `.j-tabs` centers its row. Centered overflow spills off the left edge, where
+   no scroll can reach it; `safe` falls back to start-aligned when the row is
+   wider than the column, so the first tab stays reachable. */
+.j-ide-toolbar__tabs .j-tabs {
+  justify-content: safe center;
+}
+
 .j-ide-toolbar__tabs {
   min-width: 0;
   padding-bottom: 3px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
 
 .j-ide__body {
