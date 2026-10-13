@@ -31,7 +31,7 @@ function runtimeEnumNames(enumObject) {
 // ── 1. The generated grammar is the engine loader's grammar ─────────────────
 const boot = Motely.default;
 if (boot.getStatus() !== boot.BootStatus.Booted) await boot.boot();
-const UNMAPPED = /could not be mapped|no clause key among/i;
+const UNMAPPED = /could not be mapped|no clause key among|not found on type/i;
 const check = (yaml) => Motely.JamlConfigLoader.check(yaml) ?? "";
 const head = "deck: Red\nstake: White\nmust:\n";
 

@@ -21,7 +21,7 @@
  * Run: pnpm decode:check
  */
 import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve } from "node:path";
 import {
   MotelyItemEdition as Edition,
@@ -38,7 +38,7 @@ if (!existsSync(built)) {
   console.error("decode:check: dist/motely.js is missing — run `pnpm build` first.");
   process.exit(2);
 }
-const { decodeMotelyItem } = await import(built);
+const { decodeMotelyItem } = await import(pathToFileURL(built).href);
 
 // Runtime sanity: if motely-wasm ever ships ordinal enums, every assumption below
 // changes and the decoder must be revisited, not the test.
