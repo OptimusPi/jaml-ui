@@ -1,0 +1,67 @@
+/*
+ * Tailwind v4 bridge. In your app's CSS:
+ *   @import 'tailwindcss';
+ *   @import 'jaml-ui/tailwind.css';
+ * Utilities like bg-j-surface, text-j-gold, rounded-j-md and font-jimbo then
+ * follow the same runtime theme as the components.
+ */
+@theme inline {
+  --color-j-red: var(--j-red);
+  --color-j-red-deep: var(--j-red-deep);
+  --color-j-blue: var(--j-blue);
+  --color-j-blue-deep: var(--j-blue-deep);
+  --color-j-green: var(--j-green);
+  --color-j-green-deep: var(--j-green-deep);
+  --color-j-green-text: var(--j-green-text);
+  --color-j-orange: var(--j-orange);
+  --color-j-orange-deep: var(--j-orange-deep);
+  --color-j-purple: var(--j-purple);
+  --color-j-purple-deep: var(--j-purple-deep);
+  --color-j-gold: var(--j-gold);
+  --color-j-planet: var(--j-planet);
+  --color-j-spectral: var(--j-spectral);
+  --color-j-grey: var(--j-grey);
+  --color-j-teal-grey: var(--j-teal-grey);
+  --color-j-dark-grey: var(--j-dark-grey);
+  --color-j-darkest: var(--j-darkest);
+  --color-j-surface-inset: var(--j-surface-inset);
+  --color-j-panel-edge: var(--j-panel-edge);
+  --color-j-inner-border: var(--j-inner-border);
+  --color-j-border-silver: var(--j-border-silver);
+  --color-j-border-south: var(--j-border-south);
+  --color-j-background: var(--j-background);
+  --color-j-white: var(--j-white);
+  --color-j-black: var(--j-black);
+  --color-j-tone-orange: var(--j-tone-orange);
+  --color-j-tone-red: var(--j-tone-red);
+  --color-j-tone-blue: var(--j-tone-blue);
+  --color-j-tone-green: var(--j-tone-green);
+  --color-j-tone-purple: var(--j-tone-purple);
+  --color-j-page: var(--j-page);
+  --color-j-surface: var(--j-surface);
+  --color-j-surface-inset: var(--j-surface-inset);
+  --color-j-surface-edge: var(--j-surface-edge);
+  --color-j-border: var(--j-border);
+  --color-j-border-south: var(--j-border-south);
+  --color-j-text: var(--j-text);
+  --color-j-text-muted: var(--j-text-muted);
+  --color-j-focus: var(--j-focus);
+  --spacing-j-xs: var(--j-space-xs);
+  --spacing-j-sm: var(--j-space-sm);
+  --spacing-j-md: var(--j-space-md);
+  --spacing-j-lg: var(--j-space-lg);
+  --spacing-j-xl: var(--j-space-xl);
+  --spacing-j-2xl: var(--j-space-2xl);
+  --radius-j-sm: var(--j-radius-sm);
+  --radius-j-md: var(--j-radius-md);
+  --radius-j-lg: var(--j-radius-lg);
+  --radius-j-pill: var(--j-radius-pill);
+  --font-jimbo: var(--j-font-jimbo);
+  --font-code: var(--j-font-code);
+  --text-j-xs: var(--j-text-xs);
+  --text-j-sm: var(--j-text-sm);
+  --text-j-md: var(--j-text-md);
+  --text-j-lg: var(--j-text-lg);
+  --text-j-xl: var(--j-text-xl);
+  --text-j-2xl: var(--j-text-2xl);
+}

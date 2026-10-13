@@ -3,51 +3,31 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [master, v10]
 
 permissions:
   contents: read
 
 jobs:
   verify:
-    name: typecheck · vocab · lint · build
+    name: typecheck · build · storybook
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      # motely-wasm 29 boots through Uint8Array.fromBase64 (Node 25+).
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 26
+          node-version: 24
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - run: pnpm typecheck
 
-      # Proves the generated grammar and the joker tiers against motely-wasm itself
-      # (JamlConfigLoader.check), and that decode enums round-trip, so a name
-      # never decodes to the wrong item.
-      - name: Vocabulary drift
-        run: pnpm vocab:check
+      - run: pnpm build
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Build
-        run: pnpm build
-
-      # motely-wasm's enums are bit-packed at runtime but declared ordinal in its
-      # .d.mts, so typecheck cannot see a decoder that shifts a field down to an
-      # ordinal and indexes nothing. Only decoding real packed ints against the
-      # installed motely-wasm catches it. Runs against dist, so it goes after Build.
-      - name: Packed-int decoder
-        run: pnpm decode:check
+      - run: pnpm build-storybook

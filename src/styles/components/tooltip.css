@@ -1,0 +1,45 @@
+@layer jaml.components {
+  .j-tooltip-positioner {
+    z-index: 50;
+  }
+
+  .j-tooltip {
+    max-width: 280px;
+    padding: 6px 10px;
+    border: 2px solid var(--j-border);
+    border-radius: var(--j-radius-md);
+    background: var(--j-surface);
+    box-shadow: 0 var(--j-depth-press) 0 var(--j-depth-shadow-heavy);
+    color: var(--j-text);
+    font-family: var(--j-font-jimbo);
+    font-size: var(--j-text-md);
+    line-height: 1.1;
+    text-shadow: 1px 1px 0 var(--j-text-shadow);
+    transform-origin: var(--transform-origin);
+    transition:
+      opacity var(--j-motion-ease),
+      transform var(--j-motion-ease);
+  }
+
+  .j-tooltip[data-starting-style],
+  .j-tooltip[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  .j-tooltip__arrow {
+    width: 12px;
+    height: 6px;
+  }
+  .j-tooltip__arrow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--j-border);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  .j-tooltip__arrow[data-side='top'] { bottom: -8px; }
+  .j-tooltip__arrow[data-side='bottom'] { top: -8px; rotate: 180deg; }
+  .j-tooltip__arrow[data-side='left'] { right: -11px; rotate: -90deg; }
+  .j-tooltip__arrow[data-side='right'] { left: -11px; rotate: 90deg; }
+}

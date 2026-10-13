@@ -1,0 +1,45 @@
+@layer jaml.components {
+  .j-tabs {
+    display: grid;
+    gap: var(--j-space-md);
+  }
+
+  /* Room above the row for the arrow. */
+  .j-tabs__list {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--j-space-md);
+    padding-top: 18px;
+  }
+
+  .j-tabs__indicator {
+    position: absolute;
+    top: 0;
+    left: var(--active-tab-left);
+    width: var(--active-tab-width);
+    height: 14px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    transition:
+      left var(--j-motion-ease),
+      width var(--j-motion-ease);
+  }
+
+  .j-tabs__arrow {
+    width: 16px;
+    height: 10px;
+    background: var(--j-tone);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    filter: drop-shadow(0 2px 0 var(--j-depth-shadow));
+    animation: j-bob var(--j-motion-bounce) infinite;
+  }
+
+  .j-tabs__panel:focus-visible {
+    outline: 2px solid var(--j-focus);
+    outline-offset: 4px;
+    border-radius: var(--j-radius-md);
+  }
+}

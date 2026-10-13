@@ -3,29 +3,17 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "outDir": "dist",
-    "rootDir": "src",
     "strict": true,
-    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
-    "declaration": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "isolatedDeclarations": false,
+    "verbatimModuleSyntax": true,
     "jsx": "react-jsx",
-    "allowArbitraryExtensions": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ]
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["node"]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "**/*.stories.tsx",
-    "**/*.stories.ts",
-    "**/*.test.tsx",
-    "**/*.test.ts",
-    "src/components/SeedFinderApp.tsx",
-    "src/components/McpSeedFinderApp.tsx"
-  ]
+  "include": ["src", ".storybook"]
 }

@@ -1,0 +1,76 @@
+@layer jaml.components {
+  .j-dialog__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: oklch(0% 0 0 / 0.55);
+    transition: opacity var(--j-motion-ease);
+  }
+  .j-dialog__backdrop[data-starting-style],
+  .j-dialog__backdrop[data-ending-style] {
+    opacity: 0;
+  }
+
+  .j-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 41;
+    box-sizing: border-box;
+    display: grid;
+    gap: var(--j-space-md);
+    width: min(420px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    padding: var(--j-space-md);
+    border: var(--j-depth-panel-border) solid var(--j-border);
+    border-radius: var(--j-radius-lg);
+    background: var(--j-surface);
+    box-shadow:
+      0 2px 0 0 var(--j-border-south),
+      0 8px 0 var(--j-depth-shadow-heavy);
+    color: var(--j-text);
+    font-family: var(--j-font-jimbo);
+    translate: -50% -50%;
+    transition:
+      opacity var(--j-motion-ease),
+      transform 250ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .j-dialog[data-starting-style],
+  .j-dialog[data-ending-style] {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .j-dialog { transition: opacity var(--j-motion-ease); }
+    .j-dialog[data-starting-style],
+    .j-dialog[data-ending-style] { transform: none; }
+  }
+
+  .j-dialog__title {
+    margin: 0;
+    font-size: var(--j-text-xl);
+    font-weight: normal;
+    line-height: 1;
+    text-box: trim-both cap alphabetic;
+    text-align: center;
+    text-shadow: 1px 1px 0 var(--j-text-shadow);
+  }
+
+  .j-dialog__description {
+    margin: 0;
+    color: var(--j-text-muted);
+    font-size: var(--j-text-md);
+    text-align: center;
+  }
+
+  .j-dialog__body {
+    display: grid;
+    gap: var(--j-space-md);
+  }
+
+  .j-dialog__actions {
+    display: grid;
+    gap: var(--j-space-md);
+  }
+}

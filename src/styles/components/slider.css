@@ -1,0 +1,59 @@
+@layer jaml.components {
+  .j-slider {
+    display: grid;
+    gap: var(--j-space-sm);
+    min-width: 200px;
+    color: var(--j-text);
+    font-family: var(--j-font-jimbo);
+    font-size: var(--j-text-md);
+    text-shadow: 1px 1px 0 var(--j-text-shadow);
+  }
+
+  .j-slider__head {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--j-space-lg);
+  }
+
+  .j-slider__control {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    touch-action: none;
+    cursor: pointer;
+  }
+  .j-slider[data-disabled] .j-slider__control {
+    cursor: not-allowed;
+  }
+
+  .j-slider__track {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    border: 3px solid var(--j-border);
+    border-radius: var(--j-radius-md);
+    background: var(--j-surface-inset);
+    box-shadow: 0 3px 0 var(--j-depth-shadow);
+  }
+
+  .j-slider__fill {
+    border-radius: 2px;
+    background: var(--j-tone);
+  }
+  .j-slider[data-disabled] .j-slider__fill {
+    background: var(--j-teal-grey);
+  }
+
+  /* The fill's end is the handle; the thumb is a white notch you can focus. */
+  .j-slider__thumb {
+    width: 8px;
+    height: 30px;
+    border-radius: 2px;
+    background: var(--j-white);
+    box-shadow: 0 3px 0 var(--j-depth-shadow);
+  }
+  .j-slider__thumb:has(:focus-visible) {
+    outline: 2px solid var(--j-focus);
+    outline-offset: 2px;
+  }
+}

@@ -1,0 +1,23 @@
+@layer jaml.components {
+  .j-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--j-space-sm);
+    padding: 3px 8px;
+    border-radius: var(--j-radius-sm);
+    background: var(--j-tone);
+    box-shadow: 0 2px 0 var(--j-tone-deep);
+    color: var(--j-white);
+    font-family: var(--j-font-jimbo);
+    font-size: var(--j-text-md);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-shadow: 1px 1px 0 oklch(0% 0 0 / 0.8);
+    white-space: nowrap;
+  }
+
+  .j-badge[data-size='sm'] {
+    padding: 2px 6px;
+    font-size: var(--j-text-sm);
+  }
+}
