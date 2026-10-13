@@ -1,0 +1,25 @@
+/*
+ * jaml-ui: everything in one import.
+ *   import 'jaml-ui/styles.css';
+ *
+ * All rules live in cascade layers, so any unlayered CSS in your app wins
+ * without !important or specificity fights:
+ *   .j-button__face { border-radius: 0; }   <- just works
+ */
+@layer jaml.tokens, jaml.base, jaml.components;
+
+@import '../../fonts.css';
+@import './tokens.css';
+@import './base.css';
+@import './components/background.css';
+@import './components/button.css';
+@import './components/tooltip.css';
+@import './components/panel.css';
+@import './components/badge.css';
+@import './components/tabs.css';
+@import './components/switch.css';
+@import './components/slider.css';
+@import './components/cycle.css';
+@import './components/field.css';
+@import './components/select.css';
+@import './components/dialog.css';

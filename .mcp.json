@@ -2,7 +2,7 @@
   "mcpServers": {
     "storybook": {
       "type": "http",
-      "url": "http://localhost:3141/mcp"
+      "url": "http://127.0.0.1:6006/mcp"
     }
   }
 }

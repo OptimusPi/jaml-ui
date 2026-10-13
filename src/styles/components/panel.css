@@ -1,0 +1,32 @@
+@layer jaml.components {
+  .j-panel {
+    display: grid;
+    gap: var(--j-space-md);
+    align-content: start;
+    padding: var(--j-space-md);
+    border: var(--j-depth-panel-border) solid var(--j-border);
+    border-radius: var(--j-radius-lg);
+    background: var(--j-surface);
+    box-shadow:
+      0 2px 0 0 var(--j-border-south),
+      0 6px 0 var(--j-depth-shadow-heavy);
+    color: var(--j-text);
+    font-family: var(--j-font-jimbo);
+  }
+
+  .j-panel[data-variant='inset'] {
+    border: 0;
+    background: var(--j-surface-inset);
+    box-shadow: inset 0 2px 0 var(--j-surface-edge);
+  }
+
+  .j-panel__title {
+    margin: 0;
+    font-size: var(--j-text-lg);
+    font-weight: normal;
+    line-height: 1;
+    text-box: trim-both cap alphabetic;
+    text-align: center;
+    text-shadow: 1px 1px 0 var(--j-text-shadow);
+  }
+}

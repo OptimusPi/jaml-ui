@@ -1,136 +1,64 @@
 {
   "name": "jaml-ui",
-  "version": "9.0.0",
-  "description": "Balatro card sprites and the Jimbo design system for MCP Apps, with a @json-render (Vercel Labs) catalog.",
+  "version": "10.0.0-alpha.0",
+  "description": "Balatro-style React primitives on Base UI. One look, shared by every JAML site.",
+  "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./ui": {
-      "types": "./dist/ui.d.ts",
-      "default": "./dist/ui.js"
+    "./tokens": {
+      "types": "./dist/tokens.d.ts",
+      "default": "./dist/tokens.js"
     },
-    "./sprites": {
-      "types": "./dist/sprites/spriteData.d.ts",
-      "default": "./dist/sprites.js"
-    },
-    "./assets": {
-      "types": "./dist/assets.d.ts",
-      "default": "./dist/assets.js"
-    },
-    "./motely": {
-      "types": "./dist/decode/motelyItemDecoder.d.ts",
-      "default": "./dist/motely.js"
-    },
-    "./motd": {
-      "types": "./dist/motd/motd.d.ts",
-      "default": "./dist/motd.js"
-    },
-    "./jimbo.css": "./dist/ui/jimbo.css",
+    "./styles.css": "./dist/styles/jaml.css",
+    "./tokens.css": "./dist/styles/tokens.css",
+    "./tailwind.css": "./dist/styles/tailwind.css",
     "./fonts.css": "./fonts.css",
-    "./assets/*": "./assets/*"
+    "./assets/*": "./assets/*",
+    "./package.json": "./package.json"
   },
-  "sideEffects": [
-    "./fonts.css",
-    "./dist/ui/jimbo.css",
-    "./dist/index.js"
-  ],
   "files": [
     "dist",
-    "assets/*.png",
-    "assets/fonts",
+    "assets",
     "fonts.css",
-    "README.md",
-    "LICENSE"
+    "AGENTS.md",
+    "llms.txt"
   ],
   "scripts": {
-    "build": "vite build",
-    "dev": "storybook dev",
-    "dev:watch": "vite build --watch",
-    "typecheck": "tsc --noEmit --pretty false",
-    "vocab:check": "node --experimental-strip-types scripts/check-vocab-drift.mjs",
-    "decode:check": "node scripts/check-decoder.mjs",
-    "lut:emit": "node scripts/emit-motely-sprite-lut.mjs",
-    "motd:emit": "node scripts/emit-motds.mjs",
-    "typecheck:all": "pnpm typecheck && pnpm -r --if-present run typecheck",
-    "prepack": "npm run build",
-    "storybook": "pnpm run build && storybook dev -p 3141",
-    "build-storybook": "pnpm run build && storybook build",
-    "lint": "eslint .",
-    "design:detect": "node .agents/skills/impeccable/scripts/detect.mjs --json src",
-    "design:doctor": "node .agents/skills/impeccable/scripts/doctor.mjs",
-    "gen:grammar": "node scripts/gen-engine-grammar.mjs"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/OptimusPi/jaml-ui"
-  },
-  "homepage": "https://github.com/OptimusPi/jaml-ui#readme",
-  "bugs": {
-    "url": "https://github.com/OptimusPi/jaml-ui/issues"
-  },
-  "keywords": [
-    "balatro",
-    "jaml",
-    "motely",
-    "seed",
-    "card",
-    "sprite",
-    "ui",
-    "json-render",
-    "mcp"
-  ],
-  "author": "pifreak",
-  "license": "MIT",
-  "dependencies": {
-    "@json-render/core": "^0.20.0",
-    "@json-render/react": "^0.20.0",
-    "react-icons": "^5.7.0",
-    "zod": "^4.6.5"
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "peerDependencies": {
-    "motely-wasm": "^29.0.0",
-    "react": "^18.2.0 || ^19.0.0",
-    "react-dom": "^18.2.0 || ^19.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.9.0"
   },
   "devDependencies": {
-    "@codemirror/autocomplete": "^6.20.3",
-    "@codemirror/commands": "^6.11.1",
-    "@codemirror/language": "^6.12.4",
-    "@codemirror/lint": "^6.9.7",
-    "@codemirror/state": "^6.7.6",
-    "@codemirror/view": "^6.43.13",
-    "@eslint/js": "^10.0.1",
-    "@lezer/highlight": "^1.2.5",
-    "@storybook/addon-docs": "^10.6.1",
-    "@storybook/react": "^10.6.1",
-    "@storybook/react-vite": "^10.6.1",
-    "@types/node": "^25.9.9",
+    "@storybook/addon-a11y": "^10.6.2",
+    "@storybook/addon-docs": "^10.6.2",
+    "@storybook/addon-mcp": "^10.6.2",
+    "@storybook/addon-themes": "^10.6.2",
+    "@storybook/react-vite": "^10.6.2",
+    "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^5.2.0",
-    "eslint": "^10.12.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.7",
-    "eslint-plugin-storybook": "10.4.6",
-    "globals": "^17.13.0",
-    "motely-wasm": "^29.0.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "storybook": "^10.6.1",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.71.1",
-    "vite": "^6.4.4",
-    "vite-plugin-dts": "^5.1.2"
-  }
+    "storybook": "^10.6.2",
+    "tsdown": "^0.23.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.4"
+  },
+  "packageManager": "pnpm@10.30.0"
 }

@@ -1,0 +1,28 @@
+# jaml-ui
+
+> Balatro-style React 19 primitives built on Base UI. One shared look for every JAML site.
+
+Install: `pnpm add jaml-ui react react-dom`
+Styles: `import 'jaml-ui/styles.css'` (tokens, fonts, all components). Put `className="j-app"` on your root.
+Theme: `data-theme="dark"` (default) or `"light"` on any element. Reduced motion: `data-motion="reduced"`, or the OS setting.
+Tailwind v4 (optional): `@import 'jaml-ui/tailwind.css'` after `@import 'tailwindcss'` for bg-j-surface, text-j-gold, font-jimbo, ...
+Tokens in JS: `import { tokens, palette, tones } from 'jaml-ui/tokens'`
+
+## Components (import from 'jaml-ui')
+
+- Button: tone ('orange'|'red'|'blue'|'green'|'purple'), size ('xs'|'sm'|'md'|'lg'), block, disabled, disabledReason
+- Tooltip: content, children (one element), side, delay. TooltipProvider shares delay between tooltips.
+- Panel: title, headingLevel, variant ('raised'|'inset'), as
+- Badge: tone, size ('sm'|'md')
+- Tabs (tone, size, value, defaultValue, onValueChange) > TabList (aria-label) > Tab (value); TabPanel (value)
+- Switch: label, tone, checked, defaultChecked, onCheckedChange, disabled
+- Slider: label, tone, value, defaultValue, onValueChange, min, max, step, hideValue
+- Cycle: label, options [{value,label}], value, defaultValue, onValueChange, tone, pips, loop
+- Select: label, items [{value,label,disabled?}], value, defaultValue, onValueChange, placeholder
+- Dialog: title, description, trigger, open, defaultOpen, onOpenChange, backLabel, backTone, actions, children
+- TextField: label, description, error, mono, plus every <input> prop
+
+## Docs
+
+- [AGENTS.md](./AGENTS.md): design rules and the button spec
+- Storybook MCP (local dev): http://localhost:6006/mcp

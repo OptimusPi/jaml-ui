@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
@@ -37,10 +37,9 @@ jobs:
           echo "package.json=$PKG  tag=$TAG"
           test "$PKG" = "$TAG" || { echo "::error::tag v$TAG != package.json $PKG"; exit 1; }
 
-      - name: Typecheck · lint · build
+      - name: Typecheck, build
         run: |
           pnpm typecheck
-          pnpm lint
           pnpm build
 
       - name: Publish to npm

@@ -1,0 +1,63 @@
+@layer jaml.components {
+  .j-field {
+    display: grid;
+    gap: var(--j-space-sm);
+    color: var(--j-text);
+    font-family: var(--j-font-jimbo);
+  }
+
+  .j-field__label {
+    font-size: var(--j-text-md);
+    text-shadow: 1px 1px 0 var(--j-text-shadow);
+  }
+
+  .j-field__description {
+    margin: 0;
+    color: var(--j-text-muted);
+    font-size: var(--j-text-sm);
+  }
+
+  .j-field__error {
+    margin: 0;
+    color: var(--j-red);
+    font-size: var(--j-text-sm);
+    text-shadow: 1px 1px 0 var(--j-text-shadow);
+  }
+
+  .j-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--j-size-touch);
+    padding: 8px 12px;
+    border: 3px solid var(--j-border);
+    border-radius: var(--j-radius-md);
+    background: var(--j-surface-inset);
+    color: var(--j-text);
+    caret-color: var(--j-gold);
+    font-family: var(--j-font-jimbo);
+    font-size: var(--j-text-md);
+    line-height: 1;
+    transition: border-color var(--j-motion-ease);
+  }
+  .j-input[data-mono] {
+    font-family: var(--j-font-code);
+    font-size: var(--j-text-sm);
+    letter-spacing: 0.05em;
+  }
+  .j-input::placeholder {
+    color: var(--j-text-muted);
+    opacity: 0.7;
+  }
+  .j-input:focus-visible {
+    outline: none;
+    border-color: var(--j-focus);
+  }
+  .j-input[data-invalid] {
+    border-color: var(--j-red);
+  }
+  .j-input[data-disabled] {
+    border-color: var(--j-border-south);
+    color: var(--j-text-muted);
+    cursor: not-allowed;
+  }
+}

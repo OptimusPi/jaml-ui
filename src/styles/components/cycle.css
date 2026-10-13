@@ -1,0 +1,55 @@
+@layer jaml.components {
+  .j-cycle {
+    display: grid;
+    gap: var(--j-space-sm);
+    justify-items: center;
+    color: var(--j-text);
+    font-family: var(--j-font-jimbo);
+    text-shadow: 1px 1px 0 var(--j-text-shadow);
+  }
+
+  .j-cycle__label {
+    font-size: var(--j-text-md);
+  }
+
+  .j-cycle__row {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    align-items: stretch;
+    gap: var(--j-space-sm);
+  }
+
+  .j-cycle__arrow .j-button__face {
+    align-items: center;
+    padding: 0;
+    font-size: var(--j-text-md);
+  }
+
+  .j-cycle__value {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: var(--j-space-sm);
+    min-width: 160px;
+    margin-bottom: var(--j-depth-press);
+    padding: 6px 12px;
+    border-radius: var(--j-radius-md);
+    background: var(--j-surface-inset);
+    font-size: var(--j-text-md);
+    line-height: 1;
+  }
+
+  .j-cycle__pips {
+    display: flex;
+    gap: 3px;
+  }
+  .j-cycle__pip {
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: color-mix(in oklch, var(--j-text) 25%, transparent);
+  }
+  .j-cycle__pip[data-active] {
+    background: var(--j-text);
+  }
+}

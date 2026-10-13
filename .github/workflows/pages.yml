@@ -36,14 +36,13 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # package.json's build-storybook runs the library build first, then
-      # storybook build. Same command Vercel runs.
+      # Same command Vercel runs.
       - name: Build Storybook
         run: pnpm build-storybook
 
