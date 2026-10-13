@@ -7,7 +7,7 @@
 
 import type { JamlVisualClause, JamlVisualFilter, JamlZone } from "../components/JamlIdeVisual.js";
 
-// ─── Text → Filter ────────────────────────────────────────────────────────────
+// Text → Filter
 
 function stripQuotes(s: string): string {
   if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
@@ -192,7 +192,7 @@ export function jamlTextToVisualFilter(text: string): JamlVisualFilter {
   return filter;
 }
 
-// ─── Filter → Text ───────────────────────────────────────────────────────────
+// Filter → Text
 
 function q(s: string | undefined): string {
   if (!s) return "";

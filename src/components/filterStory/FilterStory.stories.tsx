@@ -12,7 +12,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof FilterStory>;
 
-/** pifreak's Diet Cola filter, rendered as the story it is. */
 export const SimpleCola: Story = {
   args: {
     source,

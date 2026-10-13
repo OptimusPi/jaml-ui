@@ -29,9 +29,8 @@ const TONE_CLASS = {
 } as const satisfies Record<JimboInlineEditTone, string>
 
 /**
- * Borderless transparent input that reads as inline text until focused —
- * for editable titles, bylines, or descriptions inside cards/panels.
- * Focus chrome only shows on keyboard navigation so mouse use stays clean.
+ * Borderless input that reads as inline text until focused.
+ * The gold focus outline only shows on `:focus-visible`.
  */
 export const JimboInlineEdit = React.forwardRef<HTMLInputElement, JimboInlineEditProps>(
   function JimboInlineEdit(

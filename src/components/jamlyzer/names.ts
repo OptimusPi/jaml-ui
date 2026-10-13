@@ -1,10 +1,6 @@
 /**
- * Display-name resolution for packed Motely enum values — the ONE place
- * enum ordinals become human names. Sprite-backed for the kinds that render
- * as sprites (boss, voucher, tag, pack): we match the enum key against the
- * sprite sheet's own display names so JamlBoss/JamlTag/JamlVoucher always
- * get a name they can resolve. Decks and stakes use plain camel splitting
- * (their sprite lookup keys off the deck key, not the display name).
+ * Boss, voucher, tag and pack names use the matching sprite's name, so their
+ * sprites can be looked up by name. Decks and stakes have no sprite name list.
  */
 
 import {

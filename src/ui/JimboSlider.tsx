@@ -7,11 +7,7 @@ export interface JimboSliderProps
   onValueChange?: (value: number) => void;
 }
 
-/**
- * Chunky Balatro range dial — the missing React half of `.j-slider`.
- * The filled track is driven by the `--j-slider-fill` custom property so the
- * gold portion always matches the thumb position.
- */
+/** Chunky Balatro range dial. The gold fill tracks the thumb via `--j-slider-fill`. */
 export const JimboSlider = React.forwardRef<HTMLInputElement, JimboSliderProps>(
   function JimboSlider({ onValueChange, className, value, min = 0, max = 100, style, ...rest }, ref) {
     const v = Number(value ?? 0);

@@ -360,7 +360,7 @@ export function JamlIde({
     setMode("visual");
   }
 
-  // ── Add-clause picker state ──────────────────────────────────────────────
+  // Add-clause picker state
   const [addZone, setAddZone] = useState<JamlZone | null>(null);
   const [pickerFlow, setPickerFlow] = useState<"category" | SlotCategory>("category");
 

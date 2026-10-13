@@ -21,7 +21,7 @@ import { type SpriteSheetType } from "../../sprites/spriteMapper.js";
 import { JimboTabs } from "../../ui/jimboTabs.js";
 import { JimboListItem } from "../../ui/JimboListItem.js";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// Types
 
 export interface JamlMapEditorProps {
   /** Initial zone for the demo. */
@@ -44,7 +44,7 @@ export interface MapSlotSelection extends SlotSelection {
 
 type AnteSelections = Record<string, MapSlotSelection>;
 
-// ─── Category menu items ─────────────────────────────────────────────────────
+// Category menu items
 
 
 interface CategoryOption {
@@ -80,7 +80,7 @@ const CATEGORY_CONFIG_MAP: Record<SlotCategory, typeof VOUCHER_PICKER_CONFIG> = 
   pack:     PACK_PICKER_CONFIG,
 };
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// Component
 
 export function JamlMapEditor({
   zone: initialZone = "must",
@@ -259,7 +259,7 @@ export function JamlMapEditor({
   );
 }
 
-// ─── Category Selection Menu ─────────────────────────────────────────────────
+// Category Selection Menu
 
 export function CategoryMenu({
   onSelect,
@@ -286,7 +286,7 @@ export function CategoryMenu({
   );
 }
 
-// ─── Build JAML text from slots ──────────────────────────────────────────────
+// Build JAML text from slots
 
 function buildJamlText(antes: Record<number, AnteSelections>): string {
   const byZone: Record<JamlZone, Record<string, { value: string; antes: number[] }[]>> = {

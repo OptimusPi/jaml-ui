@@ -40,7 +40,6 @@ function extractSeedMilestones(
 ): SeedMilestoneHit[] {
   const milestones: SeedMilestoneHit[] = [];
 
-  // If clauses are provided, first extract specific clause matches
   if (clauses && clauses.length > 0) {
     for (const ante of result.antes) {
       if (milestones.length >= maxMilestones) break;
@@ -84,12 +83,11 @@ function extractSeedMilestones(
     }
   }
 
-  // Fallback / complement: highlight high-value items (Legendaries, The Soul, Vouchers in Ante 1-2)
+  // Fill remaining slots: legendaries from antes 1-3, ante 1 vouchers and tags.
   if (milestones.length < maxMilestones) {
     for (const ante of result.antes.slice(0, 3)) {
       if (milestones.length >= maxMilestones) break;
 
-      // Legendary Jokers
       if (ante.pulls.legendaryJokers.length > 0) {
         const decoded = decodeMotelyItem(ante.pulls.legendaryJokers[0]);
         if (decoded?.displayName) {
@@ -101,7 +99,6 @@ function extractSeedMilestones(
         }
       }
 
-      // Vouchers
       if (ante.voucher && ante.ante === 1 && milestones.length < maxMilestones) {
         const vName = voucherDisplayName(ante.voucher);
         if (vName && vName !== "Unknown") {
@@ -113,7 +110,6 @@ function extractSeedMilestones(
         }
       }
 
-      // Early Rare Tags
       if (ante.smallBlindTag && ante.ante === 1 && milestones.length < maxMilestones) {
         const tName = tagDisplayName(ante.smallBlindTag);
         if (tName && (tName.includes("Rare") || tName.includes("Negative") || tName.includes("Polychrome") || tName.includes("Coupon"))) {

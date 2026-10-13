@@ -7,7 +7,6 @@ const meta: Meta = {
 };
 export default meta;
 
-/** Token names, grouped the way jimbo-tokens.css groups them. */
 const GROUPS: Array<{ name: string; tokens: string[] }> = [
   { name: "game", tokens: ["--j-red", "--j-blue", "--j-green", "--j-orange", "--j-gold", "--j-purple", "--j-planet", "--j-spectral"] },
   { name: "pressed", tokens: ["--j-dark-red", "--j-dark-blue", "--j-dark-green", "--j-dark-orange"] },
@@ -15,9 +14,8 @@ const GROUPS: Array<{ name: string; tokens: string[] }> = [
   { name: "chrome", tokens: ["--j-border-silver", "--j-border-south", "--j-panel-edge", "--j-white"] },
 ];
 
-/* Token names and hex values are code, not game copy — the pixel font at 10px
-   turns them to mush and the .j-text shadow smears underneath. Code font,
-   no shadow. */
+/* Token names and hex values are code, not game copy: the pixel font at 10px
+   turns them to mush and the .j-text shadow smears underneath. */
 const LABEL: CSSProperties = {
   fontFamily: "var(--j-font-code)",
   fontSize: 11,

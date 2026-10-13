@@ -6,7 +6,6 @@ const meta: Meta = {
 };
 export default meta;
 
-/** The .j-text size classes with their px values from jimbo.css. */
 const SCALE = [
   ["j-text--display", "display 32px"],
   ["j-text--xl", "xl 24px"],

@@ -15,10 +15,7 @@ export interface JimboFlankNavProps {
   style?: React.CSSProperties
 }
 
-/**
- * Prev/next navigation with flanking buttons around a central stage.
- * No hardcoded labels, no lucide dep (inline chevron SVGs).
- */
+/** Prev/next navigation with flanking buttons around a central stage. */
 export function JimboFlankNav({
   onPrev,
   onNext,

@@ -18,7 +18,7 @@ import type { SpriteEntry } from "../../sprites/spriteData.js";
 import type { SpriteSheetType } from "../../sprites/spriteMapper.js";
 import type { SlotSelection, SlotCategory } from "./MysterySlot.js";
 
-// ─── Config per category ─────────────────────────────────────────────────────
+// Config per category
 
 export interface CategoryPickerConfig {
   /** Display title, e.g. "Vouchers" */
@@ -45,7 +45,7 @@ export interface CategoryPickerProps {
 
 const C = JimboColorOption;
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// Component
 
 export function CategoryPicker({ config, onSelect }: CategoryPickerProps) {
   const [search, setSearch] = useState("");
@@ -136,7 +136,7 @@ export function CategoryPicker({ config, onSelect }: CategoryPickerProps) {
   );
 }
 
-// ─── Pre-built configs ───────────────────────────────────────────────────────
+// Pre-built configs
 
 import { VOUCHERS, TAGS, BOSSES, BOOSTER_PACKS, TAROTS_AND_PLANETS } from "../../sprites/spriteData.js";
 

@@ -6,7 +6,7 @@ import { FiMaximize2, FiMinimize2, FiMove } from "react-icons/fi";
 export type JimboOuterTabTone = "blue" | "red" | "orange" | "green" | "purple" | "gold";
 
 export interface JimboOuterTabProps extends HTMLAttributes<HTMLDivElement> {
-  /** Pane name shown in the tab (m6x11, letter-spaced). */
+  /** Pane name shown in the tab. */
   label: string;
   /** Accent color for the label; maps to `--j-*` tone tokens. */
   tone?: JimboOuterTabTone;
@@ -29,10 +29,8 @@ const TONE_CLASS = {
 } as const satisfies Record<JimboOuterTabTone, string>;
 
 /**
- * Grabbable chrome strip that sits on the OUTER top edge of a pane — the
- * handle a user drags to tear panes around a layout. Drag semantics live with
- * the consumer (this primitive just passes `draggable` + `onDrag*` through
- * `...rest`); fullscreen is a one-prop toggle. Layout is grid per design rule 1.
+ * Grabbable strip on the outer top edge of a pane. Drag handling belongs to the
+ * consumer: `draggable` and `onDrag*` pass through `...rest`.
  */
 export function JimboOuterTab({
   label,

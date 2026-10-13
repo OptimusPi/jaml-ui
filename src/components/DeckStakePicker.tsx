@@ -52,8 +52,6 @@ export function DeckStakePicker({
         onPrev={() => onStakeChange(cycle(STAKES, stake, -1))}
         onNext={() => onStakeChange(cycle(STAKES, stake, 1))}
       />
-      </Container>
-    );
-  }
-
-export { DECKS as DECK_PICKER_NAMES, STAKES as STAKE_PICKER_NAMES };
+    </Container>
+  );
+}

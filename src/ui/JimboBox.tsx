@@ -8,13 +8,8 @@ export interface JimboBoxProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Thin wrapper around `<div>` (or another block element).
- *
- * All consumer code outside `src/ui/` must use `JimboBox` instead of raw
- * `<div>` — the ESLint `no-raw-html` rule forbids intrinsic HTML elements.
- * This component exists so that layouts can still use a plain container
- * without reaching for a higher-level primitive that adds semantics they
- * don't need (e.g. `JimboPanel` implies a visible card).
+ * Thin wrapper around `<div>` (or another block element) for plain layout
+ * containers. Use it instead of `JimboPanel` when no visible card is wanted.
  */
 export const JimboBox = React.forwardRef<HTMLDivElement, JimboBoxProps>(
   function JimboBox({ as: Tag = "div", children, ...rest }, ref) {

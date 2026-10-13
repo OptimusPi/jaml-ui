@@ -1,5 +1,3 @@
-// PORTABLE — intended for jaml-ui/src/ui/jimboIconButton.tsx
-// On paste, replace `from 'jaml-ui'` with `from './tokens.js'`.
 "use client";
 
 import { JimboColorOption } from "./tokens.js";

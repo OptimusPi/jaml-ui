@@ -30,7 +30,7 @@ export const {
   executeAction: executeJimboAction,
 } = defineRegistry(jimboCatalog, {
   components: {
-    // ── Layout & Containers ───────────────────────────────────────────────
+    // Layout & Containers
     JimboPanel: ({ props, children }) => (
       <JimboPanel title={props.title} tone={props.tone as never}>
         {children}
@@ -62,7 +62,7 @@ export const {
       <JimboBox className={props.className}>{children}</JimboBox>
     ),
 
-    // ── Game & Balatro Sprites ────────────────────────────────────────────
+    // Game & Balatro Sprites
     JamlGameCard: ({ props }) => (
       <JamlGameCard
         card={{ name: props.name, scale: props.scale }}
@@ -89,7 +89,7 @@ export const {
       />
     ),
 
-    // ── JAMLyzer ──────────────────────────────────────────────────────────
+    // JAMLyzer
     JamlyzerSeedCard: ({ props, emit }) => {
       const syntheticResult = {
         seed: props.seed,
@@ -107,7 +107,7 @@ export const {
       );
     },
 
-    // ── Atoms & Primitives ────────────────────────────────────────────────
+    // Atoms & Primitives
     JimboButton: ({ props, emit }) => (
       <JimboButton
         tone={props.tone as never}

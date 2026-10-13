@@ -112,8 +112,6 @@ export {
 
 export {
   DeckStakePicker,
-  DECK_PICKER_NAMES,
-  STAKE_PICKER_NAMES,
   type DeckStakePickerProps,
 } from "./components/DeckStakePicker.js";
 
@@ -171,5 +169,5 @@ export * from "./ui.js";
 // Server callers import from "jaml-ui/motely". Same for the sprite tables and
 // the asset resolver: "jaml-ui/sprites" and "jaml-ui/assets".
 
-// ── Generative UI: catalog/registry/renderer for Vercel Labs' @json-render ──
+// Generative UI: catalog/registry/renderer for Vercel Labs' @json-render
 export * from "./json-render/index.js";

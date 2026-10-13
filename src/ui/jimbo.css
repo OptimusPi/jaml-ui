@@ -16,7 +16,7 @@
   display: none !important;
 }
 
-/* ── Jimbo context roots ──────────────────────────────────────────────── */
+/* Jimbo context roots */
 /* Every container that says "you are inside the Jimbo world" declares the
    pixel font at zero specificity, so raw text dropped into a panel/picker
    renders in-brand even on a bare page (storybook, design previews) instead
@@ -28,7 +28,7 @@
   font-family: var(--j-font);
 }
 
-/* ── Base Text ─────────────────────────────────────────────────────────── */
+/* Base Text */
 
 .j-text {
   font-family: var(--j-font);
@@ -107,7 +107,7 @@
   color: var(--j-white);
 }
 
-/* ── Panel ─────────────────────────────────────────────────────────────── */
+/* Panel */
 
 .j-panel {
   /* Rounded rectangle, light solid outline, no dashed border, no soft
@@ -173,7 +173,7 @@
   padding: var(--j-space-md);
 }
 
-/* ── Button ────────────────────────────────────────────────────────────── */
+/* Button */
 
 .j-btn {
   appearance: none;
@@ -225,7 +225,7 @@
 .j-btn--purple { --j-btn-face: var(--j-purple); }
 .j-btn--grey   { --j-btn-face: var(--j-teal-grey); }
 
-/* ── Badge ─────────────────────────────────────────────────────────────── */
+/* Badge */
 
 .j-badge {
   display: inline-grid;
@@ -295,7 +295,7 @@
   --j-badge-south: var(--j-darkest);
 }
 
-/* ── Tabs ──────────────────────────────────────────────────────────────── */
+/* Tabs */
 
 .j-tabs {
   display: grid;
@@ -375,11 +375,11 @@
   }
 }
 
-/* ── Layout Utilities ─────────────────────────────────────────────────── */
+/* Layout Utilities */
 
 .j-text-center { text-align: center; }
 
-/* ── Flank Nav ────────────────────────────────────────────────────────── */
+/* Flank Nav */
 
 .j-flank {
   display: grid;
@@ -434,7 +434,7 @@
   box-shadow: none;
 }
 
-/* ── Code Block ───────────────────────────────────────────────────────── */
+/* Code Block */
 
 /* Host element for an editor view mounted by JS (CodeMirror). The view paints
    its own chrome; this only fixes the background and the height floor so the
@@ -445,7 +445,7 @@
   background: var(--j-darkest);
 }
 
-/* ── Modal ────────────────────────────────────────────────────────────── */
+/* Modal */
 
 @keyframes jimbo-modal-in {
   from { transform: translateY(8px); opacity: 0; }
@@ -561,7 +561,7 @@
   color: var(--j-white);
 }
 
-/* ── Footer ───────────────────────────────────────────────────────────── */
+/* Footer */
 
 .j-footer {
   position: fixed;
@@ -643,7 +643,7 @@
   }
 }
 
-/* ── App Shell ────────────────────────────────────────────────────────── */
+/* App Shell */
 /* The MCP App embed target. 320×(568 − footer) hard-locked. No fluid, no
    responsive, no reflow. The swirl behind shows in the surrounding viewport;
    the JimboBalatroFooter sits below this rectangle (fixed, viewport-pinned)
@@ -789,7 +789,7 @@
   padding: var(--j-space-md) var(--j-space-lg);
 }
 
-/* ── Section Header ──────────────────────────────────────────────────── */
+/* Section Header */
 /* Colored tag + horizontal rule — reusable section divider. */
 
 .j-section-header {
@@ -839,7 +839,7 @@
 .j-section-header__rule--gold { background: var(--j-gold); }
 .j-section-header__rule--grey { background: var(--j-grey); }
 
-/* ── Fluid page shell (fan sites / seedfinder marketing) ──────────────── */
+/* Fluid page shell (fan sites / seedfinder marketing) */
 /* Not the 320×540 embed. Full viewport, Jimbo type + spacing, no SaaS card. */
 
 .j-page {
@@ -880,7 +880,7 @@
   box-sizing: border-box;
 }
 
-/* ── Inset Box ───────────────────────────────────────────────────────── */
+/* Inset Box */
 /* Dark recessed content area — for log output, recent finds, etc. */
 
 .j-inset {
@@ -894,7 +894,7 @@
   line-height: 1.7;
 }
 
-/* ── Wordmark ────────────────────────────────────────────────────────── */
+/* Wordmark */
 /* Title + subtitle hero block. */
 
 .j-wordmark {
@@ -920,7 +920,7 @@
   text-shadow: var(--j-text-shadow);
 }
 
-/* ── Cards ────────────────────────────────────────────────────────────── */
+/* Cards */
 
 .j-game-card {
   width: var(--j-card-width, 71px);
@@ -986,7 +986,7 @@
   cursor: pointer;
 }
 
-/* ── Panel Spinner ───────────────────────────────────────────────────── */
+/* Panel Spinner */
 
 .j-panel-spinner {
   display: grid;
@@ -1101,7 +1101,7 @@
   text-align: center;
 }
 
-/* ── IDE ─────────────────────────────────────────────────────────────── */
+/* IDE */
 
 .j-ide {
   display: grid;
@@ -1225,7 +1225,7 @@
   line-height: 1.2;
 }
 
-/* ── Seed Input ───────────────────────────────────────────────────────── */
+/* Seed Input */
 
 .j-seed-input {
   display: grid;
@@ -1365,7 +1365,7 @@
   animation: none;
 }
 
-/* ── Footer suit animation ────────────────────────────────────────────── */
+/* Footer suit animation */
 
 .j-footer__suits {
   display: inline-grid;
@@ -1416,7 +1416,7 @@
   height: 0.95em;
 }
 
-/* ── Copy row label ───────────────────────────────────────────────────── */
+/* Copy row label */
 
 /* Tap icon + seed, green flash on copy. Chrome is .j-btn's — this block only
    re-themes the face and lays out the two children inside it. */
@@ -1468,7 +1468,7 @@
   color: var(--j-green-text);
 }
 
-/* ── Jamlyzer ─────────────────────────────────────────────────────────── */
+/* Jamlyzer */
 
 .j-jamlyzer {
   min-height: 0;
@@ -1529,7 +1529,7 @@
   overflow: hidden;
 }
 
-/* ── Filter Browser ──────────────────────────────────────────────────── */
+/* Filter Browser */
 
 /* Canonical clickable list row primitive — used by JimboListItem.
    .j-filter-browser__item is kept as an alias for backward-compat with
@@ -1559,7 +1559,7 @@
   box-shadow: 0 var(--j-press-y) 0 var(--j-darkest);
 }
 
-/* ── Pickers ─────────────────────────────────────────────────────────── */
+/* Pickers */
 
 .j-picker {
   max-height: 80vh;
@@ -1663,7 +1663,7 @@
   display: none;
 }
 
-/* ── Layout primitives — JimboStack / JimboRow ─────────────────────────── */
+/* Layout primitives — JimboStack / JimboRow */
 /* Grid-based, not flex. The 320×568 canvas is fixed; we compose the surface
    with named tracks rather than guess-and-checking flexbox flow.            */
 
@@ -1689,7 +1689,7 @@
 /* Row-only: opt-in soft wrap. Stack is column-flow so wrap is meaningless. */
 .j-row--wrap { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, max-content); }
 
-/* ── Spinner — `< value >` cycler. Value is a display badge, NOT a button. ── */
+/* Spinner — `< value >` cycler. Value is a display badge, NOT a button. */
 .j-spinner-wrap {
   display: grid;
   grid-auto-flow: row;
@@ -1735,7 +1735,7 @@
   pointer-events: none;
 }
 
-/* ── Layout helpers ───────────────────────────────────────────────────── */
+/* Layout helpers */
 
 .j-row { display: grid; grid-auto-flow: column;
   grid-auto-columns: max-content; align-items: center; }
@@ -1755,7 +1755,7 @@
   margin: 0 4px;
 }
 
-/* ── Error Block ─────────────────────────────────────────────────────── */
+/* Error Block */
 .j-error-block {
   background: var(--j-dark-red);
   border: var(--j-panel-border-width) solid var(--j-red);
@@ -1772,7 +1772,7 @@
   letter-spacing: 0.04em;
 }
 
-/* ── Status Pill (specialization of badge — short single-word state) ── */
+/* Status Pill (specialization of badge — short single-word state) */
 .j-status-pill {
   display: inline-grid;
   grid-auto-flow: column;
@@ -1871,7 +1871,7 @@
   transition: opacity 200ms, filter 200ms;
 }
 
-/* ── Jammy mascot motion (class names used by json-render mascot) ───────── */
+/* Jammy mascot motion (class names used by json-render mascot) */
 
 @keyframes jammy-idle {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -1917,7 +1917,7 @@
   }
 }
 
-/* ── Jamlyzer 10k-Seed Triage Architecture ────────────────────────────── */
+/* Jamlyzer 10k-Seed Triage Architecture */
 
 .j-jamlyzer {
   width: 100%;
@@ -2109,7 +2109,7 @@
   gap: 4px;
 }
 
-/* ── Orbital menu + mascot (JimboOrbitalMenu / JimboMascot) ────────────── */
+/* Orbital menu + mascot (JimboOrbitalMenu / JimboMascot) */
 /* The ring lays itself out from a zero-size center anchor, so the menu box is
    a single grid cell and the anchor + optional mascot stack in it. */
 .j-orbital-menu {
@@ -2250,7 +2250,7 @@
   display: block;
 }
 
-/* ── Outer tab — grabbable tear-off pane chrome (JimboOuterTab) ────────── */
+/* Outer tab — grabbable tear-off pane chrome (JimboOuterTab) */
 .j-outer-tab {
   display: grid;
   grid-template-columns: auto auto 1fr auto;
@@ -2289,7 +2289,7 @@
 .j-outer-tab--purple { color: var(--j-purple); }
 .j-outer-tab--gold { color: var(--j-gold); }
 
-/* ── JamlMapPreview ────────────────────────────────────────────────────── */
+/* JamlMapPreview */
 
 .j-map-preview-pill {
   display: grid;
@@ -2426,7 +2426,7 @@
   gap: 10px;
   padding: 10px;
 }
-/* ── Deck Sprite ───────────────────────────────────────────────────────── */
+/* Deck Sprite */
 .j-deck-sprite {
   position: relative;
   width: var(--j-deck-w);
@@ -2442,7 +2442,7 @@
   image-rendering: pixelated;
 }
 
-/* ── Standard Card ─────────────────────────────────────────────────────── */
+/* Standard Card */
 .j-standard-card {
   position: relative;
   display: inline-block;
@@ -2481,7 +2481,7 @@
   pointer-events: none;
 }
 
-/* ── JamlIde ───────────────────────────────────────────────────────────── */
+/* JamlIde */
 .j-ide-results__empty {
   border: 1px dashed var(--j-dark-grey);
   border-radius: 10px;
@@ -2796,7 +2796,7 @@
     min-width: 0;
 }
 
-/* ── Dock (harvested SeedLab tab panel) ───────────────────────────────── */
+/* Dock (harvested SeedLab tab panel) */
 .j-dock {
   display: grid;
   min-height: 0;
@@ -2884,7 +2884,7 @@
     outline-offset: 2px;
 }
 
-/* ── Added via Fix ── */
+/* Added via Fix */
 .j-footer__suit--heart { animation-name: jaml-heart; }
 .j-footer__suit--spade { animation-name: jaml-spade; }
 .j-footer__suit--diamond { animation-name: jaml-diamond; }
@@ -2975,7 +2975,7 @@
   outline-offset: 2px;
 }
 
-/* ── JimboSlider — chunky range dial ──────────────────────────────────── */
+/* JimboSlider — chunky range dial */
 .j-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -3011,7 +3011,7 @@
 .j-slider:disabled { opacity: 0.55; cursor: not-allowed; }
 .j-slider:focus-visible { box-shadow: 0 0 0 3px rgba(228, 182, 67, 0.5); }
 
-/* ── SeedCalculus — geometric-waiting-time panel ──────────────────────── */
+/* SeedCalculus — geometric-waiting-time panel */
 .j-seedcalc__rarity { text-align: center; display: flex; flex-direction: column; gap: var(--j-space-xs); }
 .j-seedcalc__rarity-big { letter-spacing: 0.5px; }
 .j-seedcalc__one { color: var(--j-gold); }

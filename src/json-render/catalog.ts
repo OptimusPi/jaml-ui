@@ -9,7 +9,7 @@ import { z } from "zod";
  */
 export const jimboCatalog = schema.createCatalog({
   components: {
-    // ── Layout & Containers ───────────────────────────────────────────────
+    // Layout & Containers
     JimboPanel: {
       props: z.object({
         title: z.string().optional(),
@@ -60,7 +60,7 @@ export const jimboCatalog = schema.createCatalog({
       example: {},
     },
 
-    // ── Game & Balatro Sprites ────────────────────────────────────────────
+    // Game & Balatro Sprites
     JamlGameCard: {
       props: z.object({
         name: z.string(),
@@ -97,7 +97,7 @@ export const jimboCatalog = schema.createCatalog({
       example: { deck: "Erratic", stake: "White", size: 50 },
     },
 
-    // ── JAMLyzer ──────────────────────────────────────────────────────────
+    // JAMLyzer
     JamlyzerSeedCard: {
       props: z.object({
         seed: z.string(),
@@ -113,7 +113,7 @@ export const jimboCatalog = schema.createCatalog({
       },
     },
 
-    // ── Atoms & Primitives ────────────────────────────────────────────────
+    // Atoms & Primitives
     JimboButton: {
       props: z.object({
         label: z.string(),

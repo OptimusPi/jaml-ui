@@ -14,9 +14,8 @@ export interface JimboTabsProps {
 }
 
 /**
- * Balatro shop-style tab row. Each tab IS a JimboButton — same face, same
- * chunky press, same red tone as the in-game shop buttons. The only thing
- * that marks the selected tab is the red bouncing triangle above it.
+ * Shop-style tab row. Each tab is a red JimboButton; the bouncing arrow above
+ * the selected tab is the only selection marker.
  */
 export function JimboTabs({ tabs, activeTab, onTabChange }: JimboTabsProps) {
   return (

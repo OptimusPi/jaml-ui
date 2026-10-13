@@ -9,17 +9,7 @@ import { JimboText } from "../../ui/jimboText.js";
 import { JimboBadge } from "../../ui/JimboBadge.js";
 import { JimboRow } from "../../ui/JimboLayout.js";
 
-/**
- * The PRNG tape.
- *
- * `JamlyzerEvents` shows the first 8 rolls of 12 streams and drops the rest on
- * the floor. 25.1.0 dropped resumeSeeds; paging is `MotelyJamlyzer.analyze(config, n)`
- * with a growing n, then we keep only the new suffix.
- *
- * Nothing shipped has ever used it. This scrolls it.
- */
-
-/** The 14 streams the engine actually rolls. Two of them have never had a UI. */
+/** One entry per MotelyJamlyzerEvents stream. `fresh` streams get an orange badge. */
 const STREAMS = [
   { key: "luckyMoney", label: "Lucky money", kind: "bool", fresh: false },
   { key: "luckyMult", label: "Lucky mult", kind: "bool", fresh: false },
@@ -61,7 +51,6 @@ function appendPage(tape: Tape, events: MotelyJamlyzerEvents): Tape {
 export interface JamlyzerTapeProps {
   /** A JAML filter. Its `seeds:` list must name exactly one seed. */
   jaml: string;
-  /** Rolls fetched per page. The engine's own default is 20. */
   pageSize?: number;
   /** Stop after this many rolls so a runaway scroll can't page forever. */
   maxRolls?: number;
@@ -92,16 +81,14 @@ export function JamlyzerTape({
   // cascading ones.
   const [state, setState] = useState<TapeState>(freshState);
 
-  // The cursor lives in a ref, not state: a stale closure reading it would
-  // silently re-fetch the same window. It carries the filter it belongs to, so
-  // it invalidates itself rather than needing a render-phase reset.
+  // A ref, not state, so a stale closure can't re-fetch the same window. It
+  // stores its filter, so a filter change invalidates it.
   const cursorRef = useRef<{ jaml: string; rolls: number }>({ jaml, rolls: 0 });
   const busyRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  // Reset during render rather than in an effect — React re-renders before it
-  // paints, so there is no flash of the previous seed's tape and no cascading
-  // render.
+  // Reset during render, not in an effect: React re-renders before paint, so the
+  // previous seed's tape never flashes.
   const [prevJaml, setPrevJaml] = useState(jaml);
   if (prevJaml !== jaml) {
     setPrevJaml(jaml);
@@ -159,7 +146,6 @@ export function JamlyzerTape({
     if (state.status === "idle") void loadPage();
   }, [state.status, loadPage]);
 
-  // Auto-page when the foot of the tape scrolls into view.
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || state.status === "done" || state.status === "error") return;

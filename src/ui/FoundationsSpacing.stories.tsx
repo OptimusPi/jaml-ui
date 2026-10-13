@@ -10,7 +10,7 @@ export default meta;
 const SPACES = ["--j-space-xs", "--j-space-sm", "--j-space-md", "--j-space-lg", "--j-space-xl"];
 const RADII = ["--j-radius-sm", "--j-radius-md", "--j-radius-lg", "--j-radius-pill"];
 
-/* Token names and px values are code, not game copy — code font, no shadow. */
+/* Token names and px values are code, not game copy. */
 const LABEL: CSSProperties = {
   fontFamily: "var(--j-font-code)",
   fontSize: 11,
@@ -29,7 +29,7 @@ function useTokenValue(token: string): string {
   return value;
 }
 
-/* The gap between the two tiles IS the token, at actual size — no scale trick. */
+/* The gap between the two tiles is the token itself, at actual size. */
 function SpacingRow({ token }: { token: string }) {
   const px = useTokenValue(token);
   return (

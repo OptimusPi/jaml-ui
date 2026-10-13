@@ -82,7 +82,7 @@ export function DailyRitualView({
       style={style}
     >
       <JimboStack gap="md" align="stretch">
-        {/* ── Ritual Hero Header ───────────────────────────────────────────── */}
+        {/* Ritual Hero Header */}
         <JimboInnerPanel className="j-daily-ritual__hero">
           <JimboRow wrap gap="md" align="center" justify="between">
             <JimboStack gap="xs" align="start">
@@ -138,7 +138,7 @@ export function DailyRitualView({
           </JimboRow>
         </JimboInnerPanel>
 
-        {/* ── Flavor & Strategy Hints ─────────────────────────────────────── */}
+        {/* Flavor & Strategy Hints */}
         {(ritual.flavor || ritual.hint) && (
           <JimboRow wrap gap="md" align="stretch">
             {ritual.flavor && (
@@ -165,7 +165,7 @@ export function DailyRitualView({
           </JimboRow>
         )}
 
-        {/* ── Action Bar ─────────────────────────────────────────────────── */}
+        {/* Action Bar */}
         <JimboRow wrap gap="sm" align="center" justify="between">
           <JimboRow gap="xs" align="center">
             {onPlayRitual && (

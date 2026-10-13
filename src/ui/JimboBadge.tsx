@@ -10,10 +10,8 @@ export interface JimboBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode
 }
 
-// Class names are spelled out rather than interpolated. An interpolated name
-// never appears as a literal in the source, so nothing can grep for it, no
-// dead-CSS pass can count it, and a rename goes silently unstyled. `satisfies`
-// makes a missing tone a type error instead of a blank badge.
+// Class names are spelled out, not interpolated, so grep and dead-CSS checks
+// can see them. `satisfies` makes a missing tone a type error.
 const SIZE_CLASS = {
   sm: 'j-badge--sm',
   md: 'j-badge--md',

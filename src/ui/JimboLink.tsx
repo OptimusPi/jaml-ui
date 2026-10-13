@@ -5,12 +5,7 @@ export interface JimboLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorEle
   children?: React.ReactNode;
 }
 
-/**
- * Thin wrapper around `<a>`.
- *
- * Use when you need a plain hyperlink. The ESLint `no-raw-html` rule
- * forbids `<a>` outside `src/ui/`, so consumers use this primitive.
- */
+/** Thin wrapper around `<a>`. Use this instead of a raw `<a>` outside `src/ui/`. */
 export function JimboLink({ children, ...rest }: JimboLinkProps) {
   return <a {...rest}>{children}</a>;
 }

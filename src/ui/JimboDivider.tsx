@@ -7,7 +7,7 @@ export interface JimboDividerProps extends HTMLAttributes<HTMLHRElement> {
   vert?: boolean;
 }
 
-/** Thin hairline rule — the missing React half of `.j-divider`. */
+/** Thin hairline rule styled by `.j-divider`. */
 export function JimboDivider({ vert = false, className, ...rest }: JimboDividerProps) {
   const classes = ["j-divider", vert ? "j-divider--vert" : "", className].filter(Boolean).join(" ");
   return <hr className={classes} {...rest} />;

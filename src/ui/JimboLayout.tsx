@@ -2,9 +2,7 @@
 
 import type { HTMLAttributes } from "react";
 
-// The .j-stack / .j-row classes these bind to already exist in jimbo.css and are
-// grid-based by design — see the "Layout primitives" section there. This file is
-// only the missing React half.
+// .j-stack and .j-row are grid-based by design; see "Layout primitives" in jimbo.css.
 
 /** Spacing scale — maps to the --j-space-* tokens. */
 export type JimboGap = "xs" | "sm" | "md" | "lg" | "xl";
@@ -22,11 +20,8 @@ export type JimboLayoutProps = HTMLAttributes<HTMLDivElement> & {
   justify?: JimboJustify;
 };
 
-// Class names are spelled out rather than interpolated. An interpolated name
-// never appears as a literal in the source, so nothing can grep for it and no
-// dead-CSS pass can count it — which is exactly how the orphaned `.j-row--md`
-// scale sat in jimbo.css unnoticed. `satisfies` makes a missing variant a type
-// error instead of a silently unstyled element.
+// Class names are spelled out, not interpolated, so grep and dead-CSS checks
+// can see them. `satisfies` makes a missing variant a type error.
 const LAYOUT_CLASS = {
   "j-stack": {
     gap: {
@@ -80,7 +75,6 @@ function layoutClasses(
     .join(" ");
 }
 
-/** Vertical stack — the answer for "these go under each other". */
 export function JimboStack({
   gap,
   align,
@@ -102,10 +96,8 @@ export type JimboRowProps = JimboLayoutProps & {
 };
 
 /**
- * Horizontal row — the answer for "these go next to each other". Columns size to
- * their content (`grid-auto-columns: max-content`), so this is what every
- * hand-rolled layout div in the consumer screens should collapse into.
- * Defaults to vertically centred.
+ * Horizontal row. Columns size to their content (`grid-auto-columns: max-content`).
+ * Vertically centred by default.
  */
 export function JimboRow({
   gap,

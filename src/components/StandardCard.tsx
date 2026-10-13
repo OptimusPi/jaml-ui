@@ -6,7 +6,7 @@ import { resolveJamlAssetUrl } from '../assets.js'
 import { RANK_MAP, SUIT_MAP, ENHANCER_MAP, SEAL_MAP, EDITION_MAP, type SpritePos } from '../sprites/spriteData.js'
 import { CardEdition, type CardSuit, type CardRank, type CardEnhancement, type CardSeal } from './cardEnums.js'
 
-// ── Sprite geometry ────────────────────────────────────────────────────────
+// Sprite geometry
 
 const CARD_WIDTH = 71
 const CARD_HEIGHT = 95

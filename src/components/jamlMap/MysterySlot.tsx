@@ -7,7 +7,7 @@ import { JimboColorOption, withAlpha, JIMBO_ANIMATIONS } from "../../ui/tokens.j
 import type { SpriteSheetType } from "../../sprites/spriteMapper.js";
 
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// Types
 
 export type JamlZone = "must" | "should" | "mustnot";
 
@@ -48,7 +48,7 @@ export interface MysterySlotProps {
   style?: React.CSSProperties;
 }
 
-// ─── Zone colors ─────────────────────────────────────────────────────────────
+// Zone colors
 
 const C = JimboColorOption;
 
@@ -60,7 +60,7 @@ const ZONE_BORDER: Record<JamlZone, string> = {
 
 import { JimboBox } from "../../ui/JimboBox.js";
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// Component
 
 export function MysterySlot({
   zone,
@@ -187,7 +187,7 @@ export function MysterySlot({
   );
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// Helpers
 
 function categoryToSheet(cat: SlotCategory): SpriteSheetType | null {
   switch (cat) {
