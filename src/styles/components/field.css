@@ -49,8 +49,9 @@
     opacity: 0.7;
   }
   .j-input:focus-visible {
-    outline: none;
     border-color: var(--j-focus);
+    outline: 2px solid var(--j-focus);
+    outline-offset: 1px;
   }
   .j-input[data-invalid] {
     border-color: var(--j-red);

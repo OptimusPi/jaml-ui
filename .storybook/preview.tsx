@@ -1,8 +1,16 @@
 import type { Decorator, Preview } from '@storybook/react-vite';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { useEffect } from 'react';
+import bootsharp from 'motely-wasm';
 import { JimboBackground } from '../src/components/JimboBackground.tsx';
+import { JimboBackground as JimboBackgroundLegacy } from '../src/ui/JimboBackground.js';
 import '../src/styles/jaml.css';
+import '../src/ui/jimbo.css';
+import './preview.css';
+
+// Legacy apps (Apps/*) bring their own JimboApp shell and fill the viewport.
+// Everything else is a primitive and gets the v10 app context.
+const isLegacyApp = (title?: string) => !!title?.startsWith('Apps/');
 
 const withApp: Decorator = (Story, context) => {
   const motion = context.globals.motion as string | undefined;
@@ -11,6 +19,16 @@ const withApp: Decorator = (Story, context) => {
     if (motion === 'reduced') root.dataset.motion = 'reduced';
     else delete root.dataset.motion;
   }, [motion]);
+
+  if (isLegacyApp(context.title)) {
+    return (
+      <>
+        <JimboBackgroundLegacy />
+        <Story />
+      </>
+    );
+  }
+
   return (
     <>
       <JimboBackground />
@@ -22,6 +40,12 @@ const withApp: Decorator = (Story, context) => {
 };
 
 const preview: Preview = {
+  loaders: [
+    async () => {
+      if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
+      return {};
+    },
+  ],
   decorators: [
     withApp,
     withThemeByDataAttribute({

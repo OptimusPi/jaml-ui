@@ -34,25 +34,44 @@
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "vocab:check": "node --experimental-strip-types scripts/check-vocab-drift.mjs",
+    "decode:check": "node scripts/check-decoder.mjs",
+    "lut:emit": "node scripts/emit-motely-sprite-lut.mjs",
+    "motd:emit": "node scripts/emit-motds.mjs",
+    "gen:grammar": "node scripts/gen-engine-grammar.mjs"
   },
   "peerDependencies": {
+    "motely-wasm": "^29.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@base-ui/react": "^1.9.0"
+    "@base-ui/react": "^1.9.0",
+    "@json-render/core": "^0.20.0",
+    "@json-render/react": "^0.20.0",
+    "react-icons": "^5.7.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@codemirror/autocomplete": "^6.20.3",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@lezer/highlight": "^1.2.5",
     "@storybook/addon-a11y": "^10.6.2",
     "@storybook/addon-docs": "^10.6.2",
     "@storybook/addon-mcp": "^10.6.2",
     "@storybook/addon-themes": "^10.6.2",
     "@storybook/react-vite": "^10.6.2",
+    "@tsdown/css": "0.23.1",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "motely-wasm": "^29.0.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "storybook": "^10.6.2",

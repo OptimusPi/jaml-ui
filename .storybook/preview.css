@@ -1,0 +1,50 @@
+/* The pixel fonts. jimbo.css only *references* m6x11plus/m6x11 via --j-font —
+   it never declares the faces (consumers embed them; seedfinder vendors them
+   as base64 data URIs). Storybook must declare them itself or every story
+   silently falls back to the OS monospace — the "font is wrong" bug. */
+@font-face {
+  font-family: 'm6x11plus';
+  src: url('../assets/fonts/m6x11plus.ttf') format('truetype');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'm6x11';
+  src: url('../assets/fonts/m6x11.ttf') format('truetype');
+  font-display: block;
+}
+
+html,
+body,
+#storybook-root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Felt is the world. Primitives sit in a padded slot; Apps fill the locked viewport. */
+.story-root {
+  min-height: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.story-root--flush {
+  overflow: hidden;
+}
+
+.story-root__stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+}
+
+.story-root__stage--flush {
+  padding: 0;
+  height: 100%;
+  display: block;
+}

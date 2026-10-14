@@ -107,5 +107,13 @@ export const size = {
   touch: '44px',
 } as const;
 
-export const tokens = { palette, tones, themes, space, radius, font, fontSize, motion, depth, size } as const;
+/** Stacking order. One scale, so nothing fights over magic numbers. */
+export const z = {
+  below: -10,
+  backdrop: 40,
+  dialog: 41,
+  popover: 50,
+} as const;
+
+export const tokens = { palette, tones, themes, space, radius, font, fontSize, motion, depth, size, z } as const;
 export type Tokens = typeof tokens;

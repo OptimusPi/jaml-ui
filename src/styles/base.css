@@ -15,12 +15,13 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Every tone-able part reads --j-tone / --j-tone-deep, set here once. */
-  [data-tone='orange'] { --j-tone: var(--j-tone-orange); --j-tone-deep: var(--j-tone-orange-deep); }
-  [data-tone='red'] { --j-tone: var(--j-tone-red); --j-tone-deep: var(--j-tone-red-deep); }
-  [data-tone='blue'] { --j-tone: var(--j-tone-blue); --j-tone-deep: var(--j-tone-blue-deep); }
-  [data-tone='green'] { --j-tone: var(--j-tone-green); --j-tone-deep: var(--j-tone-green-deep); }
-  [data-tone='purple'] { --j-tone: var(--j-tone-purple); --j-tone-deep: var(--j-tone-purple-deep); }
+  /* Every tone-able part reads --j-tone / --j-tone-deep, set here once.
+     Scoped to .j-app so a host's own data-tone is never hijacked. */
+  .j-app [data-tone='orange'] { --j-tone: var(--j-orange); --j-tone-deep: var(--j-orange-deep); }
+  .j-app [data-tone='red'] { --j-tone: var(--j-red); --j-tone-deep: var(--j-red-deep); }
+  .j-app [data-tone='blue'] { --j-tone: var(--j-blue); --j-tone-deep: var(--j-blue-deep); }
+  .j-app [data-tone='green'] { --j-tone: var(--j-green); --j-tone-deep: var(--j-green-deep); }
+  .j-app [data-tone='purple'] { --j-tone: var(--j-purple); --j-tone-deep: var(--j-purple-deep); }
 
   .j-sr-only {
     position: absolute;

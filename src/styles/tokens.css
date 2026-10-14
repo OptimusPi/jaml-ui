@@ -26,16 +26,6 @@
     --j-background: oklch(19.78% 0.0171 195.85);
     --j-white: oklch(100% 0 0);
     --j-black: oklch(0% 0 0);
-    --j-tone-orange: oklch(77.03% 0.1741 64.05);
-    --j-tone-orange-deep: oklch(53.93% 0.1238 62.25);
-    --j-tone-red: oklch(67.46% 0.2107 27.29);
-    --j-tone-red-deep: oklch(46.75% 0.1583 27.95);
-    --j-tone-blue: oklch(65.58% 0.1899 250.83);
-    --j-tone-blue-deep: oklch(45.61% 0.1390 252.61);
-    --j-tone-green: oklch(63.60% 0.1062 163.60);
-    --j-tone-green-deep: oklch(43.80% 0.0763 163.39);
-    --j-tone-purple: oklch(63.72% 0.1371 304.31);
-    --j-tone-purple-deep: oklch(43.91% 0.0982 303.74);
     --j-space-xs: 2px;
     --j-space-sm: 4px;
     --j-space-md: 8px;
@@ -62,6 +52,10 @@
     --j-depth-shadow-heavy: oklch(0% 0 0 / 0.55);
     --j-size-touch: 44px;
     --j-app-w: 375px;
+    --j-z-below: -10;
+    --j-z-backdrop: 40;
+    --j-z-dialog: 41;
+    --j-z-popover: 50;
   }
 
   :root,
@@ -69,10 +63,8 @@
     color-scheme: dark;
     --j-page: oklch(19.78% 0.0171 195.85);
     --j-surface: oklch(41.51% 0.0283 213.23);
-    --j-surface-inset: oklch(33.65% 0.0226 218.99);
     --j-surface-edge: oklch(28.88% 0.0224 214.97);
     --j-border: oklch(81.20% 0.0246 262.08);
-    --j-border-south: oklch(59.09% 0.0187 259.42);
     --j-text: oklch(100% 0 0);
     --j-text-muted: oklch(78.09% 0.0224 207.57);
     --j-text-shadow: oklch(0% 0 0 / 0.8);

@@ -1,0 +1,102 @@
+name: simpleCola
+author: pifreak
+description: Diet Cola Trick at Ante 5. Diet Cola Trick is using PErkeo adn Ankh for ma Ghost Deck's shop items consumale grab and duplciaitng hte hell out of it as much sa you can. SAcrifice EVERY joker, including poor Perkeo! and only keep one: Diet fola. Use 1 Ankh (Destroys all other joker: none sinc exu got. non e but. diet cola! and then you have 2 diet cola. now sell one diet cola. yoou get 1 DoubleTag: it si A TAG that sits n your TAG INVENTORY. :) use Ankh, Sell. Ankh., sek. reoeat. then popo tha tnegative tag ge tlike ~20-30 ish by ante 5, and hope for another legenday joker AFTER then ":sacrifice it all."
+deck: Ghost
+stake: White
+
+must:
+  - legendaryJoker: Perkeo
+    antes: [1,2]
+  - spectralCard: Ankh
+    antes: [1,2]
+    sources:
+      shopItems: [0,1,2,3]
+  - smallBlindTag: NegativeTag
+    antes: [5]
+  - joker: DietCola
+    antes: [5]
+    sources:
+      boosterPacks: [0,1]
+      shopItems: [0,1]
+should:
+  - joker: OopsAll6s
+    score: 2
+    antes: [1,2,3,4]
+  - joker: OopsAll6s
+    score: 10
+    sources:
+      shopItems: [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+    antes: [5]
+  - jokers: [HangingChad, Blueprint, Brainstorm, InvisibleJoker]
+    score: 8
+    sources:
+      shopItems: [2,3,4,5,6,7,8]
+    antes: [5]
+
+  - joker: Showman
+    antes: [1,2,3,4,5]
+    score: 4
+    max: 1
+
+  - joker: OopsAll6s
+    score: 10
+    sources:
+      shopItems: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+    antes: [6]
+  - jokers: [HangingChad, Blueprint, Brainstorm, InvisibleJoker]
+    score: 8
+    sources:
+      shopItems: [0,1,2,3,4,5,6,7,8]
+    antes: [6]
+
+seeds:
+  - 7CSNSFD1
+  - P6F4DGA1
+  - P5TOP111
+  - 57GRO411
+  - WTWJ5A11
+  - GCS2JD21
+  - FBVOON31
+  - SKZHJR41
+  - BK1HF761
+  - 8PYR1I61
+  - 9RDJ8O61
+  - IRIPIX61
+  - 2DZZR571
+  - MVIIGH71
+  - LFMSJW71
+  - 7DO4BA91
+  - HDZLTC91
+  - YDECDU91
+  - DKZO8111
+  - ZEIA7111
+  - EPV23111
+  - CUP27111
+  - V9Y11111
+  - GWX14111
+  - Q3916111
+  - FFC14111
+  - MED17111
+  - NK915111
+  - VR413111
+  - KV515111
+  - 3R214111
+  - 5M213111
+  - GU112111
+  - WF115111
+  - WJ216111
+  - 4P213111
+  - 21314111
+  - PP115111
+  - NM411111
+  - F3712111
+  - T8ANALX8
+  - TITSGOFG
+  - PISSTYVB
+  - G1ZECUMS
+  - XIT5CUMS
+  - 6FAGS3GH
+  - 2M8CUMSI
+  - 95GQFUCK
+  - GMDONGIV
+  - X6ZKHJ11

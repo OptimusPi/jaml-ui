@@ -1,0 +1,59 @@
+"use client";
+
+import { MotelyDeck, MotelyStake } from "motely-wasm";
+import { DeckSprite, StakeSprite } from "./DeckSprite.js";
+import { JimboPanelSpinner } from "../ui/JimboPanelSpinner.js";
+import { JimboStack, JimboRow } from "../ui/JimboLayout.js";
+
+/** Member names of a numeric TS enum, in declaration order (drops the reverse-mapped numbers). */
+const enumNames = (e: object): readonly string[] => Object.keys(e).filter((k) => Number.isNaN(Number(k)));
+
+const DECKS = enumNames(MotelyDeck);
+const STAKES = enumNames(MotelyStake);
+
+function cycle(list: readonly string[], value: string, dir: -1 | 1): string {
+  const i = list.indexOf(value);
+  const start = i < 0 ? 0 : i;
+  return list[(start + dir + list.length) % list.length]!;
+}
+
+export interface DeckStakePickerProps {
+  deck: string;
+  stake: string;
+  onDeckChange: (deck: string) => void;
+  onStakeChange: (stake: string) => void;
+  layout?: "stack" | "row";
+  className?: string;
+}
+
+/** New-run deck + stake cyclers. Sprites from the atlas, names from Motely enums. */
+export function DeckStakePicker({
+  deck,
+  stake,
+  onDeckChange,
+  onStakeChange,
+  layout = "stack",
+  className = "",
+}: DeckStakePickerProps) {
+  const Container = layout === "row" ? JimboRow : JimboStack;
+  return (
+    <Container gap="md" className={className} align="center" justify="center">
+      <JimboPanelSpinner
+        label="Deck"
+        title={deck}
+        media={<DeckSprite deck={deck} stake={stake} size={64} />}
+        onPrev={() => onDeckChange(cycle(DECKS, deck, -1))}
+        onNext={() => onDeckChange(cycle(DECKS, deck, 1))}
+      />
+      <JimboPanelSpinner
+        label="Stake"
+        title={stake}
+        media={<StakeSprite stake={stake} size={54} />}
+        onPrev={() => onStakeChange(cycle(STAKES, stake, -1))}
+        onNext={() => onStakeChange(cycle(STAKES, stake, 1))}
+      />
+      </Container>
+    );
+  }
+
+export { DECKS as DECK_PICKER_NAMES, STAKES as STAKE_PICKER_NAMES };

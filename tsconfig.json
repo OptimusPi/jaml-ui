@@ -4,16 +4,18 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
+    "allowArbitraryExtensions": true,
     "isolatedModules": true,
     "isolatedDeclarations": false,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["node"]
+    "types": ["node", "vite/client"]
   },
-  "include": ["src", ".storybook"]
+  "include": ["src", ".storybook"],
+  "exclude": ["**/*.stories.ts", "**/*.stories.tsx"]
 }

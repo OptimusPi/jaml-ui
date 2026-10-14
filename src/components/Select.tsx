@@ -65,7 +65,7 @@ export function Select<T extends string | number>({
                   className="j-select__item"
                 >
                   <BaseSelect.ItemIndicator className="j-select__check">✓</BaseSelect.ItemIndicator>
-                  <BaseSelect.ItemText>{item.label}</BaseSelect.ItemText>
+                  <BaseSelect.ItemText className="j-select__text">{item.label}</BaseSelect.ItemText>
                 </BaseSelect.Item>
               ))}
             </BaseSelect.List>
