@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { MotelyJamlyzerSeedResult, MotelyJamlyzerAnteResult } from "motely-wasm";
+import type { MotelyItem, MotelyJamlyzerSeedResult, MotelyJamlyzerAnteResult } from "motely-wasm";
 import { JamlyzerView } from "./JamlyzerView.js";
 import { decodeMotelyItem } from "../decode/motelyItemDecoder.js";
 import { JimboPanel } from "../ui/JimboPanel.js";
@@ -32,7 +32,7 @@ export interface JamlyzerBulkProps {
   pageSize?: number;
 }
 
-function pullItems(ante: MotelyJamlyzerAnteResult): MotelyJamlyzerAnteResult["pulls"]["judgementJokers"] {
+function pullItems(ante: MotelyJamlyzerAnteResult, legendaries: MotelyItem[]): MotelyJamlyzerAnteResult["pulls"]["judgementJokers"] {
   return [
     ...ante.pulls.judgementJokers,
     ...ante.pulls.wraithJokers,
@@ -43,7 +43,7 @@ function pullItems(ante: MotelyJamlyzerAnteResult): MotelyJamlyzerAnteResult["pu
     ...ante.pulls.riffRaffJokers,
     ...ante.pulls.rareTagJokers,
     ...ante.pulls.uncommonTagJokers,
-    ...ante.pulls.legendaryJokers,
+    ...legendaries,
   ];
 }
 
@@ -59,7 +59,10 @@ function seedClauseMatches(
       const allItems = [
         ...ante.shopItems,
         ...ante.packs.flatMap((p) => p.items),
-        ...pullItems(ante),
+        ...pullItems(
+          ante,
+          seedResult.legendaryOrder.filter((l) => l.ante === ante.ante).map((l) => l.item),
+        ),
       ];
       const matched = allItems.some((item) => {
         const decoded = decodeMotelyItem(item);

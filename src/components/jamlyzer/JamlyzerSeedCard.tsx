@@ -60,7 +60,7 @@ function extractSeedMilestones(
           ...ante.pulls.riffRaffJokers,
           ...ante.pulls.rareTagJokers,
           ...ante.pulls.uncommonTagJokers,
-          ...ante.pulls.legendaryJokers,
+          ...result.legendaryOrder.filter((l) => l.ante === ante.ante).map((l) => l.item),
         ];
 
         const matched = allItems.some((item) => {
@@ -90,8 +90,9 @@ function extractSeedMilestones(
       if (milestones.length >= maxMilestones) break;
 
       // Legendary Jokers
-      if (ante.pulls.legendaryJokers.length > 0) {
-        const decoded = decodeMotelyItem(ante.pulls.legendaryJokers[0]);
+      const legendary = result.legendaryOrder.find((l) => l.ante === ante.ante);
+      if (legendary) {
+        const decoded = decodeMotelyItem(legendary.item);
         if (decoded?.displayName) {
           milestones.push({
             ante: ante.ante,
