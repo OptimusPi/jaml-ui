@@ -7,6 +7,7 @@ import {
   MotelyStandardcardRank,
   MotelyStandardcardSuit,
 } from "motely-wasm";
+import type { MotelyItem, MotelyItemType, MotelyJamlyzerLegendary } from "motely-wasm";
 
 type MotelyItemCategoryName = "Standardcard" | "SpectralCard" | "TarotCard" | "PlanetCard" | "Joker" | "Invalid";
 
@@ -299,6 +300,36 @@ export function decodeMotelyItemToJamlCard(input: MotelyItemInput, scale?: numbe
       scale,
     },
   };
+}
+
+/**
+ * A legendary from the seed's `legendaryOrder` (the run's one Joker4 stream, motely-wasm 30+)
+ * as the MotelyItem the decoders and cards take. A joker's item type is its category bits
+ * OR'd with its MotelyJoker value; the packed value adds the edition bits.
+ */
+export function motelyLegendaryToItem(legendary: MotelyJamlyzerLegendary): MotelyItem {
+  const type = (MotelyItemTypeCategory.Joker | legendary.joker) as MotelyItemType;
+  return {
+    value: type | legendary.edition,
+    type,
+    typeCategory: MotelyItemTypeCategory.Joker,
+    seal: MotelyItemSeal.None,
+    enhancement: MotelyItemEnhancement.None,
+    edition: legendary.edition,
+    standardcardSuit: MotelyStandardcardSuit.Clubs,
+    standardcardRank: MotelyStandardcardRank.Two,
+    isPerishable: false,
+    isEternal: false,
+    isRental: false,
+  };
+}
+
+/** The legendaries the run gets in one ante, in the order the game gives them. */
+export function legendaryItemsForAnte(
+  legendaryOrder: readonly MotelyJamlyzerLegendary[],
+  ante: number
+): MotelyItem[] {
+  return legendaryOrder.filter((l) => l.ante === ante).map(motelyLegendaryToItem);
 }
 
 export * from "./motelySprite.js";

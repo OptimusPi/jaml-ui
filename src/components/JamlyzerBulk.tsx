@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { MotelyJamlyzerSeedResult, MotelyJamlyzerAnteResult } from "motely-wasm";
 import { JamlyzerView } from "./JamlyzerView.js";
-import { decodeMotelyItem } from "../decode/motelyItemDecoder.js";
+import { decodeMotelyItem, legendaryItemsForAnte } from "../decode/motelyItemDecoder.js";
 import { JimboPanel } from "../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../ui/panel.js";
 import { JimboText } from "../ui/jimboText.js";
@@ -32,7 +32,10 @@ export interface JamlyzerBulkProps {
   pageSize?: number;
 }
 
-function pullItems(ante: MotelyJamlyzerAnteResult): MotelyJamlyzerAnteResult["pulls"]["judgementJokers"] {
+function pullItems(
+  ante: MotelyJamlyzerAnteResult,
+  legendaryOrder: MotelyJamlyzerSeedResult["legendaryOrder"]
+): MotelyJamlyzerAnteResult["pulls"]["judgementJokers"] {
   return [
     ...ante.pulls.judgementJokers,
     ...ante.pulls.wraithJokers,
@@ -43,7 +46,7 @@ function pullItems(ante: MotelyJamlyzerAnteResult): MotelyJamlyzerAnteResult["pu
     ...ante.pulls.riffRaffJokers,
     ...ante.pulls.rareTagJokers,
     ...ante.pulls.uncommonTagJokers,
-    ...ante.pulls.legendaryJokers,
+    ...legendaryItemsForAnte(legendaryOrder, ante.ante),
   ];
 }
 
@@ -59,7 +62,7 @@ function seedClauseMatches(
       const allItems = [
         ...ante.shopItems,
         ...ante.packs.flatMap((p) => p.items),
-        ...pullItems(ante),
+        ...pullItems(ante, seedResult.legendaryOrder),
       ];
       const matched = allItems.some((item) => {
         const decoded = decodeMotelyItem(item);

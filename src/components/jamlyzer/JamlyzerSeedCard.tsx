@@ -6,7 +6,7 @@ import { JimboBox } from "../../ui/JimboBox.js";
 import { JimboRow } from "../../ui/JimboLayout.js";
 import { JimboBadge } from "../../ui/JimboBadge.js";
 import { JimboSeedCopyChip } from "../../ui/JimboSeedCopyChip.js";
-import { decodeMotelyItem } from "../../decode/motelyItemDecoder.js";
+import { decodeMotelyItem, legendaryItemsForAnte } from "../../decode/motelyItemDecoder.js";
 import {
   type JamlClause,
   matchMotelyItemToClause,
@@ -60,7 +60,7 @@ function extractSeedMilestones(
           ...ante.pulls.riffRaffJokers,
           ...ante.pulls.rareTagJokers,
           ...ante.pulls.uncommonTagJokers,
-          ...ante.pulls.legendaryJokers,
+          ...legendaryItemsForAnte(result.legendaryOrder, ante.ante),
         ];
 
         const matched = allItems.some((item) => {
@@ -90,8 +90,9 @@ function extractSeedMilestones(
       if (milestones.length >= maxMilestones) break;
 
       // Legendary Jokers
-      if (ante.pulls.legendaryJokers.length > 0) {
-        const decoded = decodeMotelyItem(ante.pulls.legendaryJokers[0]);
+      const legendaries = legendaryItemsForAnte(result.legendaryOrder, ante.ante);
+      if (legendaries.length > 0) {
+        const decoded = decodeMotelyItem(legendaries[0]);
         if (decoded?.displayName) {
           milestones.push({
             ante: ante.ante,

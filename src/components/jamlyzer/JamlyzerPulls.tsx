@@ -1,12 +1,12 @@
 "use client";
 
-import type { MotelyJamlyzerAnteResult } from "motely-wasm";
+import type { MotelyJamlyzerAnteResult, MotelyJamlyzerLegendary } from "motely-wasm";
 import { JimboPanel } from "../../ui/JimboPanel.js";
 import { JimboInnerPanel } from "../../ui/panel.js";
 import { JimboText } from "../../ui/jimboText.js";
 import { JimboRow } from "../../ui/JimboLayout.js";
 import { JamlVoucher } from "../GameCard.js";
-import { decodeMotelyItem } from "../../decode/motelyItemDecoder.js";
+import { decodeMotelyItem, legendaryItemsForAnte } from "../../decode/motelyItemDecoder.js";
 import type { JamlClause } from "../../lib/jaml/jaml.js";
 import { voucherDisplayName } from "./names.js";
 import { itemTypeOfCategory, selectHighlight } from "./highlight.js";
@@ -15,10 +15,12 @@ import { JamlyzerItemCard } from "./JamlyzerItemCard.js";
 export interface JamlyzerPullsProps {
   ante: MotelyJamlyzerAnteResult;
   matches: Map<string, JamlClause[]>;
+  /** The seed's `legendaryOrder`; this ante's entries show as "Legendary jokers". */
+  legendaryOrder?: readonly MotelyJamlyzerLegendary[];
 }
 
 /** Extra-card pulls (Judgement, Wraith, tags, …) and the voucher sequence. */
-export function JamlyzerPulls({ ante, matches }: JamlyzerPullsProps) {
+export function JamlyzerPulls({ ante, matches, legendaryOrder = [] }: JamlyzerPullsProps) {
   const pulls = ante.pulls;
   const groups = [
     { title: "Judgement jokers", items: pulls.judgementJokers },
@@ -30,7 +32,7 @@ export function JamlyzerPulls({ ante, matches }: JamlyzerPullsProps) {
     { title: "Riff-Raff jokers", items: pulls.riffRaffJokers },
     { title: "Rare tag jokers", items: pulls.rareTagJokers },
     { title: "Uncommon tag jokers", items: pulls.uncommonTagJokers },
-    { title: "Legendary jokers", items: pulls.legendaryJokers },
+    { title: "Legendary jokers", items: legendaryItemsForAnte(legendaryOrder, ante.ante) },
   ].filter((g) => g.items.length > 0);
 
   if (groups.length === 0 && pulls.voucherSequence.length === 0) return null;
