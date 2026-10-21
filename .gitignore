@@ -38,3 +38,4 @@ ds-bundle/
 .vercel
 .env*
 /screenshot_balatro_examples
+/scripts
