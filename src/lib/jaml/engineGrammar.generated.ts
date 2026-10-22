@@ -3,7 +3,7 @@
 // scripts/check-vocab-drift.mjs runs every key here through the engine's JamlConfigLoader.check.
 
 /** Top-level document keys (JamlConfig properties). */
-export const ROOT_KEYS: readonly string[] = ["id","name","description","author","deck","stake","seeds","must","should","mustNot"];
+export const ROOT_KEYS: readonly string[] = ["id","name","description","author","deck","stake","seeds","cutoff","must","should","mustNot"];
 
 /** Clause key (the YAML mapping key, e.g. `legendaryJoker`) -> the clause class it loads. */
 export const DISCRIMINATORS = {
@@ -89,12 +89,12 @@ export const DISCRIMINATORS = {
   },
   "standardCard": {
     "clause": "StandardCardClause",
-    "valueProperty": "label",
+    "valueProperty": "card",
     "valueIsList": false
   },
   "standardCards": {
     "clause": "StandardCardClause",
-    "valueProperty": "label",
+    "valueProperty": "card",
     "valueIsList": false
   },
   "erraticRank": {
@@ -179,8 +179,18 @@ export const DISCRIMINATORS = {
   },
   "startingDraw": {
     "clause": "StartingDrawClause",
-    "valueProperty": "label",
+    "valueProperty": "card",
     "valueIsList": false
+  },
+  "soulOrder": {
+    "clause": "LegendarySoulOrderClause",
+    "valueProperty": "entries",
+    "valueIsList": true
+  },
+  "soulOrders": {
+    "clause": "LegendarySoulOrderClause",
+    "valueProperty": "entries",
+    "valueIsList": true
   },
   "luckyMoney": {
     "clause": "LuckyMoneyClause",
@@ -310,8 +320,19 @@ export const CLAUSE_KEYS: Record<string, readonly string[]> = {
     "jokers",
     "edition",
     "sources",
+    "rolls",
+    "with",
     "soulCardOnly",
     "soulEditionRolls"
+  ],
+  "LegendarySoulOrderClause": [
+    "label",
+    "min",
+    "max",
+    "score",
+    "entries",
+    "maxAnte",
+    "boosterPacks"
   ],
   "PlanetCardClause": [
     "label",
@@ -346,6 +367,7 @@ export const CLAUSE_KEYS: Record<string, readonly string[]> = {
     "max",
     "score",
     "antes",
+    "card",
     "rank",
     "suit",
     "enhancement",
@@ -437,6 +459,7 @@ export const CLAUSE_KEYS: Record<string, readonly string[]> = {
     "max",
     "score",
     "antes",
+    "card",
     "rank",
     "suit"
   ],
