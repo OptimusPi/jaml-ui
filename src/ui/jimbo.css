@@ -204,13 +204,14 @@
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
 }
 
-.j-btn:not(.j-btn--disabled):hover .j-btn__face { filter: brightness(1.1); }
+/* Balatro feedback: the face darkens on hover, and darker still when pressed. */
+.j-btn:not(.j-btn--disabled):hover .j-btn__face { filter: brightness(0.88); }
 
 .j-btn[data-pressed="true"] .j-btn__face,
 .j-btn:active:not(.j-btn--disabled) .j-btn__face {
   transform: translateY(4px);
   box-shadow: none;
-  filter: none;
+  filter: brightness(0.75);
 }
 
 .j-btn--xs .j-btn__face { padding: 5px 10px;  font-size: 12px; }
