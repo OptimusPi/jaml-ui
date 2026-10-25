@@ -10,7 +10,7 @@ Tokens in JS: `import { tokens, palette, tones } from 'jaml-ui/tokens'`
 
 ## Components (import from 'jaml-ui')
 
-- Button: tone ('orange'|'red'|'blue'|'green'|'purple'), size ('xs'|'sm'|'md'|'lg'), block, disabled, disabledReason
+- Button: tone ('orange'|'red'|'blue'|'green'|'purple'), size ('xs'|'sm'|'md'|'lg'), block, disabled, disabledReason. Balatro feedback: hover DARKENS the face (0.88), press sinks 4px and darkens further (0.75). Never brighten on hover.
 - Tooltip: content, children (one element), side, delay. TooltipProvider shares delay between tooltips.
 - Panel: title, headingLevel, variant ('raised'|'inset'), as
 - Badge: tone, size ('sm'|'md')
