@@ -1,6 +1,6 @@
 {
   "name": "jaml-ui",
-  "version": "10.0.0-alpha.0",
+  "version": "10.0.0-alpha.1",
   "description": "Balatro-style React primitives on Base UI. One look, shared by every JAML site.",
   "license": "MIT",
   "type": "module",
