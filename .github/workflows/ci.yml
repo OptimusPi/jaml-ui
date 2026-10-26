@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify:
-    name: typecheck · vocab · lint · build
+    name: typecheck · vocab · lint · test · build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +41,9 @@ jobs:
 
       - name: Lint
         run: pnpm lint
+
+      - name: Test
+        run: pnpm test
 
       - name: Build
         run: pnpm build

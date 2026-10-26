@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import bootsharp, {
   CancellationToken,
   Errors,
@@ -74,8 +74,21 @@ const END_BATCH = 2n;
 const SEEDS_PER_BATCH = 35 ** BATCH_CHARS; // 1,500,625
 const WINDOW_SEEDS = Number(END_BATCH - START_BATCH) * SEEDS_PER_BATCH; // 3,001,250
 
-/** Hits kept in the list. The engine can out-run the DOM on a loose filter. */
-const MAX_HITS = 80;
+/**
+ * Hits kept for one search. Every hit is kept up to here; past it the list stops
+ * growing and the Results pane says how many more were found and not kept.
+ * ~100k rows of { seed, score, tallies } is a few MB — a ceiling, not a target.
+ */
+export const MAX_HITS = 100_000;
+
+/** Rows the Results table renders at a time; scrolling near the end adds another page. */
+export const HIT_PAGE_SIZE = 100;
+
+/**
+ * Hits LiveJamlIde hands its Inspect tab. The Jamlyzer analyses every seed it
+ * is given, on every change, so it gets the newest few, as it always has.
+ */
+const IDE_INSPECT_HITS = 80;
 
 /** How often the engine reports progress. ~7 ticks/second reads as live. */
 const PROGRESS_INTERVAL_MS = 150n;
@@ -128,7 +141,12 @@ const ZERO_STATS: SeedSearchStats = {
 function useSeedSearch(jaml: string) {
   const [phase, setPhase] = useState<SeedSearchPhase>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [hits, setHits] = useState<SeedHit[]>([]);
+  /** Newest first. Rebuilt on flush, not per hit (see `flush` in start()). */
+  const [hits, setHits] = useState<readonly SeedHit[]>([]);
+  /** Hits found after the list reached MAX_HITS, counted but not kept. */
+  const [overflow, setOverflow] = useState(0);
+  /** Bumps on every start(), so views keyed on it reset with the list. */
+  const [searchId, setSearchId] = useState(0);
   const [tallyLabels, setTallyLabels] = useState<readonly string[]>([]);
   const [stats, setStats] = useState<SeedSearchStats>(ZERO_STATS);
 
@@ -162,14 +180,36 @@ function useSeedSearch(jaml: string) {
 
     setError(null);
     setHits([]);
+    setOverflow(0);
+    setSearchId((id) => id + 1);
     setTallyLabels([]);
     setStats(ZERO_STATS);
     setPhase("booting");
 
+    /*
+     * Hits land in a plain array (O(1) per hit) and reach React state on the
+     * progress tick and once at the end. A loose filter finds thousands of
+     * seeds a second; a prepend-copy plus a render per hit is quadratic and
+     * locks the page long before the list gets anywhere near MAX_HITS.
+     */
+    const found: SeedHit[] = [];
+    let dropped = 0;
+    let flushedFound = 0;
+    let flushedDropped = 0;
+    const flush = () => {
+      if (found.length === flushedFound && dropped === flushedDropped) return;
+      flushedFound = found.length;
+      flushedDropped = dropped;
+      setHits(found.slice().reverse());
+      setOverflow(dropped);
+    };
+
     const onHit = (seed: string, score: number, tallies: readonly number[]) => {
-      setHits((prev) => [{ seed, score, tallies }, ...prev].slice(0, MAX_HITS));
+      if (found.length < MAX_HITS) found.push({ seed, score, tallies });
+      else dropped++;
     };
     const onProgress = (p: MotelyProgress) => {
+      flush();
       setStats({
         seedsSearched: Number(p.seedsSearched),
         matchingSeeds: Number(p.matchingSeeds),
@@ -238,12 +278,13 @@ function useSeedSearch(jaml: string) {
       setError(Errors.last() ?? (e instanceof Error ? e.message : String(e)));
       setPhase("error");
     } finally {
+      flush();
       if (runRef.current === token) runRef.current = null;
     }
   }, [jaml]);
 
   const running = phase === "booting" || phase === "searching";
-  return { phase, running, error, hits, tallyLabels, stats, start, stop };
+  return { phase, running, error, hits, overflow, searchId, tallyLabels, stats, start, stop };
 }
 
 const integer = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
@@ -258,13 +299,23 @@ function describeProgress(phase: SeedSearchPhase, stats: SeedSearchStats, hitCou
   const parts = [`${integer.format(stats.seedsSearched)} seeds`];
   if (stats.percentComplete > 0) parts.push(`${Math.round(stats.percentComplete * 100)}%`);
   if (stats.seedsPerSecond > 0) parts.push(`${integer.format(stats.seedsPerSecond)}/s`);
-  parts.push(`${hitCount} ${hitCount === 1 ? "hit" : "hits"}`);
+  parts.push(`${integer.format(hitCount)} ${hitCount === 1 ? "hit" : "hits"}`);
   return parts.join(" · ");
 }
 
 export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: string }) {
   const [jaml, setJaml] = useState(defaultJaml);
   const { running, error, hits, tallyLabels, stats, phase, start } = useSeedSearch(jaml);
+  const inspectResults = useMemo(
+    () =>
+      hits.slice(0, IDE_INSPECT_HITS).map((h) => ({
+        seed: h.seed,
+        score: h.score,
+        tallyColumns: [...h.tallies],
+        tallyLabels: [...tallyLabels],
+      })),
+    [hits, tallyLabels],
+  );
 
   return (
     <JamlIde
@@ -273,12 +324,7 @@ export function LiveJamlIde({ defaultJaml = STARTER_JAML }: { defaultJaml?: stri
       onSearch={() => void start()}
       isSearching={running}
       showLoadFileButton
-      searchResults={hits.map((h) => ({
-        seed: h.seed,
-        score: h.score,
-        tallyColumns: [...h.tallies],
-        tallyLabels: [...tallyLabels],
-      }))}
+      searchResults={inspectResults}
       subtitle={error ?? (running ? describeProgress(phase, stats, hits.length) : undefined)}
     />
   );
@@ -298,7 +344,7 @@ export function SeedLab({
 }) {
   const [jaml, setJaml] = useState(defaultJaml);
   const [selected, setSelected] = useState<string | null>(null);
-  const { phase, running, error, hits, tallyLabels, stats, start, stop } = useSeedSearch(jaml);
+  const { phase, running, error, hits, overflow, searchId, tallyLabels, stats, start, stop } = useSeedSearch(jaml);
   const wide = useWideLayout();
 
   const autoStarted = useRef(false);
@@ -311,7 +357,8 @@ export function SeedLab({
   // Demo mode: pin the first hit so the Jamlyze pane lights up with it.
   // Adjust-state-during-render (same pattern as the IDE's prop sync above) —
   // an effect here would fire setState after paint and trip the lint rule.
-  const firstHit = hits[0]?.seed ?? null;
+  // `hits` is newest first and arrives in batches, so the first find is the last row.
+  const firstHit = hits[hits.length - 1]?.seed ?? null;
   const [pinnedFirstHit, setPinnedFirstHit] = useState<string | null>(null);
   if (autoStart && firstHit !== pinnedFirstHit) {
     setPinnedFirstHit(firstHit);
@@ -409,7 +456,9 @@ export function SeedLab({
                 </JimboText>
               ) : (
                 <SeedHitTable
+                  key={searchId}
                   hits={hits}
+                  overflow={overflow}
                   tallyLabels={tallyLabels}
                   selected={selected}
                   onSelect={setSelected}
@@ -438,66 +487,130 @@ export function SeedLab({
   );
 }
 
+/** Nearest ancestor that scrolls vertically (the dock pane body), or null for the viewport. */
+function scrollParent(el: HTMLElement): HTMLElement | null {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (overflowY === "auto" || overflowY === "scroll" || overflowY === "overlay") return node;
+  }
+  return null;
+}
+
 /**
  * Results pane: one row per hit — Seed, Score, then one column per should
  * clause's tally, headed by that clause's label. Clicking a row picks it for Jamlyze.
+ *
+ * Every hit is in `hits`, but only the first `HIT_PAGE_SIZE * n` rows render: a
+ * sentinel under the table grows n when it scrolls into view. Keyed on the
+ * search, so a new search starts back at one page.
  */
-function SeedHitTable({
+export function SeedHitTable({
   hits,
+  overflow = 0,
   tallyLabels,
   selected,
   onSelect,
 }: {
+  /** Newest first. */
   hits: readonly SeedHit[];
+  /** Hits found past MAX_HITS and not kept. */
+  overflow?: number;
   tallyLabels: readonly string[];
   selected: string | null;
   onSelect: (seed: string) => void;
 }) {
+  const [pageCount, setPageCount] = useState(1);
+  const shown = Math.min(pageCount * HIT_PAGE_SIZE, hits.length);
+  const hasMore = shown < hits.length;
+  const rows = useMemo(() => hits.slice(0, shown), [hits, shown]);
+  const showMore = useCallback(() => setPageCount((n) => n + 1), []);
+
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  /*
+   * Rebuilt after every page (`shown` changes): a fresh observer reports the
+   * sentinel's current state straight away, so a pane tall enough to still show
+   * it after an append keeps filling instead of waiting for a scroll that never
+   * comes.
+   */
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!hasMore || !sentinel || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) showMore();
+      },
+      { root: scrollParent(sentinel), rootMargin: "0px 0px 400px 0px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, shown, showMore]);
+
   return (
-    <div style={{ overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", color: "var(--j-white)" }}>
-        <thead>
-          <tr>
-            <th scope="col" style={{ textAlign: "left" }}>Seed</th>
-            <th scope="col" style={{ textAlign: "right" }}>Score</th>
-            {tallyLabels.map((label, i) => (
-              <th key={i} scope="col" style={{ textAlign: "right" }}>
-                {label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {hits.map((h) => (
-            <tr
-              key={h.seed}
-              tabIndex={0}
-              aria-selected={h.seed === selected}
-              onClick={() => onSelect(h.seed)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  onSelect(h.seed);
-                }
-              }}
-              style={{
-                cursor: "pointer",
-                background: h.seed === selected ? "var(--j-dark-red)" : undefined,
-              }}
-            >
-              <th scope="row" style={{ textAlign: "left", fontFamily: "var(--j-font-code)", color: "var(--j-gold)" }}>
-                {h.seed}
-              </th>
-              <td style={{ textAlign: "right" }}>{h.score}</td>
-              {tallyLabels.map((_, i) => (
-                <td key={i} style={{ textAlign: "right" }}>
-                  {h.tallies[i] ?? 0}
-                </td>
+    <JimboStack gap="sm">
+      {overflow > 0 ? (
+        <JimboText size="sm" tone="orange" role="status">
+          List full: kept the first {integer.format(MAX_HITS)} hits. {integer.format(overflow)} more{" "}
+          {overflow === 1 ? "was" : "were"} found and not kept. Tighten the filter to browse them.
+        </JimboText>
+      ) : null}
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", color: "var(--j-white)" }}>
+          <thead>
+            <tr>
+              <th scope="col" style={{ textAlign: "left" }}>Seed</th>
+              <th scope="col" style={{ textAlign: "right" }}>Score</th>
+              {tallyLabels.map((label, i) => (
+                <th key={i} scope="col" style={{ textAlign: "right" }}>
+                  {label}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {rows.map((h) => (
+              <tr
+                key={h.seed}
+                tabIndex={0}
+                aria-selected={h.seed === selected}
+                onClick={() => onSelect(h.seed)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelect(h.seed);
+                  }
+                }}
+                style={{
+                  cursor: "pointer",
+                  background: h.seed === selected ? "var(--j-dark-red)" : undefined,
+                }}
+              >
+                <th scope="row" style={{ textAlign: "left", fontFamily: "var(--j-font-code)", color: "var(--j-gold)" }}>
+                  {h.seed}
+                </th>
+                <td style={{ textAlign: "right" }}>{h.score}</td>
+                {tallyLabels.map((_, i) => (
+                  <td key={i} style={{ textAlign: "right" }}>
+                    {h.tallies[i] ?? 0}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {hasMore ? (
+        <div ref={sentinelRef} data-testid="seed-hit-sentinel">
+          <JimboStack gap="xs">
+            <JimboText size="sm" tone="grey">
+              Showing {integer.format(shown)} of {integer.format(hits.length)} hits · scroll for more
+            </JimboText>
+            {/* Same page step for keyboards and browsers without IntersectionObserver. */}
+            <JimboButton size="xs" tone="blue" onClick={showMore}>
+              Show {integer.format(Math.min(HIT_PAGE_SIZE, hits.length - shown))} more
+            </JimboButton>
+          </JimboStack>
+        </div>
+      ) : null}
+    </JimboStack>
   );
 }

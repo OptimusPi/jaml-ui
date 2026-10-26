@@ -1,6 +1,6 @@
 {
   "name": "jaml-ui",
-  "version": "9.1.1",
+  "version": "9.2.0",
   "description": "Balatro card sprites and the Jimbo design system for MCP Apps, with a @json-render (Vercel Labs) catalog.",
   "type": "module",
   "main": "./dist/index.js",
@@ -61,6 +61,7 @@
     "storybook": "pnpm run build && storybook dev -p 3141",
     "build-storybook": "pnpm run build && storybook build",
     "lint": "eslint .",
+    "test": "vitest run",
     "design:detect": "node .agents/skills/impeccable/scripts/detect.mjs --json src",
     "design:doctor": "node .agents/skills/impeccable/scripts/doctor.mjs",
     "gen:grammar": "node scripts/gen-engine-grammar.mjs"
@@ -115,6 +116,8 @@
     "@storybook/addon-docs": "^10.6.1",
     "@storybook/react": "^10.6.1",
     "@storybook/react-vite": "^10.6.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^25.9.9",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -124,6 +127,7 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "eslint-plugin-storybook": "10.4.6",
     "globals": "^17.13.0",
+    "jsdom": "^30.1.3",
     "motely-wasm": "^31.0.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -131,6 +135,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.71.1",
     "vite": "^6.4.4",
-    "vite-plugin-dts": "^5.1.2"
+    "vite-plugin-dts": "^5.1.2",
+    "vitest": "^5.0.5"
   }
 }
