@@ -4,6 +4,9 @@
   "description": "Balatro-style React primitives on Base UI. One look, shared by every JAML site.",
   "license": "MIT",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "sideEffects": [
     "**/*.css"
   ],
@@ -12,11 +15,32 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./ui": {
+      "types": "./dist/ui.d.ts",
+      "default": "./dist/ui.js"
+    },
     "./tokens": {
       "types": "./dist/tokens.d.ts",
       "default": "./dist/tokens.js"
     },
+    "./sprites": {
+      "types": "./dist/sprites.d.ts",
+      "default": "./dist/sprites.js"
+    },
+    "./assets": {
+      "types": "./dist/assets.d.ts",
+      "default": "./dist/assets.js"
+    },
+    "./motely": {
+      "types": "./dist/motely.d.ts",
+      "default": "./dist/motely.js"
+    },
+    "./motd": {
+      "types": "./dist/motd.d.ts",
+      "default": "./dist/motd.js"
+    },
     "./styles.css": "./dist/styles/jaml.css",
+    "./jimbo.css": "./dist/ui/jimbo.css",
     "./tokens.css": "./dist/styles/tokens.css",
     "./tailwind.css": "./dist/styles/tailwind.css",
     "./fonts.css": "./fonts.css",

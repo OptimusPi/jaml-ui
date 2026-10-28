@@ -61,5 +61,9 @@ export default defineConfig({
     assetFileNames: (info: { name?: string }) =>
       info.name?.endsWith('.css') ? 'ui/jimbo.css' : 'assets/[name]-[hash][extname]',
   },
-  copy: [{ from: 'src/styles', to: 'dist' }],
+  copy: [
+    { from: 'src/styles', to: 'dist' },
+    { from: 'assets', to: 'dist/ui' },
+    { from: 'assets', to: 'dist' },
+  ],
 });

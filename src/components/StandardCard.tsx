@@ -11,7 +11,7 @@ import { CardEdition, type CardSuit, type CardRank, type CardEnhancement, type C
 const CARD_WIDTH = 71
 const CARD_HEIGHT = 95
 
-interface StandardCardProps {
+export interface StandardCardProps {
   suit?: CardSuit
   rank?: CardRank
   name?: string
