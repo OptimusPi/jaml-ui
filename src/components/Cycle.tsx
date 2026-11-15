@@ -1,3 +1,5 @@
+'use client';
+
 import { useId, useState, type ReactNode } from 'react';
 import type { Tone } from '../tokens.ts';
 import { cx } from '../utils/cx.ts';

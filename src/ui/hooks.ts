@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { JamlVisualClause, JamlVisualFilter, JamlZone } from '../components/JamlIdeVisual.js'
 import { JIMBO_ANIMATIONS } from './tokens.js'
