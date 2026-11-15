@@ -1,3 +1,5 @@
+'use client';
+
 import { Button as BaseButton } from '@base-ui/react/button';
 import { forwardRef, useId, type ReactNode } from 'react';
 import type { Tone } from '../tokens.ts';

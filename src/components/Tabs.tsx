@@ -1,3 +1,5 @@
+'use client';
+
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { createContext, forwardRef, useContext, type ReactNode } from 'react';
 import type { Tone } from '../tokens.ts';

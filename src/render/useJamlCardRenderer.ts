@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Layer } from "./Layer.js";
 import { SPRITE_SHEETS } from "../sprites/spriteData.js";
