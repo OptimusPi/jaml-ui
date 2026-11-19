@@ -1,6 +1,5 @@
 node_modules/
 dist/
-.playwright-mcp/
 
 .vercel
 *.tgz
@@ -19,23 +18,4 @@ storybook-static
 /examples/mcp-seed-finder/public/motely-wasm
 
 .claude/settings.local.json
-
-.vercel
-.env*
-.env.local
-
-# design-sync (claude.ai/design) — transient state; durable files in .design-sync/ are committed
-.design-sync/sb-reference/
-.design-sync/learnings/
-.design-sync/.cache/
-.design-sync/node_modules
-.ds-sync/
-ds-bundle/
-/.agents/skills/impeccable
-/.agents/skills
-/.claude/skills/impeccable
-
-.vercel
-.env*
-/screenshot_balatro_examples
-/scripts
+/.claude
