@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useCallback } from "react";
-import { StoryScene } from "../../.storybook/StoryScene.js";
 import { JimboCodeSurface } from "./JimboCodeSurface.js";
 import { JimboText } from "./jimboText.js";
 
@@ -11,20 +10,18 @@ const meta: Meta<typeof JimboCodeSurface> = {
 export default meta;
 type Story = StoryObj<typeof JimboCodeSurface>;
 
-export const EmptyEditorWell: Story = {
-  name: "Empty JAML well before CodeMirror mounts",
-  render: () => (
-    <StoryScene title="JAML" tone="blue">
-      <JimboText size="sm" tone="grey">
-        Editor view attaches here
-      </JimboText>
-      <JimboCodeSurface minHeight={200} />
-    </StoryScene>
-  ),
+/** Empty surface — what the caller sees before an editor view attaches. */
+export const Default: Story = {
+  render: () => <JimboCodeSurface minHeight={200} />,
 };
 
-export const MountedView: Story = {
-  name: "CodeMirror stand-in after mount",
+/** The height floor is a prop, so a caller can size the well per screen. */
+export const TallFloor: Story = {
+  render: () => <JimboCodeSurface minHeight={420} />,
+};
+
+/** A mounted view owns everything inside; here a plain node stands in for one. */
+export const WithMountedView: Story = {
   render: () => {
     const mount = useCallback((node: HTMLDivElement | null) => {
       if (!node) return;
@@ -39,9 +36,12 @@ export const MountedView: Story = {
       return () => line.remove();
     }, []);
     return (
-      <StoryScene title="JAML" tone="blue">
+      <>
+        <JimboText size="sm" tone="grey">
+          Content below is appended by a ref callback, not by React.
+        </JimboText>
         <JimboCodeSurface ref={mount} minHeight={160} />
-      </StoryScene>
+      </>
     );
   },
 };

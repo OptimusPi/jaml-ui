@@ -1,0 +1,8 @@
+{
+  "name": "Jaml UI",
+  "description": "Zero-dependency json-render engine and Balatro card sprites for MCP Apps",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

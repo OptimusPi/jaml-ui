@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { StoryScene } from "../../.storybook/StoryScene.js";
-import { JimboButton } from "./JimboButton.js";
-import { JimboRow } from "./JimboLayout.js";
 import { JimboTabs } from "./jimboTabs.js";
-import { JimboText } from "./jimboText.js";
 
 const meta: Meta<typeof JimboTabs> = {
   title: "Primitives/Layout/JimboTabs",
@@ -15,28 +11,13 @@ type Story = StoryObj<typeof JimboTabs>;
 
 const TABS = [
   { id: "visual", label: "Visual" },
-  { id: "code", label: "JAML" },
-  { id: "inspect", label: "Inspect" },
+  { id: "code", label: "Code" },
+  { id: "map", label: "Ante Map" },
 ];
 
-export const IdeModes: Story = {
-  name: "IDE mode switch next to Search",
+export const Default: Story = {
   render: () => {
     const [active, setActive] = useState("visual");
-    return (
-      <StoryScene title="Filter" tone="blue">
-        <JimboRow gap="sm" align="center" justify="between">
-          <JimboTabs tabs={TABS} activeTab={active} onTabChange={setActive} />
-          <JimboButton tone="red" size="sm">
-            Search
-          </JimboButton>
-        </JimboRow>
-        <JimboText size="sm" tone="grey">
-          {active === "visual" && "Clause cards. Drag a joker onto Must."}
-          {active === "code" && "YAML editor with engine typeahead."}
-          {active === "inspect" && "Raw Motely dump for this seed."}
-        </JimboText>
-      </StoryScene>
-    );
+    return <JimboTabs tabs={TABS} activeTab={active} onTabChange={setActive} />;
   },
 };

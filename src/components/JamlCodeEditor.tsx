@@ -7,14 +7,14 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirro
 import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { tags } from "@lezer/highlight";
-import { jamlCompletionSource, jamlLinter } from "../lib/jaml/engineYamlCodemirror.js";
+import { jamlCompletionSource, jamlLinter } from "../lib/jaml/jamlLangCodemirror.js";
 import { JimboColorOption } from "../ui/tokens.js";
 import { JimboCodeSurface } from "../ui/JimboCodeSurface.js";
 
 const balatroHighlight = HighlightStyle.define([
   { tag: tags.comment, color: JimboColorOption.GREY, fontStyle: "italic" },
   { tag: tags.keyword, color: JimboColorOption.RED },
-  { tag: tags.string, color: JimboColorOption.GOLD },
+  { tag: tags.string, color: JimboColorOption.GOLD_TEXT },
   { tag: tags.number, color: JimboColorOption.BLUE },
   { tag: tags.bool, color: JimboColorOption.BLUE },
   { tag: tags.null, color: JimboColorOption.GREY },
@@ -34,7 +34,7 @@ const balatroTheme = EditorView.theme(
       fontFamily: "var(--j-font-code, 'JetBrains Mono', ui-monospace, monospace)",
       lineHeight: "23px",
       padding: "12px 0",
-      caretColor: JimboColorOption.GOLD,
+      caretColor: JimboColorOption.GOLD_TEXT,
       minHeight: "100%",
     },
     ".cm-gutters": {
@@ -48,7 +48,7 @@ const balatroTheme = EditorView.theme(
       fontSize: "14px",
     },
     ".cm-activeLineGutter": {
-      color: JimboColorOption.GOLD,
+      color: JimboColorOption.GOLD_TEXT,
       backgroundColor: "transparent",
     },
     ".cm-activeLine": {
@@ -61,7 +61,7 @@ const balatroTheme = EditorView.theme(
       backgroundColor: `${JimboColorOption.WHITE}20`,
     },
     ".cm-cursor, .cm-dropCursor": {
-      borderLeftColor: JimboColorOption.GOLD,
+      borderLeftColor: JimboColorOption.GOLD_TEXT,
     },
     ".cm-scroller": {
       overflow: "auto",
@@ -92,7 +92,9 @@ export function JamlCodeEditor({
   const suppressEmitRef = useRef(false);
   const lastSyncedValueRef = useRef(value);
   const onChangeRef = useRef(onChange);
-  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   // React 19 ref-callback cleanup: the CodeMirror view's lifecycle is tied
   // directly to the element's, no separate mount effect needed.

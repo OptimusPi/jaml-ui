@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { JimboBox } from "../ui/JimboBox.js";
 import { Layer } from "../render/Layer.js";
 import { JamlCardRenderer } from "../render/CanvasRenderer.js";
+import { JimboBox } from "../ui/JimboBox.js";
 import {
     JOKERS,
     JOKER_FACES,

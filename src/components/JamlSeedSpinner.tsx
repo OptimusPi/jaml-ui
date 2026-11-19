@@ -4,11 +4,10 @@ import React, { useMemo, useState } from "react";
 import { JimboBadge } from "../ui/JimboBadge.js";
 import { JimboFlankNav } from "../ui/jimboFlankNav.js";
 import { JimboSeedCopyChip } from "../ui/JimboSeedCopyChip.js";
+import { JimboBox } from "../ui/JimboBox.js";
+import { JimboText } from "../ui/jimboText.js";
 import { JamlSeedInput, type JamlSeedInputProps } from "./JamlSeedInput.js";
 import { normalizeJamlSeed } from "./jamlSeedUtils.js";
-
-import { JimboBox } from "../ui/JimboBox.js";
-import { JimboInline } from "../ui/JimboInline.js";
 
 export interface JamlSeedSpinnerProps extends Omit<JamlSeedInputProps, "onChange"> {
   seeds?: string[];
@@ -60,7 +59,13 @@ export function JamlSeedSpinner({
   return (
     <JimboBox className={rootClass} style={style}>
       <JimboBox className="j-seed-spinner__meta">
-        {label ? <JimboInline className="j-seed-spinner__label">{label}</JimboInline> : <JimboInline />}
+        {label ? (
+          <JimboText size="xs" tone="grey" className="j-seed-spinner__label">
+            {label}
+          </JimboText>
+        ) : (
+          <JimboBox />
+        )}
         {normalizedSeeds.length > 0 ? (
           <JimboBadge size="sm" tone={variant === "dark" ? "grey" : "dark"}>
             {activeIndex >= 0 ? `${activeIndex + 1} of ${normalizedSeeds.length}` : `${normalizedSeeds.length} seeds`}

@@ -196,7 +196,7 @@ export function JamlyzerSeedCard({
               <FiStar />
             </JimboBox>
           )}
-          <JimboSeedCopyChip value={result.seed} />
+          <JimboSeedCopyChip value={result.seed} allowEmpty />
         </JimboRow>
 
         <JimboRow gap="xs" align="center">

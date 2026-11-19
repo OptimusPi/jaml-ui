@@ -1,45 +1,98 @@
-import type { MotelyItem } from "motely-wasm";
-import { resolveJamlAssetUrl, type JamlAssetKey } from "../assets.js";
-import { MOTELY_SPRITE_BY_TYPE } from "./motelySpriteLut.generated.js";
+import { decodeMotelyItem, type MotelyRenderableCategory } from "./motelyItemDecoder.js";
+import { getSpriteData, SHEET_META } from "../sprites/spriteMapper.js";
+import { RANK_MAP, SUIT_MAP } from "../sprites/spriteData.js";
+import { resolveJamlAssetUrl } from "../assets.js";
 
-/** sheet 0=Jokers 1=Tarots 2=Decks — packed in the LUT, not a string. */
-const SHEET_ASSET: readonly JamlAssetKey[] = ["jokers", "tarots", "deck"];
-const SHEET_COLS = [10, 10, 13] as const;
-const SHEET_ROWS = [16, 6, 4] as const;
-
-export interface MotelySpriteCell {
+export interface MotelySpriteData {
   atlasPath: string;
   gridCol: number;
   gridRow: number;
   gridCols: number;
   gridRows: number;
+  displayName: string;
+  category: MotelyRenderableCategory;
 }
 
-export function unpackSpriteCell(packed: number): {
-  sheet: number;
-  x: number;
-  y: number;
-} {
-  return { sheet: packed & 0xff, x: (packed >>> 8) & 0xff, y: (packed >>> 16) & 0xff };
-}
+/**
+ * Given a raw motely-wasm item value (which may be a bitpacked integer or raw MotelyItemType),
+ * resolves it to a sprite atlas path and grid coordinates for rendering.
+ */
+export function motelyItemToSprite(rawValue: number): MotelySpriteData | null {
+  const decoded = decodeMotelyItem(rawValue);
+  if (!decoded) return null;
 
-/** O(1): MotelyItemType int → atlas cell. No name, no normalize. */
-export function motelyItemTypeToSprite(type: number): MotelySpriteCell | null {
-  const packed = MOTELY_SPRITE_BY_TYPE.get(type);
-  if (packed === undefined) return null;
-  const { sheet, x, y } = unpackSpriteCell(packed);
-  const asset = SHEET_ASSET[sheet];
-  if (!asset) return null;
+  if (decoded.category === "playing" && decoded.rank && decoded.suit) {
+    const col = RANK_MAP[decoded.rank];
+    const row = SUIT_MAP[decoded.suit];
+    if (col !== undefined && row !== undefined) {
+      return {
+        atlasPath: resolveJamlAssetUrl('deck'),
+        gridCol: col,
+        gridRow: row,
+        gridCols: 13,
+        gridRows: 4,
+        displayName: decoded.displayName,
+        category: "playing"
+      };
+    }
+  }
+
+  const sprite = getSpriteData(decoded.displayName);
+  if (!sprite) return null;
+
+  const meta = SHEET_META[sprite.type];
+  if (!meta) return null;
+
   return {
-    atlasPath: resolveJamlAssetUrl(asset),
-    gridCol: x,
-    gridRow: y,
-    gridCols: SHEET_COLS[sheet] ?? 0,
-    gridRows: SHEET_ROWS[sheet] ?? 0,
+    atlasPath: resolveJamlAssetUrl(meta.assetKey),
+    gridCol: sprite.pos.x,
+    gridRow: sprite.pos.y,
+    gridCols: meta.cols,
+    gridRows: meta.rows,
+    displayName: decoded.displayName,
+    category: decoded.category
   };
 }
 
-export function motelyItemToSprite(item: MotelyItem | number): MotelySpriteCell | null {
-  const type = typeof item === "number" ? item : item.type;
-  return motelyItemTypeToSprite(type);
+/**
+ * Resolves a sprite by name and category without needing a Motely integer.
+ */
+export function getMotelySpriteByName(name: string, category: MotelyRenderableCategory = "unknown"): MotelySpriteData | null {
+  if (category === "playing") {
+    // Attempt to parse "Rank of Suit"
+    const match = /^(.*?)\s+of\s+(.*?)$/i.exec(name);
+    if (match) {
+        const rank = match[1];
+        const suit = match[2];
+        const col = RANK_MAP[rank];
+        const row = SUIT_MAP[suit];
+        if (col !== undefined && row !== undefined) {
+          return {
+            atlasPath: resolveJamlAssetUrl('deck'),
+            gridCol: col,
+            gridRow: row,
+            gridCols: 13,
+            gridRows: 4,
+            displayName: name,
+            category: "playing"
+          };
+        }
+    }
+  }
+
+  const sprite = getSpriteData(name);
+  if (!sprite) return null;
+
+  const meta = SHEET_META[sprite.type];
+  if (!meta) return null;
+
+  return {
+    atlasPath: resolveJamlAssetUrl(meta.assetKey),
+    gridCol: sprite.pos.x,
+    gridRow: sprite.pos.y,
+    gridCols: meta.cols,
+    gridRows: meta.rows,
+    displayName: name,
+    category
+  };
 }

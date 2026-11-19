@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { MysterySlot, type SlotSelection, type JamlZone, type SlotCategory } from "./MysterySlot.js";
 import { JokerPicker } from "./JokerPicker.js";
-import { JimboBox } from "../../ui/JimboBox.js";
 import {
   CategoryPicker,
   VOUCHER_PICKER_CONFIG,
@@ -20,6 +19,8 @@ import { JimboSprite } from "../../ui/sprites.js";
 import { type SpriteSheetType } from "../../sprites/spriteMapper.js";
 import { JimboTabs } from "../../ui/jimboTabs.js";
 import { JimboListItem } from "../../ui/JimboListItem.js";
+import { JimboBox } from "../../ui/JimboBox.js";
+import { JimboRow, JimboStack } from "../../ui/JimboLayout.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -46,7 +47,6 @@ type AnteSelections = Record<string, MapSlotSelection>;
 
 // ─── Category menu items ─────────────────────────────────────────────────────
 
-
 interface CategoryOption {
   key: SlotCategory;
   label: string;
@@ -57,17 +57,15 @@ interface CategoryOption {
 }
 
 const CATEGORIES: CategoryOption[] = [
-  { key: "joker",    label: "Joker",         sprite: "Joker",        sheet: "Jokers",   tone: "blue",     hint: "Shop, Buffoon Pack" },
-  { key: "voucher",  label: "Voucher",       sprite: "Blank",        sheet: "Vouchers", tone: "orange",     hint: "1 per Ante in shop" },
-  { key: "tarot",    label: "Tarot Card",    sprite: "The Fool",     sheet: "Tarots",   tone: "tarot",    hint: "Arcana Pack, shop" },
-  { key: "planet",   label: "Planet Card",   sprite: "Mercury",      sheet: "Tarots",   tone: "planet",   hint: "Celestial Pack, shop" },
-  { key: "spectral", label: "Spectral Card", sprite: "Grim",         sheet: "Tarots",   tone: "spectral", hint: "Ghost Deck, Spectral Pack" },
-  { key: "tag",      label: "Tag",           sprite: "Uncommon Tag", sheet: "tags",     tone: "green",    hint: "Skip blind reward" },
-  { key: "boss",     label: "Boss Blind",    sprite: "The Hook",     sheet: "BlindChips",tone: "red",      hint: "End of each Ante" },
-  { key: "pack",     label: "Booster Pack",  sprite: "Arcana Pack",  sheet: "Boosters", tone: "orange",   hint: "Arcana, Celestial, etc." },
+  { key: "joker",    label: "Joker",         sprite: "Joker",        sheet: "Jokers",     tone: "blue",     hint: "Shop, Buffoon Pack" },
+  { key: "voucher",  label: "Voucher",       sprite: "Blank",        sheet: "Vouchers",   tone: "orange",   hint: "1 per Ante in shop" },
+  { key: "tarot",    label: "Tarot Card",    sprite: "The Fool",     sheet: "Tarots",     tone: "tarot",    hint: "Arcana Pack, shop" },
+  { key: "planet",   label: "Planet Card",   sprite: "Mercury",      sheet: "Tarots",     tone: "planet",   hint: "Celestial Pack, shop" },
+  { key: "spectral", label: "Spectral Card", sprite: "Grim",         sheet: "Tarots",     tone: "spectral", hint: "Ghost Deck, Spectral Pack" },
+  { key: "tag",      label: "Tag",           sprite: "Uncommon Tag", sheet: "tags",       tone: "green",    hint: "Skip blind reward" },
+  { key: "boss",     label: "Boss Blind",    sprite: "The Hook",     sheet: "BlindChips", tone: "red",      hint: "End of each Ante" },
+  { key: "pack",     label: "Booster Pack",  sprite: "Arcana Pack",  sheet: "Boosters",   tone: "orange",   hint: "Arcana, Celestial, etc." },
 ];
-
-
 
 const CATEGORY_CONFIG_MAP: Record<SlotCategory, typeof VOUCHER_PICKER_CONFIG> = {
   joker:    VOUCHER_PICKER_CONFIG,
@@ -161,10 +159,11 @@ export function JamlMapEditor({
   };
 
   return (
-    <JimboBox className="j-jaml-map-editor">
-      {/* Zone Toggle Header */}
-      <JimboBox className="j-jaml-map-editor__header">
-        <JimboText size="md" tone="white" className="j-jaml-map-editor__title">Jaml Visual Builder</JimboText>
+    <JimboBox className="j-map-editor">
+      <JimboBox className="j-map-editor__header">
+        <JimboText size="md" tone="white" className="j-map-editor__title">
+          Jaml Visual Builder
+        </JimboText>
         <JimboTabs
           tabs={[
             { id: "must", label: "Must" },
@@ -176,56 +175,55 @@ export function JamlMapEditor({
         />
       </JimboBox>
 
-      {/* Map Layout - Vertical Scrolling Antes */}
-      <JimboBox ref={scrollRef} className="j-jaml-map-editor__scroll hide-scrollbar">
+      <JimboBox ref={scrollRef} className="hide-scrollbar j-map-editor__scroll">
         {Array.from({ length: 40 }, (_, i) => i).map((a) => (
-          <JimboBox key={a} className="j-jaml-map-editor__ante">
-            <JimboInnerPanel className="j-jaml-map-editor__ante-panel">
-              <JimboText size="lg" tone="white" className="j-jaml-map-editor__ante-title">Ante {a}</JimboText>
+          <JimboBox key={a} className="j-map-editor__ante-page">
+            <JimboInnerPanel className="j-map-editor__ante-card">
+              <JimboText size="lg" tone="white" className="j-map-editor__ante-title">
+                Ante {a}
+              </JimboText>
 
-              {/* Row 1: Blinds & Tags & Voucher */}
-              <JimboBox className="j-row j-row--justify-between j-row--align-end j-jaml-map-editor__row">
-                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
+              <JimboRow justify="between" align="end" className="j-map-editor__blinds-row">
+                <JimboStack align="center" gap="xs">
                   <JimboText size="xs" tone="grey">Voucher</JimboText>
                   {renderSlot(a, `ante_${a}_voucher`, 42, "Vouchers", "voucher")}
-                </JimboBox>
-                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
+                </JimboStack>
+                <JimboStack align="center" gap="xs">
                   <JimboText size="xs" tone="grey">Small</JimboText>
                   {renderSlot(a, `ante_${a}_tag_small`, 42, "tags", "tag")}
-                </JimboBox>
-                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
+                </JimboStack>
+                <JimboStack align="center" gap="xs">
                   <JimboText size="xs" tone="grey">Big</JimboText>
                   {renderSlot(a, `ante_${a}_tag_big`, 42, "tags", "tag")}
-                </JimboBox>
-                <JimboBox className="j-stack j-stack--align-center j-stack--gap-xs">
+                </JimboStack>
+                <JimboStack align="center" gap="xs">
                   <JimboText size="xs" tone="grey">Boss</JimboText>
                   {renderSlot(a, `ante_${a}_boss`, 42, "BlindChips", "boss")}
-                </JimboBox>
-              </JimboBox>
+                </JimboStack>
+              </JimboRow>
 
-              {/* Row 2: Shop Items */}
-              <JimboBox className="j-stack j-stack--gap-xs">
-                <JimboText size="sm" tone="grey" className="j-jaml-map-editor__section-title">Shop Items</JimboText>
-                <JimboBox className="j-shop-belt hide-scrollbar">
-                  {Array.from({ length: 24 }, (_, i) => i + 1).map((i) =>
-                    renderSlot(a, `ante_${a}_shop_${i}`, 52, "Jokers"),
-                  )}
-                </JimboBox>
-              </JimboBox>
+              <JimboStack gap="xs">
+                <JimboText size="sm" tone="grey" className="j-map-editor__section-label">
+                  Shop Items
+                </JimboText>
+                <JimboRow gap="sm" className="hide-scrollbar j-map-editor__shop-strip">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => renderSlot(a, `ante_${a}_shop_${i}`, 52, "Jokers"))}
+                </JimboRow>
+              </JimboStack>
 
-              {/* Row 3: Packs */}
-              <JimboBox className="j-stack j-stack--gap-xs">
-                <JimboText size="sm" tone="grey" className="j-jaml-map-editor__section-title">Packs</JimboText>
-                <JimboBox className="j-row j-row--gap-sm j-jaml-map-editor__pack-row">
-                  {[1,2,3,4,5,6].map(i => renderSlot(a, `ante_${a}_pack_${i}`, 64, "Boosters", "pack"))}
-                </JimboBox>
-              </JimboBox>
+              <JimboStack gap="xs">
+                <JimboText size="sm" tone="grey" className="j-map-editor__section-label">
+                  Packs
+                </JimboText>
+                <JimboRow gap="sm" className="j-map-editor__packs-strip">
+                  {[1, 2, 3, 4, 5, 6].map((i) => renderSlot(a, `ante_${a}_pack_${i}`, 64, "Boosters", "pack"))}
+                </JimboRow>
+              </JimboStack>
             </JimboInnerPanel>
           </JimboBox>
         ))}
       </JimboBox>
 
-      {/* Picker overlay */}
       <JimboModal
         open={activeSlot !== null}
         onClose={handlePickerCancel}
@@ -238,7 +236,7 @@ export function JamlMapEditor({
         }
         className="j-picker-modal"
       >
-        {activeSlot !== null && (
+        {activeSlot !== null ? (
           pickerFlow === "category" ? (
             <CategoryMenu onSelect={handleCategorySelect} />
           ) : pickerFlow === "joker" ? (
@@ -253,7 +251,7 @@ export function JamlMapEditor({
               onCancel={handlePickerCancel}
             />
           )
-        )}
+        ) : null}
       </JimboModal>
     </JimboBox>
   );
@@ -267,15 +265,12 @@ export function CategoryMenu({
   onSelect: (cat: SlotCategory) => void;
 }) {
   return (
-    <JimboBox className="j-category-menu hide-scrollbar">
+    <JimboBox className="hide-scrollbar j-category-menu">
       {CATEGORIES.map((cat) => (
-        <JimboListItem
-          key={cat.key}
-          onClick={() => onSelect(cat.key)}
-        >
-          <JimboBox className="j-category-menu__item">
+        <JimboListItem key={cat.key} onClick={() => onSelect(cat.key)}>
+          <JimboBox className="j-category-menu__row">
             <JimboSprite name={cat.sprite} sheet={cat.sheet} width={32} />
-            <JimboBox className="j-category-menu__text">
+            <JimboBox className="j-category-menu__copy">
               <JimboText size="sm" tone="white">{cat.label}</JimboText>
               <JimboText size="micro" tone="grey">{cat.hint}</JimboText>
             </JimboBox>
@@ -290,7 +285,7 @@ export function CategoryMenu({
 
 function buildJamlText(antes: Record<number, AnteSelections>): string {
   const byZone: Record<JamlZone, Record<string, { value: string; antes: number[] }[]>> = {
-    must: {}, should: {}, mustnot: {}
+    must: {}, should: {}, mustnot: {},
   };
 
   for (const [anteStr, selections] of Object.entries(antes)) {
@@ -298,12 +293,12 @@ function buildJamlText(antes: Record<number, AnteSelections>): string {
     for (const sel of Object.values(selections)) {
       const zone = sel.zone;
       const key = sel.clauseKey;
-      
+
       if (!byZone[zone][key]) {
         byZone[zone][key] = [];
       }
-      
-      const existing = byZone[zone][key].find(item => item.value === sel.value);
+
+      const existing = byZone[zone][key].find((item) => item.value === sel.value);
       if (existing) {
         if (!existing.antes.includes(anteNum)) existing.antes.push(anteNum);
       } else {
@@ -322,14 +317,13 @@ function buildJamlText(antes: Record<number, AnteSelections>): string {
   for (const [zone, label] of [["must", "must"], ["should", "should"], ["mustnot", "mustNot"]] as const) {
     const clauses = byZone[zone as JamlZone];
     if (Object.keys(clauses).length === 0) continue;
-    
+
     lines.push(`${label}:`);
     for (const [key, items] of Object.entries(clauses)) {
       for (const item of items) {
         lines.push(`  - ${key}: ${item.value}`);
-        // Only emit `antes:` if it's not all 8 antes (simplification, or just emit it)
         if (item.antes.length < 8) {
-          lines.push(`    antes: [${item.antes.sort((a,b)=>a-b).join(", ")}]`);
+          lines.push(`    antes: [${item.antes.sort((a, b) => a - b).join(", ")}]`);
         }
       }
     }

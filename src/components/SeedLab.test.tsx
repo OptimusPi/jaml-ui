@@ -85,7 +85,11 @@ vi.mock("motely-wasm", () => {
 
 // The editor and the analyser are their own components with their own wasm needs.
 vi.mock("./JamlIde.js", () => ({ JamlIde: () => null }));
-vi.mock("./Jamlyzer.js", () => ({ Jamlyzer: () => null }));
+vi.mock("./Jamlyzer.js", () => ({
+  Jamlyzer: ({ seeds, defaultSelectedSeed }: { seeds?: string[]; defaultSelectedSeed?: string }) => (
+    <div data-testid="jamlyzer-mock" data-seeds={JSON.stringify(seeds)} data-selected={defaultSelectedSeed ?? ""} />
+  ),
+}));
 
 /* IntersectionObserver stand-in: the test decides when the sentinel is in view. */
 class FakeIntersectionObserver {
@@ -115,6 +119,8 @@ class FakeIntersectionObserver {
 }
 
 const { SeedLab, MAX_HITS, HIT_PAGE_SIZE } = await import("./SeedLab.js");
+const { parseJamlSeeds, mergeSeedsIntoJaml } = await import("../lib/jaml/jamlSeeds.js");
+const { JimboSeedCopyChip } = await import("../ui/JimboSeedCopyChip.js");
 
 function stubLayout(wide: boolean) {
   vi.stubGlobal("matchMedia", (query: string) => ({
@@ -244,4 +250,51 @@ describe("SeedLab results", () => {
     expect(rows()[1].getAttribute("aria-selected")).toBe("true");
     await finishSearch();
   });
+
+  it('renders and selects the 0-character empty seed ("") hit and mounts Jamlyzer', async () => {
+    render(<SeedLab />);
+    await startSearch();
+    await act(async () => {
+      engine.hit("");
+      engine.hit("ALEEB");
+      engine.tick();
+    });
+    // Newest first: ALEEB then ""
+    expect(rowSeeds()).toEqual(["ALEEB", '""']);
+    expect(screen.queryByTestId("jamlyzer-mock")).toBeNull();
+
+    fireEvent.click(rows()[1]);
+    expect(rows()[1].getAttribute("aria-selected")).toBe("true");
+    fireEvent.click(screen.getByText("Jamlyze"));
+    const jamlyzer = screen.getByTestId("jamlyzer-mock");
+    expect(jamlyzer.getAttribute("data-seeds")).toBe('[""]');
+    expect(jamlyzer.getAttribute("data-selected")).toBe("");
+    await finishSearch();
+  });
+
+  it('preselects a deep-linked 0-character seed ("") from defaultJaml seeds: block', () => {
+    render(<SeedLab defaultJaml={'seeds:\n  - ""\ndeck: Red\nstake: White\n'} />);
+    const jamlyzer = screen.getByTestId("jamlyzer-mock");
+    expect(jamlyzer.getAttribute("data-seeds")).toBe('[""]');
+    expect(jamlyzer.getAttribute("data-selected")).toBe("");
+  });
+
+  it('round-trips 0-character seed ("") in jamlSeeds and JimboSeedCopyChip', () => {
+    const merged = mergeSeedsIntoJaml("deck: Red\nstake: White\n", ["", "   ", "ALEEB"]);
+    expect(merged).toContain('  - ""');
+    expect(parseJamlSeeds(merged)).toEqual(["", "ALEEB"]);
+
+    const copied: string[] = [];
+    const { unmount } = render(<JimboSeedCopyChip value="" allowEmpty onCopy={(v) => copied.push(v)} />);
+    const btn = screen.getByRole("button", { name: 'Copy seed ""' });
+    expect((btn as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.click(btn);
+    expect(copied).toEqual([""]);
+    unmount();
+
+    render(<JimboSeedCopyChip value="" placeholder="--------" />);
+    const placeholderBtn = screen.getByRole("button", { name: "Seed unavailable" });
+    expect((placeholderBtn as HTMLButtonElement).disabled).toBe(true);
+  });
 });
+

@@ -17,7 +17,8 @@ import { JimboStatusPill } from "../ui/JimboStatusPill.js";
 import { JimboText } from "../ui/jimboText.js";
 import { JamlIde } from "./JamlIde.js";
 import { Jamlyzer } from "./Jamlyzer.js";
-import { defaultPyramidDock, stackedDock } from "../ui/dockTree.js";
+import { parseJamlSeeds } from "../lib/jaml/jamlSeeds.js";
+import { defaultPyramidDock, dockActivate, stackedDock } from "../ui/dockTree.js";
 
 export const STARTER_JAML = `name: Blueprint Faucet
 author: pifreak
@@ -342,8 +343,9 @@ export function SeedLab({
    */
   autoStart?: boolean;
 }) {
+  const initialSeeds = useMemo(() => parseJamlSeeds(defaultJaml), [defaultJaml]);
   const [jaml, setJaml] = useState(defaultJaml);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(() => initialSeeds[0] ?? null);
   const { phase, running, error, hits, overflow, searchId, tallyLabels, stats, start, stop } = useSeedSearch(jaml);
   const wide = useWideLayout();
 
@@ -362,7 +364,7 @@ export function SeedLab({
   const [pinnedFirstHit, setPinnedFirstHit] = useState<string | null>(null);
   if (autoStart && firstHit !== pinnedFirstHit) {
     setPinnedFirstHit(firstHit);
-    if (selected === null && firstHit) setSelected(firstHit);
+    if (selected === null && firstHit !== null) setSelected(firstHit);
   }
 
   const statusLabel =
@@ -380,14 +382,21 @@ export function SeedLab({
                 : "No hits"
               : "Ready";
 
+  const baseDock = wide
+    ? defaultPyramidDock({ filter: "filter", search: "search", results: "results", jamlyze: "jamlyze" })
+    : stackedDock({ filter: "filter", search: "search", results: "results", jamlyze: "jamlyze" });
+  const startingDock = initialSeeds.length > 0 ? dockActivate(baseDock, "jamlyze") : baseDock;
+  const jamlyzeSeeds =
+    selected !== null
+      ? hits.length === 0 && initialSeeds.includes(selected)
+        ? initialSeeds
+        : [selected]
+      : [];
+
   return (
     <JimboDock
       key={wide ? "wide" : "narrow"}
-      defaultLayout={
-        wide
-          ? defaultPyramidDock({ filter: "filter", search: "search", results: "results", jamlyze: "jamlyze" })
-          : stackedDock({ filter: "filter", search: "search", results: "results", jamlyze: "jamlyze" })
-      }
+      defaultLayout={startingDock}
       panes={{
         filter: {
           label: "Filter",
@@ -470,12 +479,12 @@ export function SeedLab({
         jamlyze: {
           label: "Jamlyze",
           tone: "purple",
-          content: selected ? (
+          content: selected !== null ? (
             /*
              * motely-wasm 28 dropped the in-pass Jamlyzer rider, so the pane
              * analyses the picked seed itself, on demand.
              */
-            <Jamlyzer jaml={jaml} seeds={[selected]} defaultSelectedSeed={selected} />
+            <Jamlyzer jaml={jaml} seeds={jamlyzeSeeds} defaultSelectedSeed={selected} />
           ) : (
             <JimboText size="sm" tone="grey">
               Pick a hit in Results.
@@ -585,7 +594,7 @@ export function SeedHitTable({
                 }}
               >
                 <th scope="row" style={{ textAlign: "left", fontFamily: "var(--j-font-code)", color: "var(--j-gold)" }}>
-                  {h.seed}
+                  {h.seed === "" ? '""' : h.seed}
                 </th>
                 <td style={{ textAlign: "right" }}>{h.score}</td>
                 {tallyLabels.map((_, i) => (

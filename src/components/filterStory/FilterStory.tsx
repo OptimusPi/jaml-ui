@@ -46,8 +46,8 @@ async function analyzeSeed(seed: string): Promise<MotelyJamlyzerSeedResult> {
   const hit = analysisCache.get(seed);
   if (hit) return hit;
   if (bootsharp.getStatus() !== bootsharp.BootStatus.Booted) await bootsharp.boot();
-  const [result] = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(`seeds:\n  - ${seed}`));
-  if (!result) throw new Error(`Motely returned nothing for ${seed}`);
+  const [result] = MotelyJamlyzer.analyze(JamlConfigLoader.fromJaml(`seeds:\n  - ${JSON.stringify(seed)}`));
+  if (!result) throw new Error(`Motely returned nothing for ${seed || '""'}`);
   analysisCache.set(seed, result);
   return result;
 }
@@ -89,12 +89,14 @@ function SeedCard({
     .filter(Boolean)
     .join(" ");
 
+  const seedDisplay = seed === "" ? '""' : seed;
+
   return (
-    <button type="button" className={classes} onClick={flip} aria-label={`Inspect seed ${seed}`}>
+    <button type="button" className={classes} onClick={flip} aria-label={`Inspect seed ${seedDisplay}`}>
       <span className="j-story-seed__inner">
         <span className="j-story-seed__face j-story-seed__front">
           {crowned ? <span className="j-story-seed__crown" aria-hidden>♛</span> : null}
-          <span className="j-story-seed__string">{seed}</span>
+          <span className="j-story-seed__string">{seedDisplay}</span>
           <span className="j-story-seed__no">#{String(index + 1).padStart(2, "0")}</span>
         </span>
         <span className="j-story-seed__face j-story-seed__back">

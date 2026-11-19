@@ -1,31 +1,24 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { StoryScene } from "../../.storybook/StoryScene.js";
-import { JimboErrorBlock } from "./JimboErrorBlock.js";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { JimboErrorBlock } from './JimboErrorBlock';
 
 const meta = {
-  title: "Primitives/Feedback/JimboErrorBlock",
+  title: 'Jimbo/Feedback/Error Block',
   component: JimboErrorBlock,
 } satisfies Meta<typeof JimboErrorBlock>;
 export default meta;
 
-export const SearchTimeout: StoryObj<typeof meta> = {
-  name: "Motely timed out on Search",
+export const Default: StoryObj<typeof meta> = {
   render: () => (
-    <StoryScene title="Search" tone="green">
-      <JimboErrorBlock title="Search failed">
-        Motely timed out after 30s. Lower the max ante and try again.
-      </JimboErrorBlock>
-    </StoryScene>
+    <JimboErrorBlock title="Search failed">
+      Motely timed out after 30s. Lower the max ante and try again.
+    </JimboErrorBlock>
   ),
 };
 
-export const BadJaml: StoryObj<typeof meta> = {
-  name: "Parser reject on the JAML tab",
+export const Dismissible: StoryObj<typeof meta> = {
   render: () => (
-    <StoryScene title="JAML" tone="blue">
-      <JimboErrorBlock title="Invalid JAML" onDismiss={() => {}}>
-        Unexpected token on line 4 — did you mean `should:`?
-      </JimboErrorBlock>
-    </StoryScene>
+    <JimboErrorBlock title="Invalid JAML" onDismiss={() => {}}>
+      Unexpected token on line 4 — did you mean `should:`?
+    </JimboErrorBlock>
   ),
 };

@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { JimboBox } from '../ui/JimboBox.js'
-import { resolveJamlAssetUrl } from '../assets.js'
+import React from "react";
+import { resolveJamlAssetUrl } from "../assets.js";
+import { JimboSpriteStage, JimboSpriteLayer } from "../ui/JimboSpriteStage.js";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const DECK_SPRITE_POS: Record<string, { x: number; y: number }> = {
@@ -23,7 +23,7 @@ export const DECK_SPRITE_POS: Record<string, { x: number; y: number }> = {
   challenge:  { x: 0, y: 4 },
   anaglyph:   { x: 2, y: 4 },
   zodiac:     { x: 3, y: 4 },
-}
+};
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const STAKE_SPRITE_POS: Record<string, { x: number; y: number }> = {
@@ -35,24 +35,24 @@ export const STAKE_SPRITE_POS: Record<string, { x: number; y: number }> = {
   purple: { x: 1, y: 1 },
   orange: { x: 2, y: 1 },
   gold:   { x: 3, y: 1 },
-}
+};
 
-const SPRITE_WIDTH = 142
-const SPRITE_HEIGHT = 190
-const DECK_COLS = 7
-const DECK_ROWS = 5
-const STICKER_COLS = 5
-const STICKER_ROWS = 3
+const SPRITE_WIDTH = 142;
+const SPRITE_HEIGHT = 190;
+const DECK_COLS = 7;
+const DECK_ROWS = 5;
+const STICKER_COLS = 5;
+const STICKER_ROWS = 3;
 
 export interface DeckSpriteProps {
   /** Deck name — case-insensitive, "Deck" suffix tolerated (e.g. "Erratic Deck" → "erratic"). */
-  deck: string
+  deck: string;
   /** Optional stake name to overlay its sticker on the deck. */
-  stake?: string
+  stake?: string;
   /** Rendered width in pixels. Height is scaled proportionally from the 142x190 sprite. */
-  size?: number
-  className?: string
-  style?: React.CSSProperties
+  size?: number;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -61,77 +61,30 @@ export interface DeckSpriteProps {
  * two rows) and stickers.png for the stake band. Uses jaml-ui's
  * `resolveJamlAssetUrl` so consumers can override the asset base URL.
  */
-export function DeckSprite({ deck, stake, size = 50, className = '', style }: DeckSpriteProps) {
-  const deckKey = (deck || 'erratic').toLowerCase().replace(/\s*deck$/, '').trim()
-  const deckPos = DECK_SPRITE_POS[deckKey] ?? DECK_SPRITE_POS.erratic
-  const stakePos = stake ? STAKE_SPRITE_POS[stake.toLowerCase().replace(/\s*stake$/, '').trim()] : null
+export function DeckSprite({ deck, stake, size = 50, className = "", style }: DeckSpriteProps) {
+  const deckKey = (deck || "erratic").toLowerCase().replace(/\s*deck$/, "").trim();
+  const deckPos = DECK_SPRITE_POS[deckKey] ?? DECK_SPRITE_POS.erratic;
+  const stakePos = stake ? STAKE_SPRITE_POS[stake.toLowerCase().replace(/\s*stake$/, "").trim()] : null;
 
-  const scale = size / SPRITE_WIDTH
-  const displayHeight = SPRITE_HEIGHT * scale
+  const scale = size / SPRITE_WIDTH;
+  const displayHeight = SPRITE_HEIGHT * scale;
 
   return (
-    <JimboBox
-      className={`j-deck-sprite ${className}`.trim()}
-      style={{
-        '--j-deck-w': `${size}px`,
-        '--j-deck-h': `${displayHeight}px`,
-        ...style,
-      } as React.CSSProperties}
-    >
-      <JimboBox
-        className="j-deck-sprite__layer"
-        style={{
-          '--j-layer-bg-url': `url(${resolveJamlAssetUrl('enhancers')})`,
-          '--j-layer-bg-size': `${DECK_COLS * 100}% ${DECK_ROWS * 100}%`,
-          '--j-layer-bg-pos': `${(deckPos.x / (DECK_COLS - 1)) * 100}% ${(deckPos.y / (DECK_ROWS - 1)) * 100}%`,
-        } as React.CSSProperties}
+    <JimboSpriteStage width={size} height={displayHeight} className={className} style={style}>
+      <JimboSpriteLayer
+        inset
+        imageUrl={resolveJamlAssetUrl("enhancers")}
+        backgroundSize={`${DECK_COLS * 100}% ${DECK_ROWS * 100}%`}
+        backgroundPosition={`${(deckPos.x / (DECK_COLS - 1)) * 100}% ${(deckPos.y / (DECK_ROWS - 1)) * 100}%`}
       />
       {stakePos ? (
-        <JimboBox
-          className="j-deck-sprite__layer"
-          style={{
-            '--j-layer-bg-url': `url(${resolveJamlAssetUrl('stickers')})`,
-            '--j-layer-bg-size': `${STICKER_COLS * 100}% ${STICKER_ROWS * 100}%`,
-            '--j-layer-bg-pos': `${(stakePos.x / (STICKER_COLS - 1)) * 100}% ${(stakePos.y / (STICKER_ROWS - 1)) * 100}%`,
-          } as React.CSSProperties}
+        <JimboSpriteLayer
+          inset
+          imageUrl={resolveJamlAssetUrl("stickers")}
+          backgroundSize={`${STICKER_COLS * 100}% ${STICKER_ROWS * 100}%`}
+          backgroundPosition={`${(stakePos.x / (STICKER_COLS - 1)) * 100}% ${(stakePos.y / (STICKER_ROWS - 1)) * 100}%`}
         />
       ) : null}
-    </JimboBox>
-  )
-}
-
-export interface StakeSpriteProps {
-  /** Stake name (e.g. "White", "Red", "Green", "Gold Stake"). */
-  stake: string
-  /** Rendered width & height in pixels (1:1 sticker chip). */
-  size?: number
-  className?: string
-  style?: React.CSSProperties
-}
-
-/**
- * Balatro stake sticker chip (White, Red, Green, Blue, Black, Purple, Orange, Gold).
- * Draws the isolated stake sticker directly from stickers.png.
- */
-export function StakeSprite({ stake, size = 48, className = '', style }: StakeSpriteProps) {
-  const stakeKey = (stake || 'white').toLowerCase().replace(/\s*stake$/, '').trim()
-  const stakePos = STAKE_SPRITE_POS[stakeKey] ?? STAKE_SPRITE_POS.white
-
-  return (
-    <JimboBox
-      className={`j-stake-sprite ${className}`.trim()}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        position: 'relative',
-        display: 'inline-block',
-        backgroundImage: `url(${resolveJamlAssetUrl('stickers')})`,
-        backgroundSize: `${STICKER_COLS * 100}% ${STICKER_ROWS * 100}%`,
-        backgroundPosition: `${(stakePos.x / (STICKER_COLS - 1)) * 100}% ${(stakePos.y / (STICKER_ROWS - 1)) * 100}%`,
-        backgroundRepeat: 'no-repeat',
-        imageRendering: 'pixelated',
-        ...style,
-      } as React.CSSProperties}
-    />
-  )
+    </JimboSpriteStage>
+  );
 }

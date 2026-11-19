@@ -3,16 +3,16 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { JimboText } from "./jimboText.js";
 
 const meta: Meta = {
-  title: "Primitives/Foundations/Colors",
+  title: "Foundations/Colors",
 };
 export default meta;
 
 /** Token names, grouped the way jimbo-tokens.css groups them. */
 const GROUPS: Array<{ name: string; tokens: string[] }> = [
-  { name: "game", tokens: ["--j-red", "--j-blue", "--j-green", "--j-orange", "--j-gold", "--j-purple", "--j-planet", "--j-spectral"] },
-  { name: "pressed", tokens: ["--j-dark-red", "--j-dark-blue", "--j-dark-green", "--j-dark-orange"] },
-  { name: "surfaces", tokens: ["--j-darkest", "--j-dark-grey", "--j-surface-inset", "--j-grey"] },
-  { name: "chrome", tokens: ["--j-border-silver", "--j-border-south", "--j-panel-edge", "--j-white"] },
+  { name: "game", tokens: ["--j-red", "--j-blue", "--j-green", "--j-orange", "--j-gold", "--j-purple"] },
+  { name: "pressed", tokens: ["--j-dark-red", "--j-dark-blue", "--j-dark-green", "--j-dark-orange", "--j-grey", "--j-dark-grey"] },
+  { name: "surfaces", tokens: ["--j-darkest", "--j-surface-inset"] },
+  { name: "chrome", tokens: ["--j-border-silver", "--j-border-south", "--j-white", "--j-orange-text"] },
 ];
 
 /* Token names and hex values are code, not game copy — the pixel font at 10px
@@ -55,9 +55,8 @@ function Swatch({ token }: { token: string }) {
 }
 
 export const Tokens: StoryObj = {
-  name: "Paint chips — game / pressed / surfaces / chrome",
   render: () => (
-    <div className="j-panel" style={{ width: "min(920px, 100%)", padding: 16, display: "grid", gap: 24 }}>
+    <div style={{ display: "grid", gap: 24 }}>
       {GROUPS.map(({ name, tokens }) => (
         <div key={name} style={{ display: "grid", gap: 8 }}>
           <JimboText size="lg" tone="grey">

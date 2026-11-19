@@ -1,44 +1,31 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
-import { StoryScene } from "../../.storybook/StoryScene.js";
-import { JimboButton } from "./JimboButton.js";
 import { JimboInnerPanel, JimboModal } from "./panel.js";
-import { JimboText } from "./jimboText.js";
+import { useState } from "react";
+import { JimboButton } from "./JimboButton.js";
 
 const meta: Meta = {
   title: "Primitives/Layout/JimboInnerPanel",
 };
 export default meta;
 
-export const NestedLog: StoryObj = {
-  name: "Sunken log inside a Search pane",
+export const Default: StoryObj = {
   render: () => (
-    <StoryScene title="Search" tone="green">
-      <JimboInnerPanel>
-        <JimboText size="sm" tone="grey">
-          scanned 12_400 seeds
-        </JimboText>
-        <JimboText size="sm" tone="white">
-          hit WEEJOKER @ 4.2s
-        </JimboText>
-      </JimboInnerPanel>
-    </StoryScene>
+    <JimboInnerPanel style={{ width: 320 }}>
+      A sunken inner panel — used to nest content inside a JimboPanel.
+    </JimboInnerPanel>
   ),
 };
 
-export const ConfirmReplace: StoryObj = {
-  name: "Confirm replacing the open filter",
+export const Modal: StoryObj = {
   render: () => {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     return (
-      <StoryScene title="Filter" tone="blue">
-        <JimboButton size="sm" onClick={() => setOpen(true)}>
-          Load File
-        </JimboButton>
-        <JimboModal open={open} onClose={() => setOpen(false)} title="Replace filter?">
-          Loading this file dumps the clauses you have open.
+      <div>
+        <JimboButton onClick={() => setOpen(true)}>Open modal</JimboButton>
+        <JimboModal open={open} onClose={() => setOpen(false)} title="Confirm">
+          Are you sure you want to do this?
         </JimboModal>
-      </StoryScene>
+      </div>
     );
   },
 };

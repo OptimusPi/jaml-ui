@@ -6,17 +6,16 @@
 
 @import './jimbo-tokens.css';
 
-/* ── Jimbo context roots ──────────────────────────────────────────────── */
-/* Every container that says "you are inside the Jimbo world" declares the
-   pixel font at zero specificity, so raw text dropped into a panel/picker
-   renders in-brand even on a bare page (storybook, design previews) instead
-   of falling back to the UA default. `:where()` keeps specificity at 0 —
-   any explicit family (e.g. --j-font-code surfaces) still wins untouched.
-   Inside the app nothing changes: these containers already inherited the
-   same font from .j-app/.j-page. */
-:where(.j-app, .j-phone, .j-page, .j-panel, .j-inner-panel, .j-modal, .j-picker, .j-inset) {
-  font-family: var(--j-font);
+/* Global Scrollbar Hide */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
+
+*::-webkit-scrollbar {
+  display: none !important;
+}
+
 
 /* ── Base Text ─────────────────────────────────────────────────────────── */
 
@@ -26,6 +25,46 @@
   line-height: 1.2;
   text-shadow: var(--j-text-shadow);
   color: var(--j-white);
+}
+
+.j-text--no-shadow {
+  text-shadow: none;
+}
+
+.j-text--upper {
+
+  letter-spacing: 0.08em;
+}
+
+/* Font Dance Animation */
+.j-text--dance-container {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.j-font-dance-char {
+  display: inline-block;
+  animation: j-font-dance 1.5s infinite steps(2, end);
+}
+
+@keyframes j-font-dance {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(1px, -1px);
+  }
+
+  50% {
+    transform: translate(0, -2px);
+  }
+
+  75% {
+    transform: translate(-1px, -1px);
+  }
 }
 
 /* Sizes (snapped to m6x11 [16,32,48] and m6x11plus [18,36,54] pixel grids) */
@@ -45,6 +84,12 @@
   letter-spacing: 0.04em;
 }
 
+.j-text--heading {
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+
 .j-text--md {
   font-size: 16px;
 }
@@ -53,8 +98,20 @@
   font-size: 14px;
 }
 
+.j-text--body {
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+}
+
 .j-text--xs {
   font-size: 12px;
+}
+
+.j-text--label {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
 }
 
 .j-text--micro {
@@ -64,17 +121,22 @@
 }
 
 /* Tones */
+.j-text--default {
+  color: var(--j-white);
+}
 
+.j-text--mult,
 .j-text--red {
   color: var(--j-red);
 }
 
+.j-text--chips,
 .j-text--blue {
   color: var(--j-blue);
 }
 
 .j-text--gold {
-  color: var(--j-gold);
+  color: var(--j-gold-text);
 }
 
 .j-text--green {
@@ -82,7 +144,7 @@
 }
 
 .j-text--orange {
-  color: var(--j-orange);
+  color: var(--j-orange-text);
 }
 
 .j-text--purple {
@@ -96,6 +158,7 @@
 .j-text--white {
   color: var(--j-white);
 }
+
 
 /* ── Panel ─────────────────────────────────────────────────────────────── */
 
@@ -111,8 +174,8 @@
   background-color: var(--j-dark-grey);
   border: var(--j-panel-border-width) solid var(--j-border-silver);
   border-radius: var(--j-radius-lg);
-  box-shadow: 0 2px 0 0 var(--j-border-south),
-    0 6px 0 0 rgba(0, 0, 0, 0.55),
+  box-shadow: 0 var(--j-panel-south-edge-width) 0 0 var(--j-border-south),
+    0 calc(var(--j-surface-shadow-depth) + var(--j-panel-south-edge-width)) 0 0 rgba(0, 0, 0, 0.55),
     inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   padding: var(--j-space-lg);
   display: grid;
@@ -153,6 +216,22 @@
   gap: var(--j-space-md);
 }
 
+.j-panel__back {
+  margin-top: var(--j-space-md);
+  padding-top: var(--j-space-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.j-back-btn .j-btn__face {
+  padding-top: 4px;
+  padding-bottom: 6px;
+}
+
+.j-back-btn-wrap {
+  padding: 0;
+}
+
 .j-inner-panel {
   /* Subtle sunken inset on the outer panel face — NOT another framed modal.
      Balatro never nests modal-style frames; content sections sit flat or
@@ -163,58 +242,155 @@
   padding: var(--j-space-md);
 }
 
+
 /* ── Button ────────────────────────────────────────────────────────────── */
+/* Chunky 3D press: black underside via drop shadow,
+   press sinks the face +3px and collapses the shadow. */
 
 .j-btn {
+  /* Reserve room INSIDE the wrapper for the face's drop-shadow lip — so when
+     the parent (e.g. .j-app, .j-panel) uses overflow:hidden the lip doesn't
+     get clipped off, and the empty space below the face is part of the
+     button's own box, not the surrounding gap. */
   appearance: none;
+  -webkit-appearance: none;
   display: inline-block;
   position: relative;
   cursor: pointer;
-  border: 0;
-  padding: 0 0 4px;
-  background: none;
+  border: none;
+  padding: 0 0 calc(var(--j-press-y) + 2px) 0;
+  background: transparent;
+  -webkit-user-select: none;
   user-select: none;
 }
 
-.j-btn--full,
-.j-btn--full .j-btn__face { display: block; width: 100%; }
+/* Invisible stable hit target to prevent hover jitter when the child transforms */
+.j-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  z-index: 10;
+}
 
-.j-btn--disabled { opacity: 0.55; cursor: not-allowed; }
+.j-btn--full {
+  width: 100%;
+}
+
+.j-btn--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 
 .j-btn__face {
-  display: inline-block;
-  box-sizing: border-box;
-  font-family: var(--j-font);
-  line-height: 1;
+  position: relative;
+  border-radius: var(--j-radius-md);
+  background: var(--j-btn-face-color, var(--j-orange));
   color: var(--j-white);
   text-align: center;
+  line-height: 1;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
-  background: var(--j-btn-face, var(--j-orange));
-  border-radius: var(--j-radius-md);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  /* Drop shadow at 30% opacity per design. Stacked solid offset, no blur. */
+  box-shadow: 0 calc(var(--j-press-y) + 2px) 0 0 rgba(0, 0, 0, 0.3);
+  transform: translate(0, 0);
+  transition: transform var(--j-press-speed) linear, box-shadow var(--j-press-speed) linear, background-color var(--j-press-speed) linear;
+  /* No overflow:hidden — it sheared pixel-font ascenders whenever padding ran
+     tight. Nothing inside the face bleeds, so clipping bought nothing. */
+  overflow: visible;
+  isolation: isolate;
 }
 
-/* Balatro feedback: the face darkens on hover, and darker still when pressed. */
-.j-btn:not(.j-btn--disabled):hover .j-btn__face { filter: brightness(0.88); }
+.j-btn__face::before {
+  content: none;
+}
+
+.j-btn__face > * {
+  position: relative;
+  z-index: 1;
+}
 
 .j-btn[data-pressed="true"] .j-btn__face,
-.j-btn:active:not(.j-btn--disabled) .j-btn__face {
-  transform: translateY(4px);
+.j-btn:active:not(:disabled):not(.j-btn--disabled) .j-btn__face {
+  background: var(--j-btn-shadow-color, var(--j-dark-orange));
+  transform: translateY(var(--j-press-y));
   box-shadow: none;
-  filter: brightness(0.75);
 }
 
-.j-btn--xs .j-btn__face { padding: 5px 10px;  font-size: 12px; }
-.j-btn--sm .j-btn__face { padding: 8px 16px;  font-size: 14px; }
-.j-btn--md .j-btn__face { padding: 12px 22px; font-size: 18px; min-height: 44px; }
-.j-btn--lg .j-btn__face { padding: 14px 24px; font-size: 22px; min-height: 52px; }
+.j-btn:not(.j-btn--disabled):hover .j-btn__face {
+  background: var(--j-btn-shadow-color, var(--j-dark-orange));
+}
 
-.j-btn--orange { --j-btn-face: var(--j-orange); }
-.j-btn--red    { --j-btn-face: var(--j-red); }
-.j-btn--blue   { --j-btn-face: var(--j-blue); }
-.j-btn--green  { --j-btn-face: var(--j-green); }
-.j-btn--purple { --j-btn-face: var(--j-purple); }
-.j-btn--grey   { --j-btn-face: var(--j-teal-grey); }
+/* Sizes. Text anchors to the TOP of the face: the smaller pad goes on top and
+   the slack sits under the glyphs, matching the in-game buttons where the label
+   hugs the top edge above the pressed lip. */
+.j-btn--xs .j-btn__face {
+  padding-top: 3px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+  padding-left: 8px;
+  font-size: 11px;
+}
+
+.j-btn--sm .j-btn__face {
+  padding-top: 5px;
+  padding-right: 12px;
+  padding-bottom: 6px;
+  padding-left: 12px;
+  font-size: 13px;
+}
+
+.j-btn--md .j-btn__face {
+  padding-top: 6px;
+  padding-right: 18px;
+  padding-bottom: 9px;
+  padding-left: 18px;
+  font-size: 16px;
+}
+
+.j-btn--lg .j-btn__face {
+  padding-top: 6px;
+  padding-right: 18px;
+  padding-bottom: 11px;
+  padding-left: 18px;
+  font-size: 20px;
+}
+
+/* Tone colors — set via CSS custom properties */
+.j-btn--orange {
+  --j-btn-face-color: var(--j-orange);
+  --j-btn-shadow-color: var(--j-dark-orange);
+}
+
+.j-btn--red {
+  --j-btn-face-color: var(--j-red);
+  --j-btn-shadow-color: var(--j-dark-red);
+}
+
+.j-btn--blue {
+  --j-btn-face-color: var(--j-blue);
+  --j-btn-shadow-color: var(--j-dark-blue);
+}
+
+.j-btn--green {
+  --j-btn-face-color: var(--j-green);
+  --j-btn-shadow-color: var(--j-dark-green);
+}
+
+.j-btn--tarot {
+  --j-btn-face-color: var(--j-tarot-btn);
+  --j-btn-shadow-color: var(--j-tarot-btn-dark);
+}
+
+.j-btn--planet {
+  --j-btn-face-color: var(--j-planet-btn);
+  --j-btn-shadow-color: var(--j-planet-btn-dark);
+}
+
+.j-btn--spectral {
+  --j-btn-face-color: var(--j-spectral-btn);
+  --j-btn-shadow-color: var(--j-spectral-btn-dark);
+}
+
 
 /* ── Badge ─────────────────────────────────────────────────────────────── */
 
@@ -230,7 +406,6 @@
   white-space: nowrap;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
   border: none;
-  box-shadow: 0 2px 0 0 var(--j-badge-south, rgba(0, 0, 0, 0.4));
 }
 
 .j-badge--sm {
@@ -243,48 +418,42 @@
   font-size: 12px;
 }
 
-/* Badge tones — chips with dark-color-variant south edge */
+/* Badge tones — flat, no shadow, no edges */
 .j-badge--dark {
   background: var(--j-darkest);
   color: var(--j-white);
-  --j-badge-south: var(--j-black);
 }
 
 .j-badge--blue {
   background: var(--j-blue);
   color: var(--j-white);
-  --j-badge-south: var(--j-dark-blue);
 }
 
 .j-badge--red {
   background: var(--j-red);
   color: var(--j-white);
-  --j-badge-south: var(--j-dark-red);
 }
 
 .j-badge--green {
   background: var(--j-green);
   color: var(--j-white);
-  --j-badge-south: var(--j-dark-green);
 }
 
 .j-badge--orange {
   background: var(--j-orange);
   color: var(--j-white);
-  --j-badge-south: var(--j-dark-orange);
 }
 
 .j-badge--purple {
   background: var(--j-purple);
   color: var(--j-white);
-  --j-badge-south: var(--j-dark-purple);
 }
 
 .j-badge--grey {
   background: var(--j-teal-grey);
   color: var(--j-white);
-  --j-badge-south: var(--j-darkest);
 }
+
 
 /* ── Tabs ──────────────────────────────────────────────────────────────── */
 
@@ -322,7 +491,7 @@
   grid-auto-flow: column;
   grid-auto-columns: max-content;
   justify-content: center;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .j-tab__indicator svg {
@@ -334,7 +503,7 @@
   /* Arrow rests on top of the tab for ~30% of the cycle, then pops up and
      falls back. Per-keyframe easing gives it gravity (fast off the rest,
      slow at apex, fast on the fall) instead of a sleepy linear sine. */
-  animation: jimbo-tab-indicator 0.55s infinite;
+  animation: jimbo-bounce 0.55s infinite;
 }
 
 .j-tab__indicator[data-active="false"] {
@@ -345,7 +514,7 @@
    button. The selected tab is marked only by the bouncing arrow above it;
    the buttons themselves hold still so the row reads as a fixed baseline. */
 
-@keyframes jimbo-tab-indicator {
+@keyframes jimbo-bounce {
 
   /* Rest on top of the tab for the first ~30% of the cycle. */
   0%,
@@ -366,9 +535,245 @@
   }
 }
 
+@keyframes j-surface-sheen {
+
+  0%,
+  100% {
+    background-position: 0% 0%, 10% 20%;
+    opacity: 0.52;
+  }
+
+  50% {
+    background-position: 100% 100%, 88% 74%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes j-idle-bob {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Vertical tabs */
+.j-vtabs {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
+}
+
+.j-vtab {
+  border: none;
+  cursor: pointer;
+  border-radius: 8px 0 0 8px;
+  padding: 16px 8px;
+  background-color: transparent;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  transition: none;
+}
+
+.j-vtab[data-active="true"] {
+  background-color: var(--j-gold, #e4b643);
+  color: var(--j-black, #000000);
+}
+
+
+/* ── Toggle List ──────────────────────────────────────────────────────── */
+
+.j-toggle-list {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
+}
+
+.j-toggle-list__title {
+  font-family: var(--j-font);
+  font-size: 12px;
+  color: var(--j-grey);
+
+  letter-spacing: 0.04em;
+  margin-bottom: var(--j-space-sm);
+}
+
+.j-toggle-item {
+  /* Plain seated row inside the outer panel. No row backdrop — items rest
+     directly on the panel surface; the checkbox alone carries the visual
+     weight. Label fills, checkbox pinned right so columns align. */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--j-space-md);
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--j-font);
+  color: var(--j-white);
+  text-align: left;
+}
+
+.j-toggle-item__label {
+  min-width: 0;
+}
+
+.j-toggle-item[data-variant="stacked"] {
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  justify-content: center;
+  gap: var(--j-space-xs);
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+}
+
+.j-toggle-item[data-variant="stacked"] .j-toggle-item__label {
+  text-align: center;
+
+  letter-spacing: 0.04em;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.j-toggle-check {
+  /* Balatro checkbox: white outer square frame, dark inner well that fills
+     red when on with a white checkmark on top. The white outline IS the
+     box; the inner well sits inset from it so it reads as a chunky frame
+     around the empty/checked state. */
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  background: var(--j-white);
+  padding: 2px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.j-toggle-check::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--j-teal-grey);
+  border-radius: 3px;
+}
+
+.j-toggle-check[data-on="true"]::before {
+  background: var(--j-red);
+}
+
+.j-toggle-check[data-on="true"]::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><polyline points='3,9 7,13 13,4' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 92% 92% no-repeat;
+          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><polyline points='3,9 7,13 13,4' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 92% 92% no-repeat;
+  background: var(--j-white);
+}
+
+
+/* ── Tooltip ──────────────────────────────────────────────────────────── */
+
+.j-tooltip {
+  position: fixed;
+  max-width: 280px;
+  padding: 6px 10px;
+  border-radius: var(--j-radius-md);
+  background: var(--j-darkest);
+  border: var(--j-panel-border-width) solid var(--j-border-silver);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+  color: var(--j-white);
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity 120ms ease;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: center;
+  gap: 4px;
+}
+
+.j-tooltip--dark { background: var(--j-darkest); color: var(--j-white); }
+
+.j-tooltip--card {
+  background: var(--j-white);
+  color: var(--j-darkest);
+  border-color: var(--j-border-silver);
+  text-shadow: none;
+}
+
+.j-tooltip__body {
+  width: 100%;
+  text-align: center;
+  font-family: var(--j-font);
+}
+
+.j-tooltip--card .j-tooltip__body { color: var(--j-darkest); }
+
+.j-tooltip__badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--j-radius-sm);
+  font-family: var(--j-font);
+  font-size: 11px;
+  color: var(--j-white);
+  text-shadow: var(--j-text-shadow);
+  letter-spacing: 1px;
+  margin-bottom: -2px;
+}
+
+
+
 /* ── Layout Utilities ─────────────────────────────────────────────────── */
 
+.j-flex {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+}
+
+.j-flex-col {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+}
+
+.j-items-center {
+  align-items: center;
+}
+
+.j-items-start {
+  align-items: flex-start;
+}
+
+.j-justify-center {
+  justify-content: center;
+}
+
+.j-justify-between {
+  justify-content: space-between;
+}
+
+.j-gap-xs { gap: var(--j-space-xs); }
+.j-gap-sm { gap: var(--j-space-sm); }
+.j-gap-md { gap: var(--j-space-md); }
+.j-gap-lg { gap: var(--j-space-lg); }
+
+.j-w-full { width: 100%; }
+.j-h-full { height: 100%; }
+
 .j-text-center { text-align: center; }
+
 
 /* ── Flank Nav ────────────────────────────────────────────────────────── */
 
@@ -409,8 +814,8 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 var(--j-press-y) 0 0 var(--j-dark-red);
-  /* Same rule as .j-btn__face: press snaps, only color/shadow ease. */
-  transition: box-shadow var(--j-press-speed) ease,
+  transition: transform var(--j-press-speed) ease,
+    box-shadow var(--j-press-speed) ease,
     background-color var(--j-press-speed) ease;
 }
 
@@ -425,7 +830,130 @@
   box-shadow: none;
 }
 
+
+/* ── Copy Row ─────────────────────────────────────────────────────────── */
+
+.j-copy-row {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
+}
+
+.j-copy-row__field {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: var(--j-space-md);
+}
+
+.j-copy-row__value {
+  padding: 6px 10px;
+  background: var(--j-darkest);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  border-radius: var(--j-radius-sm);
+  word-break: break-all;
+}
+
+.j-copy-row__btn {
+  font-family: var(--j-font);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  border-radius: var(--j-radius-sm);
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.j-copy-row__btn[data-copied="false"] {
+  /* Red, not gold — there are no gold buttons in Balatro. */
+  color: var(--j-white);
+  background: var(--j-red);
+  border: none;
+}
+
+.j-copy-row__btn[data-copied="true"] {
+  color: var(--j-green-text);
+  background: rgba(53, 189, 134, 0.12);
+  border: 1px solid var(--j-green-text);
+}
+
+
 /* ── Code Block ───────────────────────────────────────────────────────── */
+
+.j-code-block {
+  background-color: var(--j-darkest);
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  border-radius: var(--j-radius-lg);
+  box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+}
+
+.j-code-block__header {
+  padding: 8px 12px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--j-inner-border);
+}
+
+.j-code-block__meta {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 8px;
+  align-items: center;
+}
+
+.j-code-block__filename {
+  /* JimboText handles the size + grey color now — this is just letter-spacing
+     and a small alignment hint. */
+  letter-spacing: 0.04em;
+}
+
+.j-code-block__lang {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Legacy hand-rolled copy button styles — no longer used; JimboCodeBlock
+   now renders a JimboIconButton. Left as a dead rule until a sweep removes
+   it (kept so any leftover usages don't break visually overnight). */
+.j-code-block__copy--legacy {
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+}
+
+.j-code-block__copy[data-copied="false"] {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.j-code-block__copy[data-copied="true"] {
+  color: #4ade80;
+}
+
+.j-code-block__pre {
+  padding: 12px;
+  overflow-x: auto;
+  font-family: var(--j-font-code);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #f6f0d5;
+  margin: 0;
+}
 
 /* Host element for an editor view mounted by JS (CodeMirror). The view paints
    its own chrome; this only fixes the background and the height floor so the
@@ -434,6 +962,98 @@
   width: 100%;
   min-height: var(--j-code-surface-min-height, 320px);
   background: var(--j-darkest);
+}
+
+
+/* ── Filter Bar ───────────────────────────────────────────────────────── */
+
+.j-filter-bar {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 24px;
+  padding: var(--j-space-xl);
+  background-color: var(--j-dark-grey);
+  border: 4px solid var(--j-border-silver);
+  box-shadow: 0 3px 0 0 var(--j-border-south);
+  border-radius: var(--j-radius-lg);
+  position: relative;
+  grid-template-columns: repeat(auto-fill, max-content);
+}
+
+.j-filter-bar__field {
+  min-width: 200px;
+  position: relative;
+  margin-top: 10px;
+}
+
+.j-filter-bar__pill {
+  position: absolute;
+  top: -14px;
+  left: 16px;
+  background-color: var(--j-red);
+  border: 2px solid var(--j-dark-red);
+  border-radius: var(--j-radius-md);
+  padding: 4px 12px;
+  z-index: 2;
+}
+
+.j-filter-bar__input {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  background-color: var(--j-darkest);
+  border: none;
+  border-bottom: 4px solid var(--j-panel-edge);
+  border-radius: var(--j-radius-lg);
+  color: var(--j-white);
+  font-family: var(--j-font);
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  outline: none;
+}
+
+.j-filter-bar__search-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--j-blue);
+  z-index: 1;
+}
+
+.j-filter-bar__select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--j-orange);
+  color: var(--j-white);
+  border: none;
+  border-bottom: 4px solid var(--j-dark-orange);
+  border-radius: var(--j-radius-lg);
+  cursor: pointer;
+  font-family: var(--j-font);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  padding: 14px 48px 14px 24px;
+  min-width: 200px;
+  text-align: center;
+  outline: none;
+}
+
+.j-filter-bar__sort-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--j-white);
+  opacity: 0.85;
 }
 
 /* ── Modal ────────────────────────────────────────────────────────────── */
@@ -465,7 +1085,7 @@
   grid-auto-rows: max-content;
   overflow: hidden;
   border-radius: var(--j-radius-lg);
-  animation: jimbo-modal-in 140ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: jimbo-modal-in 140ms cubic-bezier(0.2, 0, 0.2, 1.4) both;
 }
 
 .j-modal .j-panel__body {
@@ -480,6 +1100,11 @@
   color: var(--j-white);
   text-align: center;
   letter-spacing: 0.5px;
+}
+
+.j-input-modal__message {
+  display: block;
+  margin-bottom: var(--j-space-md);
 }
 
 .j-text-input {
@@ -501,7 +1126,15 @@
   border-color: var(--j-red);
 }
 
+.j-text-input--code {
+  font-family: var(--j-font-code);
+  font-size: 11px;
+}
+
 /* Jimmolate: JS predicate editor for post-SIMD seed filtering. */
+.j-jimmolate { gap: var(--j-space-sm); }
+.j-jimmolate__sig { opacity: 0.6; }
+.j-jimmolate__input { width: 100%; font-family: var(--j-font-code); font-size: 11px; }
 
 /* Inline-edit: borderless transparent input that reads as text. */
 .j-inline-edit {
@@ -529,7 +1162,7 @@
 .j-inline-edit--md { font-size: 14px; }
 .j-inline-edit--lg { font-size: 18px; }
 .j-inline-edit--white { color: var(--j-white); }
-.j-inline-edit--gold  { color: var(--j-gold); }
+.j-inline-edit--gold  { color: var(--j-gold-text); }
 .j-inline-edit--grey  { color: var(--j-grey); }
 .j-inline-edit--dim   { opacity: 0.8; }
 
@@ -552,6 +1185,21 @@
   color: var(--j-white);
 }
 
+.j-input-modal__error {
+  display: block;
+  margin-top: 6px;
+}
+
+.j-input-modal__actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  justify-content: flex-end;
+  gap: var(--j-space-md);
+  margin-top: 14px;
+}
+
+
 /* ── Footer ───────────────────────────────────────────────────────────── */
 
 .j-footer {
@@ -569,9 +1217,6 @@
   background: var(--j-black);
   padding: 4px 8px 5px;
   text-align: center;
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
 }
 
 .j-footer__line {
@@ -604,14 +1249,20 @@
   gap: 0.25rem;
 }
 
+.j-footer__sep {
+  color: var(--j-grey);
+}
+
 /* JimboLink — canonical external link styling. j-footer__link kept as an alias
    for back-compat; new uses should be `j-link` via the JimboLink primitive. */
-.j-link {
+.j-link,
+.j-footer__link {
   color: var(--j-gold);
   text-decoration: none;
 }
 
-.j-link:hover {
+.j-link:hover,
+.j-footer__link:hover {
   text-decoration: underline;
 }
 
@@ -623,7 +1274,7 @@
   margin-left: 0.25rem;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 320px) {
   .j-footer__bar {
     padding: 4px 6px 5px;
   }
@@ -632,6 +1283,118 @@
   .j-footer__line--wrap {
     font-size: 9px;
   }
+}
+
+
+/* ── Floating ─────────────────────────────────────────────────────────── */
+
+.j-floating {
+  position: absolute;
+  z-index: 20;
+}
+
+
+/* ── Background (canvas is styled inline because it's fixed fullscreen) ── */
+
+
+/* ── GlowRing ─────────────────────────────────────────────────────────── */
+
+.j-glow--must {
+  box-shadow: 0 0 0 2px var(--j-blue), 0 0 10px var(--j-blue);
+  animation: j-glow-pulse 1.6s ease-in-out infinite;
+}
+
+.j-glow--should {
+  box-shadow: 0 0 0 2px var(--j-gold), 0 0 10px var(--j-gold);
+  animation: j-glow-pulse 1.6s ease-in-out infinite;
+}
+
+.j-glow--match {
+  box-shadow: 0 0 0 2px var(--j-green-text), 0 0 18px var(--j-green-text), 0 0 36px var(--j-green-text);
+  animation: j-glow-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes j-glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+
+/* ── Utility (extras not in the Layout Utilities block) ───────────────── */
+
+.j-flex-wrap { grid-template-columns: repeat(auto-fill, max-content); }
+.j-gap-xl { gap: var(--j-space-xl); }
+.j-mt-sm { margin-top: var(--j-space-sm); }
+.j-shrink-0 { min-width: max-content; }
+.j-flex-1 { min-width: 0; }
+.j-min-w-0 { min-width: 0; }
+.j-overflow-hidden { overflow: hidden; }
+.j-overflow-auto { overflow: auto; }
+.j-relative { position: relative; }
+
+/* Tone border utilities */
+.j-border--red {
+  border-color: var(--j-red);
+}
+
+.j-border--blue {
+  border-color: var(--j-blue);
+}
+
+.j-border--green {
+  border-color: var(--j-green);
+}
+
+.j-border--gold {
+  border-color: var(--j-gold);
+}
+
+.j-border--orange {
+  border-color: var(--j-orange);
+}
+
+.j-border--purple {
+  border-color: var(--j-purple);
+}
+
+/* Tone background utilities */
+.j-bg--red {
+  background-color: var(--j-red);
+}
+
+.j-bg--blue {
+  background-color: var(--j-blue);
+}
+
+.j-bg--green {
+  background-color: var(--j-green);
+}
+
+.j-bg--gold {
+  background-color: var(--j-gold);
+}
+
+.j-bg--orange {
+  background-color: var(--j-orange);
+}
+
+.j-bg--purple {
+  background-color: var(--j-purple);
+}
+
+.j-bg--dark-grey {
+  background-color: var(--j-dark-grey);
+}
+
+.j-bg--darkest {
+  background-color: var(--j-darkest);
 }
 
 /* ── App Shell ────────────────────────────────────────────────────────── */
@@ -647,12 +1410,6 @@
   height: 100%;
   z-index: -10;
   pointer-events: none;
-  /* WebGL-failure fallback: apps are transparent by design (".j-app paints no
-     second background"), so a failed context used to fall through to whatever
-     is behind — a white page in the MCP host, white-on-white grey text, dead
-     app. The shader writes alpha=1 over the whole viewport, so this flat felt
-     is invisible when WebGL works and is the whole difference when it doesn't. */
-  background: var(--j-darkest, #0c1818);
 }
 
 .j-app {
@@ -720,74 +1477,14 @@
   gap: var(--j-space-sm);
 }
 
-/* Mobile portrait — fills a locked 375×667 SE (or 100dvh on a real phone). */
-.j-phone {
-  width: 100%;
-  max-width: var(--j-phone-w);
-  height: 100dvh;
-  max-height: 100dvh;
-  min-height: 100dvh;
-  margin: 0 auto;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  background: transparent;
-  font-family: var(--j-font);
-  color: var(--j-white);
-  overflow: hidden;
-  position: relative;
-  box-sizing: border-box;
-}
-
-.j-phone__content,
-.j-phone__scroll {
-  min-height: 0;
-  min-width: 0;
-  display: grid;
-  grid-template-rows: 1fr;
-}
-
-.j-phone__content {
-  overflow: hidden;
-  padding: var(--j-space-lg) var(--j-space-lg) var(--j-space-md);
-}
-
-.j-phone__scroll {
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0;
-}
-
-.j-phone__scroll > *,
-.j-phone__content > *,
-.j-app__scroll > .j-ide,
-.j-app__content > .j-ide,
-.j-page--full .j-ide {
-  min-height: 0;
-  height: 100%;
-}
-
-.j-phone .j-ide,
-.j-app .j-ide,
-.j-page--full .j-ide {
-  height: 100%;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto auto 1fr;
-  grid-auto-flow: row;
-}
-
-.j-phone__footer {
-  padding: var(--j-space-md) var(--j-space-lg);
-}
-
 /* ── Section Header ──────────────────────────────────────────────────── */
 /* Colored tag + horizontal rule — reusable section divider. */
 
 .j-section-header {
   display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
   align-items: center;
-  width: 100%;
   gap: var(--j-space-md);
   margin-bottom: var(--j-space-md);
 }
@@ -843,22 +1540,6 @@
   position: relative;
 }
 
-.j-page--full {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  grid-template-rows: 1fr auto;
-}
-
-.j-page--full > .j-page__main {
-  max-width: none;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  grid-template-rows: 1fr;
-}
-
 .j-page__main {
   width: 100%;
   max-width: 48rem;
@@ -870,6 +1551,356 @@
   gap: var(--j-space-xl);
   box-sizing: border-box;
 }
+
+.j-page__footer {
+}
+
+.j-page__row {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-lg);
+}
+
+@media (min-width: 720px) {
+  .j-page__row {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .j-page__row > .j-panel {
+    min-width: 0;
+  }
+}
+
+/* Code / copy row inside a panel */
+.j-copy-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: var(--j-space-sm);
+  min-width: 0;
+}
+
+.j-copy-row__code {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--j-font-code);
+  font-size: 12px;
+  color: var(--j-white);
+  letter-spacing: 0;
+}
+
+
+/* ── Stepper ─────────────────────────────────────────────────────────── */
+/* < value > control matching Balatro settings rows. */
+
+.j-spinner-wrap {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: center;
+  gap: var(--j-space-xs);
+}
+
+.j-spinner__label {
+  text-align: center;
+}
+
+.j-spinner {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: stretch;
+  gap: var(--j-space-sm);
+}
+
+.j-spinner__value {
+  min-width: 96px;
+  padding: 4px 12px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  box-shadow: 0 3px 0 var(--j-dark-red);
+}
+
+
+/* ── Stepper (page-dots) ─────────────────────────────────────────────── */
+/* Row of small dots. Active page = filled white circle; other pages = a
+   dim grey circle. Carousel page indicator pattern. */
+
+.j-stepper {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.j-stepper__hit {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+}
+
+.j-stepper__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--j-teal-grey);
+}
+
+.j-stepper__dot[data-active="true"] {
+  background: var(--j-white);
+}
+
+
+/* ── Slider ──────────────────────────────────────────────────────────── */
+
+.j-slider-wrap {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: stretch;
+  gap: var(--j-space-xs);
+  width: 100%;
+}
+
+.j-slider__label {
+  text-align: center;
+}
+
+/* Slider — track is the dark inset surface, fill is bright red (filled
+   portion), and the JimboValueBadge sits as the thumb at the fill boundary.
+   Matches Balatro audio settings (IMG_3679): red fill on dark trough, red
+   value pill riding the boundary. */
+.j-slider {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  height: 28px;
+  /* Reserve half-badge width on each side so the thumb doesn't clip when
+     value is at min or max. */
+  padding: 0 20px;
+}
+
+.j-slider__track {
+  position: relative;
+  height: 14px;
+  background: var(--j-surface-inset);
+  border-radius: var(--j-radius-pill);
+  overflow: hidden;
+}
+
+.j-slider__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--j-red);
+  border-radius: var(--j-radius-pill) 0 0 var(--j-radius-pill);
+}
+
+.j-slider__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Absolute thumb wrapper positioned at the fill boundary. The badge inside
+   centers via translateX(-50%) so the pill straddles the boundary line. */
+.j-slider__thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+
+/* ── Value Badge ─────────────────────────────────────────────────────── */
+/* Red pill displaying a numeric value. Click to edit inline. */
+
+.j-value-badge {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 2px 8px;
+  background: var(--j-red);
+  color: var(--j-white);
+  border: none;
+  border-radius: var(--j-radius-pill);
+  cursor: pointer;
+  font-family: var(--j-font);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.j-value-badge--static {
+  cursor: default;
+}
+
+.j-value-badge--editing {
+  padding: 0;
+}
+
+.j-value-badge__input {
+  width: 56px;
+  padding: 2px 8px;
+  background: var(--j-red);
+  color: var(--j-white);
+  border: none;
+  border-radius: var(--j-radius-pill);
+  font-family: var(--j-font);
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.j-value-badge__input::-webkit-outer-spin-button,
+.j-value-badge__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+/* ── Dual Chip ───────────────────────────────────────────────────────── */
+/* Two stat halves joined into one pill — used for Hands × Discards. */
+
+.j-dual-chip {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: stretch;
+  border-radius: var(--j-radius-md);
+  overflow: hidden;
+  box-shadow: 0 2px 0 var(--j-black);
+}
+
+.j-dual-chip__half {
+  min-width: 40px;
+  padding: 6px 14px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  color: var(--j-white);
+}
+
+.j-dual-chip__half--left {
+  border-right: 1px solid var(--j-black);
+}
+
+.j-dual-chip__half--blue { background: var(--j-blue); }
+.j-dual-chip__half--red { background: var(--j-red); }
+.j-dual-chip__half--green { background: var(--j-green); }
+.j-dual-chip__half--gold { background: var(--j-gold); color: var(--j-black); }
+.j-dual-chip__half--dark { background: var(--j-darkest); }
+
+
+/* ── Stat Grid ───────────────────────────────────────────────────────── */
+/* 3-column stat bar — reusable primitive. */
+
+.j-stat-grid {
+  background: var(--j-surface-inset);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--j-space-md);
+  text-align: center;
+}
+
+.j-stat-grid__value {
+  font-family: var(--j-font);
+  font-size: 16px;
+  color: var(--j-gold-text);
+  text-shadow: var(--j-text-shadow);
+}
+
+.j-stat-grid__label {
+  font-family: var(--j-font);
+  font-size: 10px;
+  color: var(--j-white);
+  letter-spacing: 1px;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+
+/* ── Info Card ───────────────────────────────────────────────────────── */
+/* Generic clickable row card — used for filter lists, seed lists, etc. */
+
+.j-info-card {
+  background: var(--j-surface-inset);
+  border-radius: var(--j-radius-md);
+  padding: var(--j-space-md);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: var(--j-space-md);
+  cursor: pointer;
+}
+
+.j-info-card:hover {
+  filter: brightness(1.08);
+}
+
+.j-info-card__body {
+  min-width: 0;
+}
+
+.j-info-card__title {
+  font-family: var(--j-font);
+  font-size: 13px;
+  color: var(--j-white);
+  letter-spacing: 1px;
+  text-shadow: var(--j-text-shadow);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.j-info-card__sub {
+  font-family: var(--j-font);
+  font-size: 9px;
+  color: var(--j-gold-text);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.j-info-card__aside {
+  text-align: right;
+}
+
 
 /* ── Inset Box ───────────────────────────────────────────────────────── */
 /* Dark recessed content area — for log output, recent finds, etc. */
@@ -885,6 +1916,7 @@
   line-height: 1.7;
 }
 
+
 /* ── Wordmark ────────────────────────────────────────────────────────── */
 /* Title + subtitle hero block. */
 
@@ -898,7 +1930,7 @@
   font-size: 32px;
   letter-spacing: 3px;
   line-height: 1.15;
-  color: var(--j-gold);
+  color: var(--j-gold-text);
   text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
 }
 
@@ -911,10 +1943,23 @@
   text-shadow: var(--j-text-shadow);
 }
 
+
 /* ── Cards ────────────────────────────────────────────────────────────── */
 
 .j-game-card {
   width: var(--j-card-width, 71px);
+}
+
+.j-game-card--unknown {
+  aspect-ratio: 0.75;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
 }
 
 .j-card-renderer {
@@ -976,6 +2021,7 @@
 .j-card-renderer[data-hover-tilt="true"] .j-card-renderer__hit {
   cursor: pointer;
 }
+
 
 /* ── Panel Spinner ───────────────────────────────────────────────────── */
 
@@ -1069,6 +2115,7 @@
 }
 
 .j-panel-spinner__title,
+.j-panel-spinner__meta,
 .j-panel-spinner__description {
   width: 100%;
   min-width: 0;
@@ -1092,6 +2139,7 @@
   text-align: center;
 }
 
+
 /* ── IDE ─────────────────────────────────────────────────────────────── */
 
 .j-ide {
@@ -1110,8 +2158,8 @@
   border: var(--j-panel-border-width) solid var(--j-border-silver);
   background: var(--j-darkest);
   color: var(--j-white);
-  box-shadow: 0 2px 0 0 var(--j-border-south),
-    0 6px 0 0 rgba(0, 0, 0, 0.55);
+  box-shadow: 0 var(--j-panel-south-edge-width) 0 0 var(--j-border-south),
+    0 calc(var(--j-surface-shadow-depth) + var(--j-panel-south-edge-width)) 0 0 rgba(0, 0, 0, 0.55);
 }
 
 .j-ide__header {
@@ -1138,7 +2186,7 @@
 .j-ide__title {
   font-family: var(--j-font);
   font-size: 16px;
-  color: var(--j-gold);
+  color: var(--j-gold-text);
   text-shadow: var(--j-text-shadow);
 }
 
@@ -1162,10 +2210,6 @@
 .j-ide-toolbar {
   display: grid;
   grid-auto-flow: column;
-  /* The tabs column gives way (it scrolls inside itself); the actions never
-     shrink or leave the row. With max-content on every column the row grew past
-     a 320px frame and pushed the last action off the edge. */
-  grid-template-columns: minmax(0, 1fr);
   grid-auto-columns: max-content;
   align-items: center;
   gap: 6px;
@@ -1175,25 +2219,27 @@
   min-width: 0;
 }
 
-/* `.j-tabs` centers its row. Centered overflow spills off the left edge, where
-   no scroll can reach it; `safe` falls back to start-aligned when the row is
-   wider than the column, so the first tab stays reachable. */
-.j-ide-toolbar__tabs .j-tabs {
-  justify-content: safe center;
-}
-
 .j-ide-toolbar__tabs {
   min-width: 0;
   padding-bottom: 3px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
+  overflow: hidden;
+}
+
+.j-ide-toolbar__action {
 }
 
 .j-ide__body {
   min-height: 0;
   overflow: auto;
   background: var(--j-darkest);
+}
+
+.j-ide__body--map {
+  overflow: hidden;
+}
+
+.j-ide__results {
+  padding: 12px;
 }
 
 .j-ide-results {
@@ -1216,6 +2262,7 @@
   line-height: 1.2;
 }
 
+
 /* ── Seed Input ───────────────────────────────────────────────────────── */
 
 .j-seed-input {
@@ -1225,10 +2272,6 @@
   gap: var(--j-space-xs);
   width: fit-content;
   max-width: 100%;
-  --j-seed-shell-bg: var(--j-dark-grey);
-  --j-seed-shell-border: var(--j-border-silver);
-  --j-seed-shell-border-bottom: var(--j-border-south);
-  --j-seed-field-bg: var(--j-darkest);
 }
 
 .j-seed-input--normal {
@@ -1270,14 +2313,14 @@
 }
 
 .j-seed-input__field {
-  width: calc(10ch + 36px);
-  min-width: 144px;
-  max-width: 180px;
+  width: calc(8ch + 16px);
+  min-width: calc(8ch + 16px);
+  max-width: calc(8ch + 16px);
   padding: 6px 8px 8px;
-  border-radius: var(--j-radius-sm);
+  border-radius: calc(var(--j-radius-md) - 2px);
   border: var(--j-panel-border-width) solid var(--j-panel-edge);
   background: var(--j-seed-field-bg);
-  color: var(--j-gold);
+  color: var(--j-gold-text);
   font-size: 18px;
   font-family: var(--j-font);
   font-weight: 400;
@@ -1337,24 +2380,245 @@
   width: 100%;
 }
 
-/* Ambient @keyframes animations (CRT/chrome pulses) are a separate concern from
- * the --j-press-speed/--j-transition tokens in jimbo-tokens.css: those glide on
- * user interaction, these loop on their own. Same rule either way: explicit
- * [data-j-motion] wins over the OS default, never a silent one-way override. */
 @media (prefers-reduced-motion: reduce) {
-  :root:not([data-j-motion="full"]) .j-panel::before,
-  :root:not([data-j-motion="full"]) .j-inner-panel::before,
-  :root:not([data-j-motion="full"]) .j-footer__bar::before,
-  :root:not([data-j-motion="full"]) .j-seed-input__shell::before {
+  .j-panel::before,
+  .j-inner-panel::before,
+  .j-btn__face::before,
+  .j-tab__btn::before,
+  .j-footer__bar::before,
+  .j-seed-input__shell::before,
+  .j-tab__btn[data-active="true"] {
     animation: none;
   }
 }
-[data-j-motion="reduced"] .j-panel::before,
-[data-j-motion="reduced"] .j-inner-panel::before,
-[data-j-motion="reduced"] .j-footer__bar::before,
-[data-j-motion="reduced"] .j-seed-input__shell::before {
-  animation: none;
+
+
+/* ── Aesthetic Selector ──────────────────────────────────────────────── */
+
+.j-aesthetic-selector {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
 }
+
+.j-aesthetic-selector__list {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fill, max-content);
+  gap: var(--j-space-sm);
+}
+
+.j-aesthetic-pill {
+  padding: 4px 10px;
+  border-radius: var(--j-radius-md);
+  border: 2px solid var(--j-panel-edge);
+  background: var(--j-darkest);
+  color: var(--j-grey);
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--j-font);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-shadow: var(--j-text-shadow);
+  transition: border-color 100ms ease, background 100ms ease, color 100ms ease;
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+.j-aesthetic-pill:hover {
+  border-color: var(--j-gold);
+  color: var(--j-gold-text);
+}
+
+.j-aesthetic-pill[data-active="true"] {
+  border-color: var(--j-gold);
+  background: rgba(228, 182, 67, 0.13);
+  color: var(--j-gold-text);
+  box-shadow: 0 0 0 1px var(--j-gold), 0 2px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+
+/* ── Showcase ─────────────────────────────────────────────────────────── */
+
+.j-showcase {
+  width: 100%;
+  height: 100%;
+  background: var(--j-darkest);
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  font-family: var(--j-font);
+  color: var(--j-white);
+  overflow: hidden;
+}
+
+.j-showcase__scroll {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 14px 10px;
+}
+
+.j-showcase__wordmark {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.j-showcase__wordmark-title {
+  font-size: 32px;
+  letter-spacing: 3px;
+  line-height: 1.15;
+  color: var(--j-gold-text);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+.j-showcase__wordmark-sub {
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: var(--j-grey);
+  margin-top: 4px;
+  text-shadow: var(--j-text-shadow);
+}
+
+.j-showcase__stats {
+  background: var(--j-surface-inset);
+  border-radius: var(--j-radius-md);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--j-space-md);
+  text-align: center;
+  margin-bottom: var(--j-space-xl);
+}
+
+.j-showcase__stat-value {
+  font-size: 16px;
+  color: var(--j-gold-text);
+  text-shadow: var(--j-text-shadow);
+}
+
+.j-showcase__stat-label {
+  font-size: 9px;
+  color: var(--j-grey);
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+.j-showcase__section-header {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: var(--j-space-md);
+  margin-bottom: var(--j-space-md);
+}
+
+.j-showcase__section-tag {
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  color: var(--j-white);
+  border-radius: 3px;
+  text-shadow: var(--j-text-shadow);
+}
+
+.j-showcase__section-rule {
+  height: 2px;
+  border-radius: 1px;
+}
+
+.j-showcase__filter-list {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-md);
+  margin-bottom: var(--j-space-xl);
+}
+
+.j-showcase__filter-card {
+  background: var(--j-surface-inset);
+  border-radius: var(--j-radius-md);
+  padding: 10px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.j-showcase__filter-sprites {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 2px;
+}
+
+.j-showcase__filter-sprite {
+  width: 30px;
+  height: 40px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+}
+
+.j-showcase__filter-info {
+  min-width: 0;
+}
+
+.j-showcase__filter-name {
+  font-size: 13px;
+  color: var(--j-white);
+  letter-spacing: 1px;
+  text-shadow: var(--j-text-shadow);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.j-showcase__filter-author {
+  font-size: 9px;
+  color: var(--j-gold-text);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.j-showcase__filter-hits {
+  text-align: right;
+}
+
+.j-showcase__filter-hits-value {
+  font-size: 14px;
+  text-shadow: var(--j-text-shadow);
+}
+
+.j-showcase__filter-hits-label {
+  font-size: 8px;
+  color: var(--j-grey);
+  letter-spacing: 1px;
+}
+
+.j-showcase__recent {
+  background: var(--j-surface-inset);
+  border-radius: var(--j-radius-md);
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--j-grey);
+  letter-spacing: 1px;
+  line-height: 1.7;
+}
+
+.j-showcase__actions {
+  padding: 8px 10px 10px;
+  border-top: 2px solid var(--j-black);
+  background: var(--j-dark-grey);
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: 6px;
+}
+
 
 /* ── Footer suit animation ────────────────────────────────────────────── */
 
@@ -1407,16 +2671,15 @@
   height: 0.95em;
 }
 
+
 /* ── Copy row label ───────────────────────────────────────────────────── */
 
-/* Tap icon + seed, green flash on copy. Chrome is .j-btn's — this block only
-   re-themes the face and lays out the two children inside it. */
-.j-seed-copy {
-  --j-btn-face-color: var(--j-darkest);
-  --j-btn-shadow-color: var(--j-black);
+.j-copy-row__label {
+  letter-spacing: 2px;
 }
 
-.j-seed-copy .j-btn__face {
+/* WeeJoker harvest — tap icon + seed, green flash on copy. */
+.j-seed-copy {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: max-content;
@@ -1425,6 +2688,20 @@
   gap: var(--j-space-sm);
   width: 100%;
   min-height: 44px;
+  padding: 6px 10px;
+  border: var(--j-panel-border-width) solid var(--j-panel-edge);
+  border-radius: var(--j-radius-sm);
+  background: var(--j-darkest);
+  color: var(--j-white);
+  font-family: var(--j-font);
+  cursor: pointer;
+  text-shadow: var(--j-text-shadow);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.j-seed-copy:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .j-seed-copy__icon {
@@ -1440,7 +2717,7 @@
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.j-seed-copy--copied .j-seed-copy__icon {
+.j-seed-copy[data-copied="true"] .j-seed-copy__icon {
   background: var(--j-green);
   color: var(--j-white);
 }
@@ -1455,8 +2732,26 @@
   text-overflow: ellipsis;
 }
 
-.j-seed-copy--copied .j-seed-copy__text {
+.j-seed-copy[data-copied="true"] .j-seed-copy__text {
   color: var(--j-green-text);
+}
+
+
+/* ── Motely version badge ─────────────────────────────────────────────── */
+
+.j-motely-badge {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 6px;
+}
+
+.j-motely-badge--chip {
+  padding: 3px 8px;
+  border-radius: var(--j-radius-sm);
+  background: var(--j-darkest);
+  border: 1px solid var(--j-panel-edge);
 }
 
 /* ── Jamlyzer ─────────────────────────────────────────────────────────── */
@@ -1474,6 +2769,14 @@
   padding: var(--j-space-sm) 0;
 }
 
+.j-jamlyzer__stats {
+  letter-spacing: 0.04em;
+}
+
+.j-jamlyzer__spinner {
+  width: 100%;
+}
+
 .j-jamlyzer__panel {
   width: 100%;
 }
@@ -1482,8 +2785,25 @@
   padding: var(--j-space-sm) var(--j-space-md);
 }
 
+.j-jamlyzer__panel--verdict .j-panel__body {
+  padding: var(--j-space-md);
+}
+
+.j-jamlyzer__panel--match {
+  background: var(--j-dark-green);
+}
+
+.j-jamlyzer__panel--miss {
+  background: var(--j-darkest);
+}
+
 .j-jamlyzer__panel--hint .j-panel__body {
   padding: var(--j-space-md) var(--j-space-sm);
+}
+
+.j-jamlyzer__tallies {
+  width: 100%;
+  text-align: center;
 }
 
 .j-jamlyzer__details {
@@ -1496,20 +2816,47 @@
   box-sizing: border-box;
 }
 
-.j-jamlyzer-ante-head {
+.j-jamlyzer__details-section {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: 16px;
-  align-items: start;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-xs);
+  background: var(--j-surface-inset);
+  padding: var(--j-space-sm);
+  border-radius: var(--j-radius-md);
+  border: 1px solid var(--j-panel-edge);
 }
 
-.j-jamlyzer-pack-line {
+.j-jamlyzer__cards-grid {
   display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: 8px;
-  align-items: start;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fill, max-content);
+  gap: var(--j-space-xs);
+  justify-content: center;
 }
+
+.j-jamlyzer__card-wrap {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  border-radius: var(--j-radius-sm);
+  box-sizing: border-box;
+  padding: 2px;
+}
+
+.j-jamlyzer__card-wrap--matched {
+  box-shadow: 0 0 10px var(--j-gold), inset 0 0 3px var(--j-gold);
+  border: 1px solid var(--j-gold);
+  animation: j-card-pulse 2s infinite ease-in-out;
+  border-radius: var(--j-radius-sm);
+}
+
+@keyframes j-card-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 1px var(--j-gold)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 5px var(--j-gold)); }
+}
+
 
 .j-ide__jamlyzer {
   min-height: 0;
@@ -1522,10 +2869,41 @@
 
 /* ── Filter Browser ──────────────────────────────────────────────────── */
 
+.j-filter-browser {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--j-space-md);
+}
+
+.j-filter-browser__list-panel {
+  min-height: 0;
+}
+
+.j-filter-browser__list-panel .j-panel__body {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  min-height: 0;
+}
+
+.j-filter-browser__list {
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: var(--j-space-sm);
+}
+
 /* Canonical clickable list row primitive — used by JimboListItem.
    .j-filter-browser__item is kept as an alias for backward-compat with
    consumers that style filter rows directly. */
-.j-list-item {
+.j-list-item,
+.j-filter-browser__item {
   width: 100%;
   border: none;
   border-radius: var(--j-radius-md);
@@ -1539,15 +2917,91 @@
   gap: var(--j-space-xs);
   text-align: left;
   font-family: var(--j-font);
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
 }
 
 .j-list-item[data-active="true"],
-.j-list-item:hover {
+.j-list-item:hover,
+.j-filter-browser__item[data-active="true"],
+.j-filter-browser__item:hover {
   background: var(--j-dark-red);
   box-shadow: 0 var(--j-press-y) 0 var(--j-darkest);
+}
+
+.j-filter-browser__item-main {
+  min-width: 0;
+}
+
+.j-filter-browser__deck-stake,
+.j-filter-browser__name {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.j-filter-browser__targets {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fill, max-content);
+  gap: var(--j-space-xs);
+}
+
+.j-filter-browser__target {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  padding: 2px 5px;
+  border-radius: var(--j-radius-sm);
+  background: var(--j-teal-grey);
+  color: var(--j-white);
+  font-family: var(--j-font);
+  font-size: 10px;
+  text-shadow: var(--j-text-shadow);
+}
+
+.j-filter-browser__pager {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  justify-content: center;
+  padding-top: var(--j-space-md);
+}
+
+.j-filter-browser__page-chip {
+  min-width: 110px;
+  padding: 6px 16px;
+  border-radius: var(--j-radius-md);
+  background: var(--j-red);
+  box-shadow: 0 3px 0 var(--j-dark-red);
+  text-align: center;
+}
+
+.j-filter-browser__details {
+  min-height: 160px;
+  justify-content: center;
+}
+
+.j-filter-browser__details-body,
+.j-filter-browser__meta,
+.j-filter-browser__actions {
+  width: 100%;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: center;
+  gap: var(--j-space-sm);
+}
+
+.j-filter-browser__targets--details {
+  justify-content: center;
+  grid-template-columns: repeat(auto-fill, max-content);
+}
+
+.j-filter-browser__actions .j-btn {
+  width: 100%;
+}
+
+.j-filter-browser__meta {
+  opacity: 0.78;
+  gap: var(--j-space-xs);
 }
 
 /* ── Pickers ─────────────────────────────────────────────────────────── */
@@ -1581,9 +3035,6 @@
   text-transform: none;
   letter-spacing: 0.04em;
   font-size: 13px;
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
 }
 
 .j-picker__hint {
@@ -1645,6 +3096,57 @@
   text-align: center;
 }
 
+.j-story-phone {
+  width: var(--j-app-w);
+  height: var(--j-app-h);
+}
+
+.j-story-panel-grid {
+  width: var(--j-app-w);
+}
+
+.j-story-card-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--j-space-md);
+  justify-items: center;
+}
+
+/* ── Font Dance Animation ─────────────────────────────────────────────── */
+
+@keyframes j-font-dance {
+  0% {
+    transform: translateY(0);
+  }
+
+  25% {
+    transform: translateY(-1px);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
+
+  75% {
+    transform: translateY(1px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.j-text--dance-container {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+}
+
+.j-font-dance-char {
+  display: inline-block;
+  animation: j-font-dance 3s infinite ease-in-out;
+}
+
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -1653,6 +3155,16 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.j-juice-hover {
+  transition: transform 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.j-juice-hover:hover {
+  transform: translateY(-2px);
+  z-index: 5;
+}
+
 
 /* ── Layout primitives — JimboStack / JimboRow ─────────────────────────── */
 /* Grid-based, not flex. The 320×568 canvas is fixed; we compose the surface
@@ -1679,6 +3191,16 @@
 
 /* Row-only: opt-in soft wrap. Stack is column-flow so wrap is meaningless. */
 .j-row--wrap { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, max-content); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   jimbo-addons.css — additions to the canonical jimbo.css
+   New primitives: StatCallout, SectionHeader, SidewaysLabel, PriceTag,
+   Toggle, Tooltip, Marquee, Toast, ProgressBar, ConfirmPrompt, ErrorBlock,
+   Stack/Row/Divider layout helpers.
+
+   All flat fills, m6x11plus font, design-token colors. No gradients,
+   no glass, no neumorphism. Balatro is chunky and pixel.
+   ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Spinner — `< value >` cycler. Value is a display badge, NOT a button. ── */
 .j-spinner-wrap {
@@ -1715,7 +3237,7 @@
   padding: 4px 14px 6px;
   background: var(--j-red);
   border: none;
-  box-shadow: 0 3px 0 var(--j-dark-red);
+  border-bottom: 3px solid var(--j-dark-red);
   border-radius: var(--j-radius-md);
   color: var(--j-white);
   font-family: var(--j-font);
@@ -1727,10 +3249,22 @@
 }
 
 /* ── Layout helpers ───────────────────────────────────────────────────── */
+.j-stack--xs { gap: 2px; }
+.j-stack--sm { gap: 4px; }
+.j-stack--md { gap: 8px; }
+.j-stack--lg { gap: 12px; }
+.j-stack--xl { gap: 16px; }
 
 .j-row { display: grid; grid-auto-flow: column;
   grid-auto-columns: max-content; align-items: center; }
+.j-row--xs { gap: 2px; }
+.j-row--sm { gap: 4px; }
 .j-row--md { gap: 8px; }
+.j-row--lg { gap: 12px; }
+.j-row--xl { gap: 16px; }
+.j-row--center { justify-content: center; }
+.j-row--end { justify-content: flex-end; }
+.j-row--between { justify-content: space-between; }
 
 .j-divider {
   border: none;
@@ -1744,6 +3278,309 @@
   height: auto;
   align-self: stretch;
   margin: 0 4px;
+}
+
+/* ── Stat Callout — label strip + big pixel number ────────────────────── */
+.j-stat {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: stretch;
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-md);
+  overflow: hidden;
+  min-width: 56px;
+}
+.j-stat__label {
+  padding: 2px 6px;
+  font-family: var(--j-font);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  color: var(--j-white);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.j-stat__label--red    { background: var(--j-red); }
+.j-stat__label--blue   { background: var(--j-blue); }
+.j-stat__label--green  { background: var(--j-green); }
+.j-stat__label--orange { background: var(--j-orange); }
+.j-stat__label--gold   { background: var(--j-gold); color: #1e1e1e; text-shadow: none; }
+.j-stat__label--purple { background: var(--j-purple); }
+.j-stat__label--grey   { background: var(--j-teal-grey); }
+.j-stat__value {
+  padding: 4px 8px 6px;
+  font-family: var(--j-font);
+  font-size: 22px;
+  line-height: 1;
+  text-align: center;
+  color: var(--j-white);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+.j-stat__value--gold { color: var(--j-gold-text); }
+.j-stat__value--red  { color: var(--j-red); }
+.j-stat__value--blue { color: var(--j-blue); }
+
+/* ── Section Header — red strip + title + downward triangle ──────────── */
+.j-section-header {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  align-items: center;
+  width: 100%;
+}
+.j-section-header__bar {
+  width: 100%;
+  background: var(--j-red);
+  padding: 6px 12px;
+  text-align: center;
+  border-radius: var(--j-radius-md) var(--j-radius-md) 0 0;
+  color: var(--j-white);
+  font-family: var(--j-font);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+.j-section-header__bar--orange  { background: var(--j-orange); }
+.j-section-header__bar--blue    { background: var(--j-blue); }
+.j-section-header__bar--green   { background: var(--j-green); }
+.j-section-header__bar--purple  { background: var(--j-purple); }
+.j-section-header__bar--gold    { background: var(--j-gold); color: #1e1e1e; text-shadow: none; }
+.j-section-header__triangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--j-red);
+}
+.j-section-header__triangle--orange { border-top-color: var(--j-orange); }
+.j-section-header__triangle--blue   { border-top-color: var(--j-blue); }
+.j-section-header__triangle--green  { border-top-color: var(--j-green); }
+.j-section-header__triangle--purple { border-top-color: var(--j-purple); }
+.j-section-header__triangle--gold   { border-top-color: var(--j-gold); }
+
+/* ── Sideways Label — vertical ALL-CAPS edge label ───────────────────── */
+.j-sideways-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--j-font);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--j-grey);
+  white-space: nowrap;
+  padding: 4px 2px;
+  user-select: none;
+}
+
+/* ── Price Tag — yellow $X badge ─────────────────────────────────────── */
+.j-price-tag {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  background: var(--j-gold);
+  color: #1e1e1e;
+  font-family: var(--j-font);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: var(--j-radius-sm);
+  text-shadow: none;
+  white-space: nowrap;
+}
+.j-price-tag--float {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* ── Toggle / Checkbox ───────────────────────────────────────────────── */
+.j-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-border-south);
+  border-radius: var(--j-radius-sm);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: background 60ms linear;
+}
+.j-toggle[data-on="true"] {
+  background: var(--j-blue);
+  border-color: var(--j-dark-blue);
+}
+.j-toggle[data-on="true"]::after {
+  content: '✓';
+  font-family: var(--j-font);
+  font-size: 14px;
+  color: var(--j-white);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+  line-height: 1;
+}
+.j-toggle--green[data-on="true"]  { background: var(--j-green); border-color: var(--j-dark-green); }
+.j-toggle--red[data-on="true"]    { background: var(--j-red); border-color: var(--j-dark-red); }
+.j-toggle--orange[data-on="true"] { background: var(--j-orange); border-color: var(--j-dark-orange); }
+
+.j-toggle-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────── */
+.j-tooltip {
+  position: relative;
+  display: inline-block;
+}
+.j-tooltip__bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--j-darkest);
+  border: 2px solid var(--j-border-silver);
+  border-radius: var(--j-radius-md);
+  padding: 6px 10px;
+  min-width: 80px;
+  max-width: 200px;
+  font-family: var(--j-font);
+  font-size: 11px;
+  color: var(--j-white);
+  text-align: center;
+  white-space: normal;
+  pointer-events: none;
+  z-index: 100;
+}
+.j-tooltip__pointer {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--j-border-silver);
+}
+.j-tooltip__pointer::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -5px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--j-darkest);
+}
+
+/* ── Marquee — SHOP sign with bulbs ──────────────────────────────────── */
+.j-marquee {
+  position: relative;
+  background: var(--j-red);
+  border-radius: var(--j-radius-md);
+  padding: 14px 24px 10px;
+  text-align: center;
+}
+.j-marquee__bulbs {
+  position: absolute;
+  inset: 4px;
+  border: 2px dotted var(--j-white);
+  border-radius: var(--j-radius-sm);
+  pointer-events: none;
+}
+.j-marquee__title {
+  font-family: var(--j-font);
+  font-size: 26px;
+  color: var(--j-gold-text);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  letter-spacing: 0.06em;
+  position: relative;
+  z-index: 1;
+}
+.j-marquee__sub {
+  font-family: var(--j-font);
+  font-size: 10px;
+  color: var(--j-white);
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+.j-toast-host {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+.j-toast {
+  background: var(--j-darkest);
+  border: 2px solid var(--j-border-silver);
+  border-radius: var(--j-radius-md);
+  padding: 6px 12px;
+  color: var(--j-white);
+  font-family: var(--j-font);
+  font-size: 12px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+  white-space: nowrap;
+  animation: j-toast-in 200ms ease-out;
+}
+.j-toast--green  { border-color: var(--j-green);  background: var(--j-dark-green); }
+.j-toast--red    { border-color: var(--j-red);    background: var(--j-dark-red); }
+.j-toast--blue   { border-color: var(--j-blue);   background: var(--j-dark-blue); }
+.j-toast--orange { border-color: var(--j-orange); background: var(--j-dark-orange); }
+@keyframes j-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Progress Bar ────────────────────────────────────────────────────── */
+.j-progress {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: 2px;
+  width: 100%;
+}
+.j-progress__track {
+  width: 100%;
+  height: 12px;
+  background: var(--j-darkest);
+  border-radius: var(--j-radius-pill);
+  overflow: hidden;
+  position: relative;
+}
+.j-progress__fill {
+  height: 100%;
+  background: var(--j-blue);
+  transition: width 200ms ease;
+}
+.j-progress__fill--red    { background: var(--j-red); }
+.j-progress__fill--green  { background: var(--j-green); }
+.j-progress__fill--orange { background: var(--j-orange); }
+.j-progress__fill--gold   { background: var(--j-gold); }
+.j-progress__caption {
+  font-family: var(--j-font);
+  font-size: 10px;
+  color: var(--j-grey);
+  text-align: right;
 }
 
 /* ── Error Block ─────────────────────────────────────────────────────── */
@@ -1790,9 +3627,149 @@
 .j-status-pill--error   { background: var(--j-red); }
 .j-status-pill--paused  { background: var(--j-grey); }
 
+/* ── Seed Row and Results Scroll (Curator V3) ────────────────────────── */
+.j-seed-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: #1e2b2d;
+  border: 2px solid #334461;
+  border-radius: 4px;
+  cursor: pointer;
+  appearance: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  animation: j-row-in 200ms ease-out;
+  transition: background 100ms ease, border-color 100ms ease;
+  text-decoration: none;
+}
+.j-seed-row:hover {
+  background: #3a5055;
+  border-color: #b9c2d2;
+}
 @keyframes j-row-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+.j-seed-row__code {
+  font-family: var(--j-font-m6x11);
+  font-size: 16px;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.j-seed-row__score {
+  font-family: var(--j-font-m6x11);
+  font-size: 16px;
+  color: #e4b643;
+}
+.j-results-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: 4px;
+}
+.j-results-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Jamlyzer Stream Layout (Curator V3) ─────────────────────────────── */
+.j-ante-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-snap-type: y mandatory;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: 8px;
+}
+.j-ante-scroll::-webkit-scrollbar {
+  display: none;
+}
+.j-ante-section {
+  scroll-snap-align: start;
+  background: #1e2b2d;
+  border: 2px solid #334461;
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  gap: 4px;
+}
+.j-ante-section__head {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+.j-ante-section__title {
+  font-family: var(--j-font-m6x11);
+  font-size: 16px;
+  color: #e4b643;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.j-stream {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  border-radius: 3px;
+  background: #0b1416;
+}
+.j-stream--hit {
+  background: rgba(228, 182, 67, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(228, 182, 67, 0.4);
+}
+.j-stream__label {
+  font-family: var(--j-font-m6x11);
+  font-size: 8px;
+  color: #708386;
+  width: 56px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.j-stream__items {
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(auto-fill, max-content);
+}
+.j-stream-item {
+  background: #0b1416;
+  border: 1px solid #334461;
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-family: var(--j-font-m6x11);
+  font-size: 8px;
+  color: #b9c2d2;
+  white-space: nowrap;
+}
+.j-stream-item--hit {
+  background: rgba(228, 182, 67, 0.25);
+  color: #fff;
+  border-color: #e4b643;
+  box-shadow: 0 0 4px rgba(228, 182, 67, 0.5);
+}
+.j-stream-item--must-hit {
+  background: rgba(0, 147, 255, 0.3);
+  border-color: #0093ff;
+}
+.j-stream-item--should-hit {
+  background: rgba(255, 76, 64, 0.3);
+  border-color: #ff4c40;
 }
 
 /* Mystery Slot Component */
@@ -1869,7 +3846,7 @@
   50% { transform: translateY(-4px) rotate(1deg); }
 }
 
-@keyframes jammy-happy {
+@keyframes jammy-bounce {
   0%, 100% { transform: translateY(0) scale(1); }
   40% { transform: translateY(-16px) scale(1.08); }
   60% { transform: translateY(4px) scale(0.96); }
@@ -1884,325 +3861,54 @@
 }
 
 .jammy-idle { animation: jammy-idle 2.5s ease-in-out infinite; }
-.jammy-happy { animation: jammy-happy 0.6s ease-out; }
+.jammy-bounce { animation: jammy-bounce 0.6s ease-out; }
 .jammy-shake { animation: jammy-shake 0.4s ease-in-out; }
 
 .j-mystery-slot__sprite--empty {
-  opacity: 0.5;
-  filter: saturate(0.3);
+  opacity: 0.5 !important;
+  filter: saturate(0.3) !important;
 }
+
 
 /* ── JamlyzerView layout ─────────────────────────────────────────────────
    Two named tracks: ante rail on the left, ante detail on the right.
    The rail scrolls independently; below 560px (narrow MCP host iframes)
    the view collapses to one column and the rail becomes a short strip. */
 .j-jamlyzer-view {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--j-space-md);
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--j-space-lg);
+  align-items: start;
+}
+
+.j-jamlyzer-view__rail {
+  max-height: 26rem;
+  min-width: 4.5rem;
 }
 
 @media (max-width: 560px) {
   .j-jamlyzer-view {
     grid-template-columns: minmax(0, 1fr);
   }
-}
-
-/* ── Jamlyzer 10k-Seed Triage Architecture ────────────────────────────── */
-
-.j-jamlyzer {
-  width: 100%;
-  min-width: 0;
-}
-
-.j-jamlyzer-header {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-  padding: var(--j-space-sm) var(--j-space-md);
-  background: var(--j-dark);
-}
-
-.j-jamlyzer-toolbar {
-  display: grid;
-  grid-template-columns: minmax(180px, 1fr) auto auto;
-  gap: var(--j-space-sm);
-  align-items: center;
-}
-
-@media (max-width: 719px) {
-  .j-jamlyzer-toolbar {
-    grid-template-columns: 1fr;
+  .j-jamlyzer-view__rail {
+    max-height: 12rem;
+    min-width: 0;
   }
 }
 
-.j-jamlyzer-search-wrap {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: center;
-}
-
-.j-jamlyzer-search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--j-grey);
-  pointer-events: none;
-  font-size: 14px;
-}
-
-.j-jamlyzer-search-input {
-  width: 100%;
-  padding: 6px 28px 6px 30px;
-  background: var(--j-darkest);
-  border: 1px solid var(--j-panel-edge);
-  border-radius: var(--j-radius-md);
-  color: var(--j-white);
-  font-family: var(--j-font);
-  font-size: 12px;
-  outline: none;
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
-}
-
-.j-jamlyzer-search-input:focus {
-  border-color: var(--j-gold);
-}
-
-.j-jamlyzer-search-clear {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  color: var(--j-grey);
-  cursor: pointer;
-  padding: 2px;
-  font-size: 10px;
-  line-height: 1;
-}
-
-.j-jamlyzer-filter-chips {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: var(--j-space-xs);
-  align-items: center;
-}
-
-.j-jamlyzer-split {
-  display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  gap: var(--j-space-md);
-  align-items: start;
-  min-height: 480px;
-}
-
-@media (max-width: 719px) {
-  .j-jamlyzer-split {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.j-jamlyzer-candidate-pane {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-xs);
-}
-
-.j-jamlyzer-candidate-header {
-  padding: 6px 10px;
-}
-
-.j-jamlyzer-candidate-list {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-xs);
-  max-height: 520px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.j-jamlyzer-inspector-pane {
-  min-width: 0;
-  overflow-x: hidden;
-}
-
-.j-jamlyzer-seed-card {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: 4px;
-  padding: 8px 10px;
-  background: var(--j-dark);
-  border: 1px solid var(--j-panel-edge);
-  border-radius: var(--j-radius-md);
-  box-shadow: 0 2px 0 var(--j-panel-edge);
-  cursor: pointer;
-  transition: transform 55ms ease-out, box-shadow 55ms ease-out, border-color 55ms ease-out;
-}
-
-.j-jamlyzer-seed-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 var(--j-panel-edge);
-  border-color: var(--j-blue);
-}
-
-.j-jamlyzer-seed-card--selected {
-  border-color: var(--j-gold);
-  background: color-mix(in srgb, var(--j-gold) 6%, var(--j-dark));
-  box-shadow: 0 2px 0 var(--j-gold);
-}
-
-.j-jamlyzer-seed-card--pinned {
-  border-color: var(--j-gold);
-}
-
-.j-jamlyzer-seed-card__header {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.j-jamlyzer-pin-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  color: var(--j-grey);
-  cursor: pointer;
-  border-radius: var(--j-radius-sm);
-  font-size: 13px;
-  transition: color 55ms ease-out;
-}
-
-.j-jamlyzer-pin-btn:hover {
-  color: var(--j-gold);
-}
-
-.j-jamlyzer-pin-btn--pinned {
-  color: var(--j-gold);
-}
-
-.j-jamlyzer-seed-card__milestones {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fill, max-content);
-  gap: 4px;
-}
 
 /* ── Orbital menu + mascot (JimboOrbitalMenu / JimboMascot) ────────────── */
-/* The ring lays itself out from a zero-size center anchor, so the menu box is
-   a single grid cell and the anchor + optional mascot stack in it. */
 .j-orbital-menu {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
   pointer-events: none;
-  z-index: 30;
 }
-.j-orbital-menu__center,
-.j-orbital-menu__anchor {
-  grid-area: 1 / 1;
-}
-.j-orbital-menu__center {
-  pointer-events: auto;
-}
-.j-orbital-menu__anchor {
-  position: relative;
-  width: 0;
-  height: 0;
-}
-
-/* One shared positioning rule for every pill. The excavated version injected a
-   \3c style> tag per pill, which thrashed the CSSOM on every menu change.
-
-   The easing is the whole "magnetic snap": fast out, long settle. Paired with
-   the even angle steps in orbitalLayout.ts, pills read as landing in detents.
-   The duration must stay in sync with ORBITAL_CLOSE_MS in orbitalMenuStore.ts —
-   the store swaps the menu when it believes the pills have finished sinking. */
-.j-orbital-pill {
-  --j-orbit-ms: 320ms;
+.j-orbital-menu__item {
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 50%;
+  top: 50%;
   transform: translate(calc(-50% + var(--j-orbit-x, 0px)), calc(-50% + var(--j-orbit-y, 0px)));
-  transition:
-    transform var(--j-orbit-ms) cubic-bezier(0.16, 1, 0.3, 1),
-    opacity var(--j-orbit-ms) cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
-}
-.j-orbital-pill[data-hiding='true'] {
-  opacity: 0;
-  pointer-events: none;
-}
-.j-orbital-pill[data-dim='true'] {
-  opacity: 0.4;
-}
-.j-orbital-pill[data-static='true'] {
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root:not([data-j-motion='full']) .j-orbital-pill {
-    --j-orbit-ms: 1ms;
-  }
-}
-[data-j-motion='reduced'] .j-orbital-pill {
-  --j-orbit-ms: 1ms;
-}
-
-/* Pills carry a dot and/or a tally beside the label. Grid, not flex — the
-   iframe determinism rule holds inside the button face too. */
-.j-orbital-btn .j-btn__face {
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--j-space-md);
-  min-width: 54px;
-  white-space: nowrap;
-}
-.j-orbital-btn--south .j-btn__face {
-  min-width: 0;
-}
-
-.j-orbital-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 1px solid var(--j-dark-grey);
-  background: var(--j-dark-red);
-}
-.j-orbital-dot[data-on='true'] {
-  border-color: var(--j-border-silver);
-  background: var(--j-green-text);
-}
-
-.j-orbital-count,
-.j-orbital-glyph {
-  font-size: 11px;
-  line-height: 1;
-  color: var(--j-grey);
-}
-.j-orbital-count {
-  min-width: 16px;
-  padding: 3px 4px;
-  border-radius: 8px;
-  background: var(--j-darkest);
-}
-.j-orbital-count[data-any='true'] {
-  color: var(--j-gold-text);
+  cursor: pointer;
 }
 
 .j-mascot {
@@ -2218,27 +3924,37 @@
 .j-mascot__hit--interactive {
   cursor: pointer;
 }
-/* The ring's territory, centered on the character.
-
-   The mascot's own box is only the artwork's size, and a ring drawn into it
-   measures that box and has nowhere to fly pills out to — they stack on his
-   face. This spans the square the mascot is sectioned into instead, defaulting
-   to the mascot box only when no host told us better. */
-.j-mascot__orbit {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: var(--j-orbit-w, 100%);
-  height: var(--j-orbit-h, 100%);
-  pointer-events: none;
-}
-
 .j-mascot__img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
+}
+
+/* ── Interactive seed card (json-render SeedCard) ──────────────────────── */
+.j-seed-card--interactive {
+  cursor: pointer;
+  transition: var(--j-transition);
+}
+.j-seed-card--interactive:hover {
+  border: 1px solid var(--j-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--j-shadow);
+}
+
+/* ── Code snippet (inline JAML / filter fragments) ─────────────────────── */
+.j-code-snippet {
+  font-family: var(--j-font-code);
+  font-size: 12px;
+  color: var(--j-grey);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+
+/* ── Storybook stage — breathing room for overlays in docs stories ─────── */
+.j-story-stage {
+  padding: 120px;
 }
 
 /* ── Outer tab — grabbable tear-off pane chrome (JimboOuterTab) ────────── */
@@ -2260,7 +3976,7 @@
   user-select: none;
 }
 .j-outer-tab:active { cursor: grabbing; }
-.j-outer-tab--active { border-color: var(--j-gold); color: var(--j-gold); }
+.j-outer-tab--active { border-color: var(--j-gold); color: var(--j-gold-text); }
 .j-outer-tab__grip { display: inline-grid; place-items: center; color: var(--j-grey); }
 .j-outer-tab__space { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .j-outer-tab__fs {
@@ -2278,33 +3994,198 @@
 .j-outer-tab--orange { color: var(--j-orange); }
 .j-outer-tab--green { color: var(--j-green-text); }
 .j-outer-tab--purple { color: var(--j-purple); }
-.j-outer-tab--gold { color: var(--j-gold); }
+.j-outer-tab--gold { color: var(--j-gold-text); }
 
-/* ── JamlMapPreview ────────────────────────────────────────────────────── */
+/* ── Footer suit keyframes (moved out of runtime <style> tag) ──────────── */
+@keyframes jaml-heart   { 0%{opacity:0;transform:scale(1)} 1%{opacity:1;transform:scale(1.45)} 3.5%{opacity:1;transform:scale(1)} 61.5%{opacity:1;transform:scale(1)} 62%{opacity:0} 100%{opacity:0} }
+@keyframes jaml-spade   { 0%,61.5%{opacity:0} 62%{opacity:1;transform:scale(1.45)} 64.5%{opacity:1;transform:scale(1)} 71.5%{opacity:1} 72%{opacity:0} 100%{opacity:0} }
+@keyframes jaml-diamond { 0%,71.5%{opacity:0} 72%{opacity:1;transform:scale(1.45)} 74.5%{opacity:1;transform:scale(1)} 81.5%{opacity:1} 82%{opacity:0} 100%{opacity:0} }
+@keyframes jaml-club    { 0%,81.5%{opacity:0} 82%{opacity:1;transform:scale(1.45)} 84.5%{opacity:1;transform:scale(1)} 99.5%{opacity:1} 100%{opacity:0} }
 
-.j-map-preview-pill {
+.j-footer__suit-char--heart   { animation-name: jaml-heart; }
+.j-footer__suit-char--spade   { animation-name: jaml-spade; }
+.j-footer__suit-char--diamond { animation-name: jaml-diamond; }
+.j-footer__suit-char--club    { animation-name: jaml-club; }
+
+/* ── Multi-layer sprite stage (DeckSprite, StandardCard) ───────────────── */
+.j-sprite-stage {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  user-select: none;
+  image-rendering: pixelated;
+}
+
+/* ── Shared Zone Rail (JimboZoneRail — JamlMapPreview + JamlIdeVisual) ── */
+.j-zone-rail {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--j-radius-md);
+  padding: 10px;
+}
+
+.j-zone-rail--compact {
+  padding: 6px;
+}
+
+.j-zone-rail--preview {
+  --j-zone-color: var(--j-blue);
+  --j-zone-accent: var(--j-blue);
+  --j-zone-glow: var(--j-blue);
+  border: 2px dashed color-mix(in srgb, var(--j-zone-color) 33%, transparent);
+}
+
+.j-zone-rail--preview.j-zone-rail--must {
+  --j-zone-color: var(--j-blue);
+  --j-zone-accent: var(--j-blue);
+  --j-zone-glow: var(--j-blue);
+}
+
+.j-zone-rail--preview.j-zone-rail--should {
+  --j-zone-color: var(--j-red);
+  --j-zone-accent: var(--j-gold);
+  --j-zone-glow: var(--j-gold);
+}
+
+.j-zone-rail--preview.j-zone-rail--mustnot {
+  --j-zone-color: var(--j-orange);
+  --j-zone-accent: var(--j-orange);
+  --j-zone-glow: var(--j-orange);
+}
+
+.j-zone-rail--editor {
+  border-radius: var(--j-radius-lg);
+  padding: 12px;
+  border: 3px solid var(--j-zone-color);
+  background: color-mix(in srgb, var(--j-zone-color) 8%, transparent);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.j-zone-rail--editor.j-zone-rail--must {
+  --j-zone-color: var(--j-green);
+  --j-zone-accent: var(--j-green-text);
+}
+
+.j-zone-rail--editor.j-zone-rail--should {
+  --j-zone-color: var(--j-orange);
+  --j-zone-accent: var(--j-orange-text);
+}
+
+.j-zone-rail--editor.j-zone-rail--mustnot {
+  --j-zone-color: var(--j-red);
+  --j-zone-accent: var(--j-red);
+}
+
+.j-zone-rail__head {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.j-zone-rail__tag {
+  font-family: var(--j-font-code);
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  background: var(--j-zone-color);
+  color: var(--j-white);
+  border-radius: 3px;
+  text-shadow: var(--j-text-shadow);
+}
+
+.j-zone-rail--compact .j-zone-rail__tag {
+  font-size: 8px;
+}
+
+.j-zone-rail--editor .j-zone-rail__tag {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  box-shadow: 0 2px 0 var(--j-black);
+}
+
+.j-zone-rail__rule {
+  height: 1px;
+  background: color-mix(in srgb, var(--j-zone-color) 28%, transparent);
+}
+
+.j-zone-rail--editor .j-zone-rail__rule {
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--j-zone-color) 33%, transparent);
+}
+
+.j-zone-rail__count {
+  font-family: var(--j-font-code);
+  font-size: 8px;
+  color: var(--j-grey);
+}
+
+.j-zone-rail__hint {
+  font-family: var(--j-font-code);
+  font-size: 9px;
+  color: var(--j-grey);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.j-zone-rail__items--wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max-content, max-content));
+  gap: 6px;
+  align-items: center;
+}
+
+.j-zone-rail__items--stack {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 6px;
+}
+
+.j-zone-rail__empty {
+  font-size: 10px;
+  color: var(--j-grey);
+  padding: 10px;
+  font-style: italic;
+}
+
+/* ── Clause Pill (JimboClausePill — JamlMapPreview) ────────────────────── */
+.j-clause-pill {
+  --j-pill-glow: var(--j-blue);
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: max-content;
   align-items: center;
   gap: 6px;
-  background: var(--j-map-pill-bg, var(--j-darkest));
-  border: 2px solid var(--j-map-pill-border, var(--j-panel-edge));
-  border-radius: 4px;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-panel-edge);
+  border-radius: var(--j-radius-sm);
   padding: 3px 8px;
   position: relative;
-  opacity: var(--j-map-pill-opacity, 0.6);
-  animation: var(--j-map-pill-anim, none);
+  opacity: 0.6;
 }
 
-.j-map-preview-pill-text {
+.j-clause-pill--must { --j-pill-glow: var(--j-blue); }
+.j-clause-pill--should { --j-pill-glow: var(--j-gold); }
+.j-clause-pill--mustnot { --j-pill-glow: var(--j-orange); }
+
+.j-clause-pill--hit {
+  background: color-mix(in srgb, var(--j-pill-glow) 20%, transparent);
+  border-color: var(--j-pill-glow);
+  opacity: 1;
+  animation: j-glow-pulse 1.6s ease-in-out infinite;
+}
+
+.j-clause-pill__label {
   font-size: 10px;
   color: var(--j-white);
   letter-spacing: 0.5px;
-  text-shadow: 1px 1px 0 rgba(0,0,0,.8);
+  text-shadow: var(--j-text-shadow);
 }
 
-.j-map-preview-hit-count {
+.j-clause-pill__count {
   position: absolute;
   top: -6px;
   right: -6px;
@@ -2317,996 +4198,434 @@
   box-shadow: 0 1px 0 var(--j-black);
 }
 
-.j-map-preview-rail {
-  border: 2px dashed var(--j-map-rail-color);
-  border-radius: 6px;
+/* ── Map Preview Surface (JamlMapPreview) ──────────────────────────────── */
+.j-map-preview {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 10px;
+  padding: 10px;
+  background: var(--j-darkest);
+  color: var(--j-white);
   width: 100%;
   box-sizing: border-box;
 }
 
-.j-map-preview-rail--compact {
-  padding: 6px;
-}
-
-.j-map-preview-rail--normal {
-  padding: 10px;
-}
-
-.j-map-preview-rail-header {
-  display: grid;
-  grid-template-columns: max-content 1fr max-content;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.j-map-preview-rail-label {
-  letter-spacing: 2px;
-  padding: 2px 8px;
-  background: var(--j-map-rail-bg);
-  color: var(--j-white);
-  border-radius: 3px;
-  text-shadow: 1px 1px 0 rgba(0,0,0,.8);
-}
-
-.j-map-preview-rail-label--compact {
-  font-size: 8px;
-}
-
-.j-map-preview-rail-label--normal {
-  font-size: 10px;
-}
-
-.j-map-preview-rail-line {
-  min-width: 0;
-  height: 1px;
-  background: var(--j-map-rail-line-bg);
-}
-
-.j-map-preview-rail-count {
-  font-size: 8px;
-  color: var(--j-grey);
-}
-
-.j-map-preview-items {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, max-content));
+.j-map-preview--compact {
   gap: 6px;
+  padding: 8px;
 }
 
-.j-map-preview-empty {
-  font-size: 10px;
-  color: var(--j-grey);
-  padding: 10px;
-  font-style: italic;
-}
-
-.j-map-preview-root-empty {
+.j-map-preview__empty {
   background: var(--j-darkest);
   border: 2px solid var(--j-panel-edge);
-  border-radius: 6px;
+  border-radius: var(--j-radius-md);
+  padding: 16px;
   color: var(--j-grey);
   font-size: 11px;
   font-style: italic;
   text-align: center;
 }
 
-.j-map-preview-root-empty--compact {
+.j-map-preview__empty--compact {
   padding: 8px;
 }
 
-.j-map-preview-root-empty--normal {
-  padding: 16px;
-}
-
-.j-map-preview-root {
+/* ── Visual IDE Builder (JamlIdeVisual, JimboClauseCard, JimboAddSlotTile) */
+.j-ide-visual {
   display: grid;
   grid-auto-flow: row;
+  gap: 14px;
+  padding: 10px;
   background: var(--j-darkest);
   color: var(--j-white);
-  width: 100%;
-  box-sizing: border-box;
 }
 
-.j-map-preview-root--compact {
-  gap: 6px;
-  padding: 8px;
-}
-
-.j-map-preview-root--normal {
+.j-ide-visual__pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
-  padding: 10px;
-}
-/* ── Deck Sprite ───────────────────────────────────────────────────────── */
-.j-deck-sprite {
-  position: relative;
-  width: var(--j-deck-w);
-  height: var(--j-deck-h);
-}
-.j-deck-sprite__layer {
-  position: absolute;
-  inset: 0;
-  background-image: var(--j-layer-bg-url);
-  background-size: var(--j-layer-bg-size);
-  background-position: var(--j-layer-bg-pos);
-  background-repeat: no-repeat;
-  image-rendering: pixelated;
+  align-items: start;
 }
 
-/* ── Standard Card ─────────────────────────────────────────────────────── */
-.j-standard-card {
+.j-clause-card {
+  --j-card-zone: var(--j-green);
+  --j-card-accent: var(--j-green-text);
   position: relative;
-  display: inline-block;
-  overflow: hidden;
+  background: var(--j-dark-grey);
+  border: 2px solid var(--j-card-zone);
+  border-radius: var(--j-radius-md);
+  padding: 8px 8px 8px 6px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  cursor: pointer;
   user-select: none;
-  width: var(--j-card-w);
-  height: var(--j-card-h);
-  image-rendering: pixelated;
-}
-.j-standard-card__layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--j-layer-w);
-  height: var(--j-layer-h);
-  transform: var(--j-layer-transform);
-  transform-origin: top left;
-  background-repeat: no-repeat;
-  background-image: var(--j-layer-bg-url);
-  background-position: var(--j-layer-bg-pos);
-  z-index: var(--j-layer-z);
-}
-.j-standard-card__layer--face {
-  filter: var(--j-layer-filter);
-}
-.j-standard-card__layer--edition {
-  mix-blend-mode: screen;
-  opacity: 0.6;
-}
-.j-standard-card__negative-tint {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  background: color-mix(in srgb, var(--j-red) 10%, transparent);
-  mix-blend-mode: overlay;
-  pointer-events: none;
+  touch-action: none;
+  box-shadow: 0 2px 0 var(--j-black);
 }
 
-/* ── JamlIde ───────────────────────────────────────────────────────────── */
+.j-clause-card--must {
+  --j-card-zone: var(--j-green);
+  --j-card-accent: var(--j-green-text);
+}
+
+.j-clause-card--should {
+  --j-card-zone: var(--j-orange);
+  --j-card-accent: var(--j-orange-text);
+}
+
+.j-clause-card--mustnot {
+  --j-card-zone: var(--j-red);
+  --j-card-accent: var(--j-red);
+}
+
+.j-clause-card__sprite {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 50px;
+}
+
+.j-clause-card__body {
+  min-width: 0;
+}
+
+.j-clause-card__label {
+  font-family: var(--j-font-code);
+  font-size: 13px;
+  color: var(--j-white);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.j-clause-card__meta {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 3px;
+  margin-top: 3px;
+  align-items: center;
+}
+
+.j-clause-card__ante-prefix {
+  font-family: var(--j-font-code);
+  font-size: 8px;
+  color: var(--j-grey);
+  letter-spacing: 1px;
+}
+
+.j-clause-card__ante-chip {
+  font-family: var(--j-font-code);
+  font-size: 9px;
+  padding: 1px 4px;
+  background: var(--j-darkest);
+  color: var(--j-card-accent);
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.j-clause-card__score {
+  margin-left: 4px;
+  font-family: var(--j-font-code);
+  font-size: 9px;
+  padding: 1px 5px;
+  background: var(--j-red);
+  color: var(--j-white);
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.j-add-slot-tile {
+  --j-card-zone: var(--j-green);
+  --j-card-accent: var(--j-green-text);
+  width: 100%;
+  appearance: none;
+  border: 2px dashed var(--j-card-zone);
+  border-radius: var(--j-radius-md);
+  padding: 12px 8px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  place-content: center;
+  align-items: center;
+  gap: 10px;
+  background: color-mix(in srgb, var(--j-card-zone) 5%, transparent);
+  min-height: 60px;
+  cursor: default;
+  opacity: 0.55;
+}
+
+.j-add-slot-tile--interactive {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.j-add-slot-tile--must {
+  --j-card-zone: var(--j-green);
+  --j-card-accent: var(--j-green-text);
+}
+
+.j-add-slot-tile--should {
+  --j-card-zone: var(--j-orange);
+  --j-card-accent: var(--j-orange-text);
+}
+
+.j-add-slot-tile--mustnot {
+  --j-card-zone: var(--j-red);
+  --j-card-accent: var(--j-red);
+}
+
+.j-add-slot-tile__glyph {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: var(--j-darkest);
+  border: 2px solid var(--j-card-zone);
+  border-radius: var(--j-radius-md);
+  font-family: var(--j-font-code);
+  font-size: 24px;
+  color: var(--j-card-zone);
+}
+
+.j-add-slot-tile__label {
+  font-family: var(--j-font-code);
+  font-size: 12px;
+  color: var(--j-card-accent);
+}
+
+.j-drag-ghost {
+  position: fixed;
+  left: var(--j-drag-x, 0px);
+  top: var(--j-drag-y, 0px);
+  pointer-events: none;
+  z-index: 999;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+  opacity: 0.92;
+}
+
+/* ── Results View (JimboTallyBar, JimboResultRow, JamlIde) ─────────────── */
 .j-ide-results__empty {
   border: 1px dashed var(--j-dark-grey);
-  border-radius: 10px;
+  border-radius: var(--j-radius-pill);
   padding: 16px;
   font-size: 13px;
   color: var(--j-grey);
-  background: color-mix(in srgb, var(--j-darkest) 53.3%, transparent);
+  background: color-mix(in srgb, var(--j-darkest) 53%, transparent);
   text-align: center;
 }
 
 .j-ide-results__list {
   display: grid;
+  grid-auto-flow: row;
   gap: 6px;
 }
 
-.j-ide-result {
-  border-radius: 10px;
-  border: 1px solid var(--j-result-border);
-  background: var(--j-result-bg);
+.j-tally-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--j-dark-grey) 53%, transparent);
+  overflow: hidden;
+  width: 100%;
+}
+
+.j-tally-bar__fill {
+  height: 100%;
+  width: var(--j-tally-pct, 0%);
+  border-radius: 999px;
+  background: var(--j-grey);
+  transition: width 200ms ease;
+}
+
+.j-tally-bar--positive .j-tally-bar__fill {
+  background: var(--j-green);
+}
+
+.j-result-row {
+  border-radius: var(--j-radius-pill);
+  border: 1px solid var(--j-panel-edge);
+  background: color-mix(in srgb, var(--j-darkest) 80%, transparent);
   overflow: hidden;
   transition: border-color 120ms;
 }
 
-.j-ide-result__header {
+.j-result-row--open {
+  border-color: color-mix(in srgb, var(--j-gold) 33%, transparent);
+  background: color-mix(in srgb, var(--j-gold) 4%, transparent);
+}
+
+.j-result-row__trigger {
   width: 100%;
+  box-sizing: border-box;
   display: grid;
-  grid-auto-flow: column;
-  grid-template-columns: max-content 1fr max-content max-content;
+  grid-template-columns: minmax(80px, max-content) minmax(0, 1fr) minmax(36px, max-content) max-content;
   align-items: center;
   gap: 10px;
   padding: 9px 12px;
-  cursor: var(--j-result-cursor, default);
+  cursor: default;
   color: inherit;
   text-align: left;
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
-  box-sizing: border-box;
 }
 
-.j-ide-result__seed {
+.j-result-row__trigger--interactive {
+  cursor: pointer;
+}
+
+.j-result-row__seed {
   font-family: var(--j-font-code);
-  font-weight: 400;
   font-size: 14px;
   letter-spacing: 1px;
-  color: var(--j-gold);
-  min-width: 80px;
+  color: var(--j-gold-text);
 }
 
-.j-ide-tally-bar {
-  width: 100%;
-  min-width: 0;
-  height: 4px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--j-dark-grey) 53.3%, transparent);
-  overflow: hidden;
-}
-
-.j-ide-tally-bar__fill {
-  height: 100%;
-  width: var(--j-tally-width);
-  border-radius: 999px;
-  background: var(--j-tally-bg);
-}
-
-.j-ide-result__score {
+.j-result-row__score {
   font-size: 12px;
-  color: var(--j-score-color);
-  min-width: 36px;
+  color: var(--j-grey);
   text-align: right;
 }
 
-.j-ide-result__toggle {
-  font-size: 11px;
-  color: var(--j-grey);
-  margin-left: 2px;
+.j-result-row__score--positive {
+  color: var(--j-green-text);
 }
 
-.j-ide-result__body {
+.j-result-row__chevron {
+  display: inline-grid;
+  place-items: center;
+  font-size: 13px;
+  color: var(--j-grey);
+}
+
+.j-result-row__detail {
   border-top: 1px solid var(--j-panel-edge);
   padding: 4px;
   display: grid;
+  grid-auto-flow: row;
   gap: 8px;
 }
 
-.j-ide-result__raw-tally {
-  padding: 6px 0 10px;
+.j-result-row__tallies {
+  padding: 6px 8px 10px;
   display: grid;
+  grid-auto-flow: row;
   gap: 6px;
 }
 
-.j-ide-result__raw-title {
+.j-result-row__tallies-heading {
   font-size: 10px;
   color: var(--j-white);
   opacity: 0.8;
 }
 
-.j-ide-result__raw-item {
+.j-result-row__tally-line {
   display: grid;
-  grid-auto-flow: column;
-  grid-template-columns: 1fr max-content;
+  grid-template-columns: minmax(0, 1fr) max-content;
   align-items: center;
   gap: 8px;
 }
 
-.j-ide-result__raw-label {
+.j-result-row__tally-label {
   font-size: 11px;
   color: var(--j-white);
-  min-width: 0;
 }
 
-.j-ide-result__raw-val {
+.j-result-row__tally-val {
   font-size: 11px;
   color: var(--j-green-text);
 }
 
-/* JamlIdeVisual components */
-
-.j-jaml-ide-visual__clause-card {
-    position: relative;
-    background: var(--j-dark-grey);
-    border: 2px solid var(--j-zone-color);
-    border-radius: 6px;
-    padding: 8px 8px 8px 6px;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    cursor: pointer;
-    user-select: none;
-    touch-action: none;
-    box-shadow: 0 2px 0 var(--j-black);
-    grid-template-columns: max-content 1fr max-content;
-}
-
-.j-jaml-ide-visual__clause-card-icon {
-    display: grid;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 50px;
-    min-width: 44px;
-}
-
-.j-jaml-ide-visual__clause-card-content {
-    min-width: 0;
-}
-
-.j-jaml-ide-visual__clause-card-label {
-    font-family: var(--j-font-code);
-    font-size: 13px;
-    color: var(--j-white);
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.j-jaml-ide-visual__clause-card-antes {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(1px, max-content));
-    gap: 3px;
-    margin-top: 3px;
-    align-items: center;
-}
-
-.j-jaml-ide-visual__clause-card-ante-label {
-    font-family: var(--j-font-code);
-    font-size: 8px;
-    color: var(--j-grey);
-    letter-spacing: 1px;
-}
-
-.j-jaml-ide-visual__clause-card-ante {
-    font-family: var(--j-font-code);
-    font-size: 9px;
-    padding: 1px 4px;
-    background: var(--j-darkest);
-    color: var(--j-zone-accent);
-    border-radius: 3px;
-    letter-spacing: 0.5px;
-    line-height: 1;
-}
-
-.j-jaml-ide-visual__clause-card-score {
-    margin-left: 4px;
-    font-family: var(--j-font-code);
-    font-size: 9px;
-    padding: 1px 5px;
-    background: var(--j-red);
-    color: var(--j-white);
-    border-radius: 3px;
-    letter-spacing: 0.5px;
-    line-height: 1;
-}
-
-.j-jaml-ide-visual__mystery-tile {
-    opacity: 0.55;
-    border: 2px dashed var(--j-zone-color);
-    border-radius: 6px;
-    padding: 12px 8px;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: color-mix(in srgb, var(--j-zone-color) 5%, transparent);
-    min-height: 60px;
-}
-.j-jaml-ide-visual__mystery-tile--tappable {
-    cursor: pointer;
-    opacity: 1;
-}
-
-.j-jaml-ide-visual__mystery-tile-icon {
-    width: 40px;
-    height: 40px;
-    display: grid;
-    align-items: center;
-    justify-content: center;
-    background: var(--j-darkest);
-    border: 2px solid var(--j-zone-color);
-    border-radius: 6px;
-    font-family: var(--j-font-code);
-    font-size: 24px;
-    color: var(--j-zone-color);
-}
-
-.j-jaml-ide-visual__mystery-tile-label {
-    font-family: var(--j-font-code);
-    font-size: 12px;
-    color: var(--j-zone-accent);
-}
-
-.j-jaml-ide-visual__zone-rail {
-    border: 3px solid var(--j-zone-color);
-    border-radius: 8px;
-    padding: 12px;
-    background: color-mix(in srgb, var(--j-zone-color) 8%, transparent);
-    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
-}
-
-.j-jaml-ide-visual__zone-header {
-    display: grid;
-    grid-template-columns: max-content 1fr max-content;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 6px;
-}
-
-.j-jaml-ide-visual__zone-label {
-    font-family: var(--j-font-code);
-    font-size: 12px;
-    padding: 2px 6px;
-    background: var(--j-zone-color);
-    color: var(--j-white);
-    border-radius: 3px;
-    box-shadow: 0 2px 0 var(--j-black);
-}
-
-.j-jaml-ide-visual__zone-divider {
-    height: 2px;
-    background: color-mix(in srgb, var(--j-zone-color) 33%, transparent);
-    border-radius: 1px;
-}
-
-.j-jaml-ide-visual__zone-count {
-    font-family: var(--j-font-code);
-    font-size: 8px;
-    color: var(--j-grey);
-}
-
-.j-jaml-ide-visual__zone-hint {
-    font-family: var(--j-font-code);
-    font-size: 9px;
-    color: var(--j-grey);
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
-}
-
-.j-jaml-ide-visual__zone-clauses {
-    display: grid;
-    gap: 6px;
-}
-
-.j-jaml-ide-visual {
-    display: grid;
-    gap: 14px;
-    padding: 10px;
-    background: var(--j-darkest);
-    color: var(--j-white);
-}
-
-.j-jaml-ide-visual__top-zones {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-/* Below a phone-ish pane the side-by-side zones squeeze clause cards into
-   ~160px and their content clips — stacking reads better. */
-@media (max-width: 560px) {
-    .j-jaml-ide-visual__top-zones {
-        grid-template-columns: 1fr;
-    }
-}
-
-.j-jaml-ide-visual__top-zone-must,
-.j-jaml-ide-visual__top-zone-mustnot {
-    min-width: 0;
-}
-
-/* ── Dock (harvested SeedLab tab panel) ───────────────────────────────── */
-.j-dock {
-  display: grid;
-  min-height: 0;
-  min-width: 0;
-  height: 100%;
+/* ── JamlMapEditor (Handoff P5) ────────────────────────────────────────── */
+.j-map-editor {
   width: 100%;
-}
-.j-dock--fs {
-  position: fixed;
-  inset: 0;
-  z-index: 45;
-  padding: 10px;
-  background: color-mix(in srgb, var(--j-darkest) 96%, transparent);
+  height: 100%;
+  display: grid;
   grid-template-rows: auto minmax(0, 1fr);
 }
-.j-dock-split {
-  display: grid;
-  gap: 4px;
-  min-height: 0;
-  min-width: 0;
-  height: 100%;
+
+.j-map-editor__header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--j-darkest);
+  padding: max(32px, env(safe-area-inset-top, 32px)) 0 8px 0;
+  border-bottom: 2px solid var(--j-panel-edge);
 }
-.j-dock-split--row {
-  grid-template-columns: var(--j-dock-a) 10px var(--j-dock-b);
+
+.j-map-editor__title {
+  text-align: center;
+  margin-bottom: 12px;
 }
-.j-dock-split--column {
-  grid-template-rows: var(--j-dock-a) 10px var(--j-dock-b);
+
+.j-map-editor__scroll {
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
-.j-dock-gutter {
+
+.j-map-editor__ante-page {
+  scroll-snap-align: start;
+  padding: 16px 8px 24px 8px;
+  min-height: 100%;
   display: grid;
   place-items: center;
-}
-.j-dock-gutter--row {
-  cursor: col-resize;
-}
-.j-dock-gutter--column {
-  cursor: row-resize;
-}
-.j-dock-pane {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  min-height: 0;
-  min-width: 0;
-}
-.j-dock-pane--drop-left { box-shadow: inset 6px 0 0 var(--j-gold); }
-.j-dock-pane--drop-right { box-shadow: inset -6px 0 0 var(--j-gold); }
-.j-dock-pane--drop-top { box-shadow: inset 0 6px 0 var(--j-gold); }
-.j-dock-pane--drop-bottom { box-shadow: inset 0 -6px 0 var(--j-gold); }
-.j-dock-tabs {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: 2px;
-  align-items: end;
-  overflow-x: auto;
-}
-.j-dock-tabs--drop {
-  outline: 2px dashed var(--j-gold);
-  outline-offset: 1px;
-  border-radius: 6px;
-}
-.j-dock-tabs .j-outer-tab__grip {
-  display: none;
-}
-.j-dock-body {
-  min-height: 0;
-  overflow: auto;
-  background: color-mix(in srgb, var(--j-dark) 92%, transparent);
-  border: 2px solid var(--j-inner-border);
-  border-radius: 0 0 8px 8px;
-}
-
-.j-jaml-ide-visual__drag-ghost {
-    position: fixed;
-    left: var(--j-drag-left);
-    top: var(--j-drag-top);
-    pointer-events: none;
-    z-index: 999;
-    filter: drop-shadow(0 4px 6px color-mix(in srgb, var(--j-black) 60%, transparent));
-    opacity: 0.92;
-}
-
-.j-jaml-ide-visual__zone-rail--drop {
-    outline: 2px solid var(--j-gold);
-    outline-offset: 2px;
-}
-
-/* ── Added via Fix ── */
-.j-footer__suit--heart { animation-name: jaml-heart; }
-.j-footer__suit--spade { animation-name: jaml-spade; }
-.j-footer__suit--diamond { animation-name: jaml-diamond; }
-.j-footer__suit--club { animation-name: jaml-club; }
-@keyframes jaml-heart   { 0%{opacity:0;transform:scale(1)} 1%{opacity:1;transform:scale(1.45)} 3.5%{opacity:1;transform:scale(1)} 61.5%{opacity:1;transform:scale(1)} 62%{opacity:0} 100%{opacity:0} }
-@keyframes jaml-spade   { 0%,61.5%{opacity:0} 62%{opacity:1;transform:scale(1.45)} 64.5%{opacity:1;transform:scale(1)} 71.5%{opacity:1} 72%{opacity:0} 100%{opacity:0} }
-@keyframes jaml-diamond { 0%,71.5%{opacity:0} 72%{opacity:1;transform:scale(1.45)} 74.5%{opacity:1;transform:scale(1)} 81.5%{opacity:1} 82%{opacity:0} 100%{opacity:0} }
-@keyframes jaml-club    { 0%,81.5%{opacity:0} 82%{opacity:1;transform:scale(1.45)} 84.5%{opacity:1;transform:scale(1)} 99.5%{opacity:1} 100%{opacity:0} }
-.j-jaml-map-editor { width: 100%; height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
-.j-jaml-map-editor__header { position: sticky; top: 0; z-index: 10; background: var(--j-darkest); padding: max(32px, env(safe-area-inset-top, 32px)) 0 8px 0; border-bottom: 2px solid var(--j-panel-edge); }
-.j-jaml-map-editor__title { text-align: center; margin-bottom: 12px; }
-.j-jaml-map-editor__scroll { overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
-.j-jaml-map-editor__ante { scroll-snap-align: start; padding: 16px 8px 24px 8px; min-height: 100%; display: grid; place-items: center; }
-.j-jaml-map-editor__ante-panel { display: grid; gap: 16px; padding: 12px 8px; width: 100%;
-  /* width:100% with horizontal padding: without this the box is its
-     padding wider than its container and overhangs. */
   box-sizing: border-box;
 }
-.j-jaml-map-editor__ante-title { text-align: center; }
-.j-jaml-map-editor__row { padding: 0 4px; }
-.j-jaml-map-editor__section-title { letter-spacing: 1px; padding: 0 4px; }
-/* Shop = Blueprint belt: one row of pixel cards, scroll sideways. Never wrap. */
-.j-shop-belt {
+
+.j-map-editor__ante-card {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: 8px;
-  align-items: end;
+  gap: 16px;
+  padding: 12px 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.j-map-editor__ante-title {
+  text-align: center;
+}
+
+.j-map-editor__blinds-row {
+  padding: 0 4px;
+}
+
+.j-map-editor__section-label {
+  letter-spacing: 1px;
+  padding: 0 4px;
+}
+
+.j-map-editor__shop-strip {
   overflow-x: auto;
-  overflow-y: hidden;
-  min-width: 0;
   padding: 0 0 8px 4px;
 }
 
-.j-shop-belt-wrap {
+.j-map-editor__packs-strip {
+  padding: 0 4px;
+}
+
+.j-category-menu {
   display: grid;
-  grid-template-columns: max-content minmax(0, 1fr) max-content;
-  gap: 8px;
+  gap: 12px;
+  padding: 12px 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.j-category-menu__row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  min-width: 0;
-}
-
-.j-shop-belt--grab {
-  cursor: grab;
-  user-select: none;
-  touch-action: pan-y;
-}
-
-.j-shop-belt--grabbing {
-  cursor: grabbing;
-}
-
-.j-shop-belt--snap {
-  scroll-snap-type: x mandatory;
-}
-
-.j-shop-belt--snap > * {
-  scroll-snap-align: center;
-}
-.j-jaml-map-editor__pack-row { padding: 0 4px; }
-.j-category-menu { display: grid; gap: 12px; padding: 12px 0; max-height: 70vh; overflow-y: auto; }
-.j-category-menu__item { display: grid; grid-auto-flow: column; grid-template-columns: auto 1fr; align-items: center; gap: 10px; width: 100%; text-align: left; }
-.j-category-menu__text { display: grid; gap: 2px; }
-
-/* ── Keyboard focus ───────────────────────────────────────────────────────
- * Six selectors set `outline: none` and only one (.j-inline-edit) ever put a
- * ring back, so tabbing through the app left no visible focus at all on text
- * inputs, selects and the seed field. Buttons kept the UA default ring, which
- * is a different shape and colour in every host — the opposite of the
- * render-identically-everywhere goal.
- *
- * One gold ring for every interactive primitive. :focus-visible (not :focus)
- * so a mouse click does not paint it. outline + offset rather than box-shadow:
- * outline never participates in layout, so this cannot reflow a grid.
- */
-.j-btn:focus-visible,
-.j-tab:focus-visible,
-.j-outer-tab:focus-visible,
-.j-link:focus-visible,
-.j-list-item:focus-visible,
-.j-picker:focus-visible,
-.j-seed-copy:focus-visible,
-.j-category-menu__item:focus-visible,
-.j-text-input:focus-visible,
-.j-textarea:focus-visible,
-.j-seed-input__field:focus-visible {
-  outline: 2px solid var(--j-gold);
-  outline-offset: 2px;
-}
-
-/* ── JimboSlider — chunky range dial ──────────────────────────────────── */
-.j-slider {
-  -webkit-appearance: none;
-  appearance: none;
+  gap: 10px;
   width: 100%;
-  height: 10px;
-  border-radius: var(--j-radius-md);
-  border: 2px solid var(--j-panel-edge);
-  background: linear-gradient(
-    90deg,
-    var(--j-gold) 0%, var(--j-gold) var(--j-slider-fill, 50%),
-    var(--j-surface-inset) var(--j-slider-fill, 50%), var(--j-surface-inset) 100%
-  );
-  outline: none;
-  cursor: pointer;
-}
-.j-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px; height: 24px;
-  border-radius: var(--j-radius-md);
-  background: radial-gradient(circle at 40% 35%, #fff7e6, var(--j-grey) 45%, #7f8b8d 100%);
-  border: 2px solid var(--j-dark-orange);
-  box-shadow: 0 var(--j-press-y) 0 var(--j-dark-orange);
-  cursor: grab;
-}
-.j-slider::-webkit-slider-thumb:active { transform: translateY(1px); cursor: grabbing; }
-.j-slider::-moz-range-thumb {
-  width: 22px; height: 22px;
-  border-radius: var(--j-radius-md);
-  background: radial-gradient(circle at 40% 35%, #fff7e6, var(--j-grey) 45%, #7f8b8d 100%);
-  border: 2px solid var(--j-dark-orange);
-  cursor: grab;
-}
-.j-slider:disabled { opacity: 0.55; cursor: not-allowed; }
-.j-slider:focus-visible { box-shadow: 0 0 0 3px rgba(228, 182, 67, 0.5); }
-
-/* ── SeedCalculus — geometric-waiting-time panel ──────────────────────── */
-.j-seedcalc__rarity { text-align: center; display: flex; flex-direction: column; gap: var(--j-space-xs); }
-.j-seedcalc__rarity-big { letter-spacing: 0.5px; }
-.j-seedcalc__one { color: var(--j-gold); }
-
-.j-seedcalc__dials {
-  display: grid; gap: var(--j-space-lg);
-  grid-template-columns: 1fr;
-}
-@media (min-width: 561px) { .j-seedcalc__dials { grid-template-columns: 1fr 1fr; } }
-.j-seedcalc__dial { display: flex; flex-direction: column; gap: var(--j-space-sm); }
-
-.j-seedcalc__tiles {
-  display: grid; gap: var(--j-space-md);
-  grid-template-columns: repeat(2, 1fr);
-}
-@media (min-width: 720px) { .j-seedcalc__tiles { grid-template-columns: repeat(4, 1fr); } }
-.j-seedcalc__tile {
-  position: relative;
-  background: var(--j-darkest);
-  border: var(--j-panel-border-width) solid var(--j-panel-edge);
-  border-radius: var(--j-radius-lg);
-  padding: var(--j-space-lg) var(--j-space-md) var(--j-space-md);
-  display: flex; flex-direction: column; gap: var(--j-space-xs);
-  overflow: hidden;
-}
-.j-seedcalc__tile--red { border-color: var(--j-dark-red); }
-.j-seedcalc__tile--blue { border-color: var(--j-dark-blue); }
-.j-seedcalc__tile--gold { border-color: var(--j-dark-orange); }
-.j-seedcalc__tile--green { border-color: var(--j-dark-green); }
-.j-seedcalc__suit {
-  position: absolute; top: 6px; right: 8px;
-  font-size: 30px; line-height: 1; opacity: 0.85;
-}
-.j-seedcalc__tile--red .j-seedcalc__suit { color: var(--j-red); }
-.j-seedcalc__tile--blue .j-seedcalc__suit { color: var(--j-blue); }
-.j-seedcalc__tile--gold .j-seedcalc__suit { color: var(--j-gold); }
-.j-seedcalc__tile--green .j-seedcalc__suit { color: var(--j-green); }
-.j-seedcalc__tile-value { font-variant-numeric: tabular-nums; }
-.j-seedcalc__formula { opacity: 0.8; }
-
-.j-seedcalc__plot {
-  width: 100%; height: auto; display: block;
-  border-radius: var(--j-radius-md);
-  border: 2px solid var(--j-panel-edge);
-  background: var(--j-darkest);
-  touch-action: none; cursor: ew-resize;
-}
-
-/* ──────────────────────────────────────────────────────────────────────────
-   FilterStory — a filter rendered as a run story. Essay, ante arc, seed wall.
-   ────────────────────────────────────────────────────────────────────────── */
-
-.j-story {
-  display: grid;
-  gap: var(--j-space-lg);
-  max-width: 1150px;
-  margin: 0 auto;
-  padding: var(--j-space-lg);
-  box-sizing: border-box;
-}
-
-.j-story__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--j-space-sm);
-  margin-bottom: var(--j-space-sm);
-}
-
-/* The author's essay, verbatim — typos are load-bearing. */
-.j-story__essay {
-  line-height: 1.6;
-  white-space: pre-wrap;
   text-align: left;
 }
 
-/* the arc — one column per ante, clauses as weighted chips */
-.j-story-arc {
+.j-category-menu__copy {
   display: grid;
-  grid-template-columns: repeat(var(--j-story-antes, 8), minmax(128px, 1fr));
-  gap: var(--j-space-sm);
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.j-story-ante {
-  background: color-mix(in srgb, var(--j-dark) 70%, transparent);
-  border: 2px solid var(--j-inner-border);
-  border-radius: 8px;
-  padding: var(--j-space-sm);
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-  align-content: start;
-  min-height: 96px;
-}
-
-.j-story-ante__label {
-  font-family: var(--j-font);
-  font-size: 12px;
-  color: var(--j-gold);
-  letter-spacing: 1px;
-}
-
-.j-story-ante__chips {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: 6px;
-}
-
-.j-story-arc__anytime {
-  margin-top: var(--j-space-sm);
-  padding: var(--j-space-sm);
-  border: 2px dashed var(--j-inner-border);
-  border-radius: 8px;
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  gap: var(--j-space-sm);
-}
-
-.j-story-chip {
-  display: grid;
-  grid-template-columns: 1fr max-content;
-  gap: 2px 6px;
-  border: 2px solid var(--j-inner-border);
-  border-radius: 6px;
-  padding: 5px 7px;
-  background: color-mix(in srgb, var(--j-darkest) 80%, transparent);
-  font-family: var(--j-font);
-}
-
-.j-story-chip--must {
-  border-color: var(--j-gold);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--j-gold) 40%, transparent);
-}
-
-.j-story-chip--mustnot {
-  border-color: var(--j-red);
-}
-
-.j-story-chip--should {
-  border-color: color-mix(in srgb, var(--j-blue) 65%, transparent);
-}
-
-.j-story-chip__type {
-  grid-column: 1 / -1;
-  font-size: 9px;
-  color: var(--j-grey);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.j-story-chip__name {
-  font-size: 12px;
-  color: var(--j-white);
-  line-height: 1.25;
-}
-
-.j-story-chip__score {
-  font-size: 12px;
-  color: var(--j-green);
-  align-self: center;
-}
-
-.j-story-chip__score--fixed {
-  color: var(--j-gold);
-  font-size: 10px;
-}
-
-.j-story-chip--mustnot .j-story-chip__score--fixed {
-  color: var(--j-red);
-}
-
-/* the keep — seed wall */
-.j-story-keep__mascot {
-  display: flex;
-  align-items: center;
-  gap: var(--j-space-md);
-  margin-bottom: var(--j-space-md);
-}
-
-.j-story-keep__wall {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: var(--j-space-sm);
-}
-
-.j-story-seed {
-  perspective: 700px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  height: 118px;
-  font-family: var(--j-font);
-}
-
-.j-story-seed__inner {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1.1);
-}
-
-.j-story-seed--flipped .j-story-seed__inner {
-  transform: rotateY(180deg);
-}
-
-.j-story-seed__face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border: 2px solid var(--j-inner-border);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--j-dark) 85%, transparent);
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
-  place-content: center;
-  gap: 4px;
-  padding: 6px;
-  box-sizing: border-box;
-}
-
-.j-story-seed__front {
-  color: var(--j-white);
-}
-
-.j-story-seed--crowned .j-story-seed__front {
-  border-color: var(--j-gold);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--j-gold) 35%, transparent);
-}
-
-.j-story-seed__crown {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 18px;
-  color: var(--j-gold);
-  text-shadow: 0 2px 0 var(--j-black);
-}
-
-.j-story-seed__string {
-  font-size: 16px;
-  letter-spacing: 1px;
-}
-
-.j-story-seed--crowned .j-story-seed__string {
-  color: var(--j-gold);
-}
-
-.j-story-seed__no {
-  font-size: 9px;
-  color: var(--j-grey);
-}
-
-.j-story-seed__back {
-  transform: rotateY(180deg);
-  place-content: start center;
-  text-align: left;
-  overflow: hidden auto;
-}
-
-.j-story-seed__hint {
-  font-size: 11px;
-  color: var(--j-grey);
-  align-self: center;
-  justify-self: center;
-}
-
-.j-story-seed__summary {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: max-content;
   gap: 2px;
-  width: 100%;
 }
 
-.j-story-seed__score {
-  font-size: 12px;
-  color: var(--j-green);
-}
-
-.j-story-seed__ante {
-  font-size: 9px;
-  color: var(--j-white);
-  line-height: 1.3;
-}
-
-/* Named from TS, not from any rule here: JamlMapPreview sets it on --j-map-pill-anim. */
-@keyframes j-glow-pulse {
-
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}

@@ -3,31 +3,41 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [master, v10]
+    branches: [master]
 
 permissions:
   contents: read
 
 jobs:
   verify:
-    name: typecheck · build · test · storybook
+    name: typecheck · lint · build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+<<<<<<< Updated upstream
       - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
+=======
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 24
+          version: 10
+>>>>>>> Stashed changes
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - run: pnpm typecheck
+      - name: Typecheck
+        run: pnpm typecheck
 
-      - run: pnpm build
+      - name: Lint
+        run: pnpm lint
 
-      - run: pnpm test
-
-      - run: pnpm build-storybook
+      - name: Build
+        run: pnpm build

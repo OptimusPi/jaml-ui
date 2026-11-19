@@ -37,4 +37,4 @@ run("git push origin master");
 run(`git push origin v${version}`);
 run("pnpm publish --no-git-checks");
 
-console.log(`\n✓ jaml-ui ${version} published to npm.`);
+console.log(`\n[ok] jaml-ui ${version} published to npm.`);

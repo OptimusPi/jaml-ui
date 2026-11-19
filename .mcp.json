@@ -2,7 +2,12 @@
   "mcpServers": {
     "storybook": {
       "type": "http",
-      "url": "http://127.0.0.1:6006/mcp"
+      "url": "http://localhost:3141/mcp"
+    },
+    "jaml": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["scripts/jaml-mcp-server.mjs"]
     }
   }
 }

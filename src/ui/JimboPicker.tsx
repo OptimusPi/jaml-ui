@@ -39,7 +39,8 @@ export interface JimboPickerGridProps extends HTMLAttributes<HTMLDivElement> {
   scroll?: boolean;
 }
 
-export function JimboPickerGrid({ legendary, className, children, ...rest }: JimboPickerGridProps) {
+export function JimboPickerGrid({ legendary, scroll, className, children, ...rest }: JimboPickerGridProps) {
+  void scroll;
   const classes = ["j-picker__grid", legendary ? "j-picker__grid--legendary" : "", className]
     .filter(Boolean)
     .join(" ");

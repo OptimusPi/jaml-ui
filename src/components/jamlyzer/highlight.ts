@@ -4,9 +4,9 @@ import {
   matchClauseToAnte,
   highlightClassForKind,
   normalizeName,
-  type JamlClause,
+  type ParsedJamlClause,
   type JamlItemType,
-} from "../../lib/jaml/jaml.js";
+} from "../../lib/jaml/parseClauses.js";
 import type { MotelyRenderableCategory } from "../../decode/motelyItemDecoder.js";
 
 export function itemTypeOfCategory(category: MotelyRenderableCategory): JamlItemType {
@@ -26,8 +26,8 @@ export function itemTypeOfCategory(category: MotelyRenderableCategory): JamlItem
   }
 }
 
-export function buildMatchMap(clauses: JamlClause[]): Map<string, JamlClause[]> {
-  const map = new Map<string, JamlClause[]>();
+export function buildMatchMap(clauses: ParsedJamlClause[]): Map<string, ParsedJamlClause[]> {
+  const map = new Map<string, ParsedJamlClause[]>();
   for (const clause of clauses) {
     for (const name of clause.names) {
       const key = `${clause.itemType}:${normalizeName(name)}`;
@@ -43,7 +43,7 @@ export function selectHighlight(
   itemType: JamlItemType,
   name: string,
   ante: number,
-  matches: Map<string, JamlClause[]>
+  matches: Map<string, ParsedJamlClause[]>
 ): string | undefined {
   const key = `${itemType}:${normalizeName(name)}`;
   const clauses = matches.get(key) ?? [];

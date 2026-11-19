@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import type { JokerRarityTier } from "./jokerRarity.js";
 import { JimboSprite } from "../../ui/sprites.js";
+import { JimboBox } from "../../ui/JimboBox.js";
 import { JimboColorOption, withAlpha, JIMBO_ANIMATIONS } from "../../ui/tokens.js";
 import type { SpriteSheetType } from "../../sprites/spriteMapper.js";
 
@@ -57,8 +58,6 @@ const ZONE_BORDER: Record<JamlZone, string> = {
   should: C.RED,
   mustnot: C.ORANGE,
 };
-
-import { JimboBox } from "../../ui/JimboBox.js";
 
 // ─── Component ───────────────────────────────────────────────────────────────
 

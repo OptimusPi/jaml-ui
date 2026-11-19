@@ -1,55 +1,24 @@
 /**
- * Engine vocabulary guard. Every name and key this package uses comes from the engine:
- * item names from motely-wasm's enums (src/engineVocab.ts) and filter keys from
- * src/lib/jaml/engineGrammar.generated.ts (generated from MotelyJAML's YAML loader by
- * scripts/gen-engine-grammar.mjs). This script proves both against the engine itself:
+ * Engine vocabulary guard. Every key and name this package uses comes from the engine package:
+ * motely-wasm/jaml/vocab.json (through src/lib/jaml/engineGrammar.ts and src/engineVocab.ts).
+ * The engine's own tests write that file from its loader. This script proves the file that is
+ * installed against the wasm binary that is installed beside it:
  *
- *   1. Every generated root, clause, clause-property and sources key is mapped by
- *      motely-wasm's JamlConfigLoader.check, and a made-up key is refused.
- *   2. The rarity bits partition the joker list: common + uncommon + rare + legendary.
+ *   1. Every root key, clause key, clause member and nested member in vocab.json loads through
+ *      the binary's JamlConfigLoader.check, and a made-up key is refused.
+ *   2. Every enum in vocab.json that the binary also exports has the same names in the same
+ *      order, and the rarity bits of MotelyItemType partition the jokers into vocab.json's
+ *      four rarity lists.
  *   3. Decode enums round-trip name -> value -> name (a collision mislabels results).
- *
- * motely-wasm 30 changed check()'s contract: valid YAML returns null, invalid YAML THROWS
- * a .NET exception (no message survives the boundary), and the throw poisons the runtime —
- * the next wasm call aborts the process ("attempted to call a UnmanagedCallersOnly method
- * from managed code"). A long-lived probe loop is also unstable: once enough garbage
- * accumulates, a GC finalizer calls back into the wasm and the process dies mid-run. So
- * every probe below is valid YAML (a mapped key loads: null; a drifted key throws), the
- * probes run in batches of child processes, and a throwing batch abandons only its own
- * process — the parent keeps probing and reports every drifted key it found.
  *
  * Run: pnpm vocab:check
  */
-import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 
 import * as Motely from "motely-wasm";
 
-import { CLAUSE_KEYS, DISCRIMINATORS, MOTELY_JOKER_STICKER, ROOT_KEYS, SOURCE_KEYS } from "../src/lib/jaml/engineGrammar.generated.ts";
-
-// ── child mode: run the probes sent as JSON on stdin, report JSON on stdout ──
-// Kept at the top so the parent never boots the wasm for its own bookkeeping.
-if (process.argv.includes("--probes")) {
-  const probes = JSON.parse(await new Promise((resolve) => {
-    let text = "";
-    process.stdin.on("data", (chunk) => (text += chunk));
-    process.stdin.on("end", () => resolve(text));
-  }));
-  const boot = Motely.default;
-  if (boot.getStatus() !== boot.BootStatus.Booted) await boot.boot();
-  const results = [];
-  for (const { label, yaml } of probes) {
-    try {
-      results.push({ label, result: Motely.JamlConfigLoader.check(yaml) });
-    } catch {
-      // The runtime is poisoned by a throw: report and stop, the parent probes on.
-      results.push({ label, threw: true });
-      break;
-    }
-  }
-  process.stdout.write(JSON.stringify(results));
-  process.exit(0);
-}
+const vocab = JSON.parse(readFileSync(createRequire(import.meta.url).resolve("motely-wasm/jaml/vocab.json"), "utf8"));
 
 const problems = [];
 const notes = [];
@@ -64,176 +33,102 @@ function runtimeEnumNames(enumObject) {
   return Object.keys(enumObject).filter((key) => Number.isNaN(Number(key)));
 }
 
-// ── 1. The generated grammar is the engine loader's grammar ─────────────────
-// Probe values come from the engine's own enums (like src/engineVocab.ts), so a
-// rename there fails here with a drift report instead of a false probe error.
-const names = (e) => runtimeEnumNames(e);
-const first = (e) => names(e)[0];
-const ITEM = Motely.MotelyItemType;
-const ofCategory = (c) => names(ITEM).filter((k) => (ITEM[k] & 0xf000) === Motely.MotelyItemTypeCategory[c]);
-const ofRarity = (r) => ofCategory("Joker").filter((k) => (ITEM[k] & 0x0c00) === Motely.MotelyJokerRarity[r]);
-const JOKER = first(Motely.MotelyJoker);
-const CARD = ofCategory("Standardcard")[0];
-const RARITY_CLAUSE_JOKER = {
-  CommonJokerClause: ofRarity("Common")[0],
-  UncommonJokerClause: ofRarity("Uncommon")[0],
-  RareJokerClause: ofRarity("Rare")[0],
-  LegendaryJokerClause: ofRarity("Legendary")[0],
-};
-/** Valid value per grammar valueProperty / clause property (shape per the engine source). */
-const VALUE = {
-  jokers: () => [JOKER],
-  planets: () => [ofCategory("PlanetCard")[0]],
-  spectrals: () => [ofCategory("SpectralCard")[0]],
-  tarots: () => [ofCategory("TarotCard")[0]],
-  vouchers: () => [first(Motely.MotelyVoucher)],
-  tags: () => [first(Motely.MotelyTag)],
-  bosses: () => [first(Motely.MotelyBossBlind)],
-  packs: () => [first(Motely.MotelyBoosterPack)],
-  pokerHands: () => ["Flush"],
-  label: () => "probe",
-  min: () => 1,
-  max: () => 1,
-  score: () => 1,
-  antes: () => [1],
-  rolls: () => [1],
-  edition: () => first(Motely.MotelyItemEdition),
-  stickers: () => [MOTELY_JOKER_STICKER[1]],
-  rank: () => first(Motely.MotelyStandardcardRank),
-  suit: () => first(Motely.MotelyStandardcardSuit),
-  enhancement: () => first(Motely.MotelyItemEnhancement),
-  seal: () => first(Motely.MotelyItemSeal),
-  with: () => ({ luck: "X1", jokers: [JOKER] }),
-  mult: () => 5,
-  mode: () => "Sum",
-  card: () => CARD,
-  soulCardOnly: () => true,
-  soulEditionRolls: () => 1,
-  maxAnte: () => 8,
-  boosterPacks: () => [1],
-};
-const flow = (v) => {
-  if (Array.isArray(v)) return `[${v.join(", ")}]`;
-  if (typeof v === "object" && v !== null)
-    return `{ ${Object.entries(v).map(([k, val]) => `${k}: ${flow(val)}`).join(", ")} }`;
-  return String(v);
-};
-
-/** `must:` with one clause; props are extra lines (already 4-space indented). */
-const mustClause = (clauseLine, props = []) => `must:\n  ${clauseLine}\n` + props.map((l) => `    ${l}\n`).join("");
-
-const discValue = (disc, d) => {
-  if (disc === "and" || disc === "or") return null; // nested clause list, rendered on the clause line
-  if (d.clause === "LegendarySoulOrderClause") return null; // entry list, rendered on the clause line
-  if (d.clause === "StandardCardClause" || d.clause === "StartingDrawClause") return CARD;
-  if (RARITY_CLAUSE_JOKER[d.clause]) return RARITY_CLAUSE_JOKER[d.clause];
-  const make = VALUE[d.valueProperty];
-  return make ? make() : "x";
-};
-const clauseDoc = (disc, props = []) => {
-  if (disc === "and" || disc === "or") return mustClause(`- ${disc}:\n      - joker: [${JOKER}]`, props);
-  if (DISCRIMINATORS[disc].clause === "LegendarySoulOrderClause")
-    return mustClause(`- ${disc}:\n      - legendary: ${ofRarity("Legendary")[0]}\n        antes: [1]`, props);
-  return mustClause(`- ${disc}: ${flow(discValue(disc, DISCRIMINATORS[disc]))}`, props);
-};
-/** sources-block values: bool switches vs int[] slot/roll lists (per the engine source). */
-const sourceValue = (key) => (["requireMegaPack", "etherealTag", "omenGlobe", "charmTag"].includes(key) ? "true" : "[1]");
+// ── 1. vocab.json's keys are keys the binary's loader maps ──────────────────
+// One value per member, built from what vocab.json says the member takes. The loader reads JSON
+// as it reads YAML, so each probe is a JSON document.
+const firstClauseKey = Object.keys(vocab.clauses)[0];
+const objectOf = (type) =>
+  Object.fromEntries(Object.entries(vocab.types[type]).filter(([, m]) => m.required).map(([key, m]) => [key, example(m)]));
+function example(member) {
+  switch (member.form) {
+    case "Text": return "probe";
+    case "Int": return 1;
+    case "Bool": return true;
+    case "Name":
+    case "Names":
+    case "CardSlot": return vocab.enums[member.enum][0];
+    case "Ints":
+    case "EventRolls": return [1];
+    case "Texts": return ["AAAA1111"];
+    case "Clauses": return [clauseOf(firstClauseKey)];
+    case "Object": return objectOf(member.type);
+    case "Objects": return [objectOf(member.type)];
+    case "NoValue": return null;
+    default:
+      problems.push(`vocab.json names a form this script does not know: ${member.form}`);
+      return null;
+  }
+}
+const clauseOf = (key) => ({ [key]: example(vocab.types[vocab.clauses[key]][key]) });
 
 const probes = [];
-const probe = (label, yaml) => probes.push({ label, yaml });
+const probe = (label, doc) => probes.push({ label, text: JSON.stringify(doc) });
 
-probe("root.id", "id: probe\n");
-probe("root.name", "name: probe\n");
-probe("root.description", "description: probe\n");
-probe("root.author", "author: probe\n");
-probe("root.deck", `deck: ${first(Motely.MotelyDeck)}\n`);
-probe("root.stake", `stake: ${first(Motely.MotelyStake)}\n`);
-probe("root.seeds", "seeds: [AAAA]\n");
-probe("root.cutoff", "cutoff: 5\n");
-for (const key of ["must", "should", "mustNot"]) probe(`root.${key}`, mustClause(`- joker: [${JOKER}]`));
-
-for (const [disc, d] of Object.entries(DISCRIMINATORS)) {
-  probe(disc, clauseDoc(disc));
-}
-// Clause-property probes: once per clause class (plural discriminators share the class).
-const classDisc = {};
-for (const [disc, d] of Object.entries(DISCRIMINATORS)) if (!classDisc[d.clause]) classDisc[d.clause] = disc;
-for (const [cls, disc] of Object.entries(classDisc)) {
-  const d = DISCRIMINATORS[disc];
-  for (const key of CLAUSE_KEYS[cls]) {
-    if (key === d.valueProperty) continue;
-    if (key === "sources" || key === "legendarySources") {
-      const blockKey = SOURCE_KEYS[`${cls}.${key}`]?.[0];
-      if (!blockKey) continue; // no block for this clause: nothing to probe here
-      probe(`${cls}.${key}`, clauseDoc(disc, [`${key}:`, `  ${blockKey}: ${sourceValue(blockKey)}`]));
-      continue;
+for (const [key, member] of Object.entries(vocab.root)) probe(`root.${key}`, { [key]: example(member) });
+const probedTypes = new Set();
+for (const [key, type] of Object.entries(vocab.clauses)) {
+  probe(key, { must: [clauseOf(key)] });
+  if (probedTypes.has(type)) continue; // a second key of the same clause shares its members
+  probedTypes.add(type);
+  for (const [memberKey, member] of Object.entries(vocab.types[type])) {
+    if (memberKey === key) continue;
+    probe(`${type}.${memberKey}`, { must: [{ ...clauseOf(key), [memberKey]: example(member) }] });
+    if (!member.type || probedTypes.has(member.type)) continue;
+    probedTypes.add(member.type);
+    for (const [nestedKey, nested] of Object.entries(vocab.types[member.type])) {
+      const mapping = { ...objectOf(member.type), [nestedKey]: example(nested) };
+      probe(`${member.type}.${nestedKey}`, { must: [{ ...clauseOf(key), [memberKey]: member.form === "Objects" ? [mapping] : mapping }] });
     }
-    const make = VALUE[key];
-    if (!make) {
-      problems.push(`${cls}.${key}: no probe value known for this key — add one to check-vocab-drift.mjs`);
-      continue;
-    }
-    probe(`${cls}.${key}`, clauseDoc(disc, [`${key}: ${flow(make())}`]));
   }
 }
-for (const [where, keys] of Object.entries(SOURCE_KEYS)) {
-  const [clause, block] = where.split(".");
-  const disc = Object.keys(DISCRIMINATORS).find((k) => DISCRIMINATORS[k].clause === clause);
-  for (const key of keys) {
-    probe(`${where}.${key}`, clauseDoc(disc, [`${block}:`, `  ${key}: ${sourceValue(key)}`]));
-  }
-}
-// Run the probes in child-process batches: one poisoned or crashed process only
-// costs its batch, and no process lives long enough for the finalizer bug to fire.
-// The made-up-key guard gets its own batch: its throw poisons the runtime by design.
-let keysChecked = 0;
-const BATCH = 40;
-const batches = [];
-for (let at = 0; at < probes.length; at += BATCH) batches.push(probes.slice(at, at + BATCH));
-batches.push([{ label: "guard.madeUpKey", yaml: "notAKey: 1\n" }]); // must throw or return a message, never load
-const aggregate = [];
-for (const batch of batches) {
-  const child = spawnSync(process.execPath, ["--experimental-strip-types", fileURLToPath(import.meta.url), "--probes"], {
-    input: JSON.stringify(batch),
-    encoding: "utf8",
-    maxBuffer: 16 * 1024 * 1024,
-  });
-  let results;
+for (const type of Object.keys(vocab.types))
+  if (!probedTypes.has(type)) problems.push(`${type}: in vocab.json but no clause reaches it, so its keys were not checked`);
+
+const boot = Motely.default;
+if (boot.getStatus() !== boot.BootStatus.Booted) await boot.boot();
+const verdict = (text) => {
   try {
-    results = JSON.parse(child.stdout);
-  } catch {
-    problems.push(`engine probe batch ${batches.indexOf(batch) + 1} crashed the runtime (exit ${child.status}) — the engine rejected a probe hard enough to kill its process`);
-    continue;
+    return Motely.JamlConfigLoader.check(text);
+  } catch (thrown) {
+    return `threw: ${thrown?.message ?? thrown}`;
   }
-  aggregate.push(...results);
+};
+let keysChecked = 0;
+for (const { label, text } of probes) {
+  const refused = verdict(text);
+  if (refused === null) keysChecked += 1;
+  else problems.push(`${label}: vocab.json has this key but the installed engine refuses ${text}: ${refused}`);
 }
-let guardSawRejection = false;
-for (const r of aggregate) {
-  if (r.label === "guard.madeUpKey") {
-    if (r.threw || r.result !== null) guardSawRejection = true;
-    continue;
-  }
-  if (r.threw) {
-    problems.push(`${r.label}: the engine rejected a valid probe — the grammar drifted from motely-wasm`);
-  } else {
-    keysChecked += 1;
-    if (r.result !== null) problems.push(`${r.label}: ${r.result}`);
-  }
-}
-if (!guardSawRejection) {
-  problems.push("JamlConfigLoader.check accepted a made-up key; the grammar probe cannot tell mapped from unmapped");
-}
-notes.push(`${keysChecked} grammar keys mapped by JamlConfigLoader.check`);
+if (verdict(JSON.stringify({ notAKey: 1 })) === null || verdict(JSON.stringify({ must: [{ ...clauseOf(firstClauseKey), notAKey: 1 }] })) === null)
+  problems.push("JamlConfigLoader.check accepted a made-up key; the probe cannot tell mapped from unmapped");
+notes.push(`${keysChecked} of ${probes.length} vocab.json keys mapped by the installed engine's JamlConfigLoader.check`);
 
-// ── 2. The rarity bits partition the joker list ─────────────────────────────
+// ── 2. vocab.json's names are the binary's names ────────────────────────────
+let enumsSame = 0;
+let enumsCompared = 0;
+for (const [kind, listed] of Object.entries(vocab.enums)) {
+  const runtime = runtimeEnum(kind);
+  if (runtime === undefined) continue; // not every loader enum crosses into JS
+  enumsCompared += 1;
+  const names = runtimeEnumNames(runtime);
+  if (names.length === listed.length && names.every((name, at) => name === listed[at])) enumsSame += 1;
+  else problems.push(`${kind}: vocab.json lists ${listed.length} names, the binary exports ${names.length}, and they differ`);
+}
+notes.push(`${enumsSame}/${enumsCompared} enums in vocab.json match the binary's own, names and order`);
+
+// The rarity bits partition the joker list, into the lists vocab.json gives.
 const itemTypeEnum = runtimeEnum("MotelyItemType");
 const jokers = runtimeEnumNames(itemTypeEnum).filter((n) => (itemTypeEnum[n] & 0xf000) === Motely.MotelyItemTypeCategory.Joker);
 const tiers = ["Common", "Uncommon", "Rare", "Legendary"].map((r) =>
   jokers.filter((n) => (itemTypeEnum[n] & 0x0c00) === Motely.MotelyJokerRarity[r]),
 );
 const tierTotal = tiers.reduce((sum, t) => sum + t.length, 0);
+const rarityLists = ["MotelyJokerCommon", "MotelyJokerUncommon", "MotelyJokerRare", "MotelyJokerLegendary"].map((kind) => vocab.enums[kind]);
+const sameList = (a, b) => a.length === b.length && a.every((name, at) => name === b[at]);
 if (tierTotal !== jokers.length || tiers[3].length !== 5) {
   problems.push(`rarity tiers ${tiers.map((t) => t.length).join("/")} do not partition ${jokers.length} jokers into 5 legendaries`);
+} else if (!sameList(jokers, vocab.enums.MotelyJoker) || !tiers.every((tier, at) => sameList(tier, rarityLists[at]))) {
+  problems.push("the binary's rarity bits and vocab.json's rarity lists name different jokers");
 } else {
   notes.push(`joker tiers partition cleanly: ${tiers.map((t) => t.length).join(" + ")} = ${jokers.length}`);
 }
@@ -315,15 +210,12 @@ for (const note of notes) console.log(`  · ${note}`);
 if (problems.length) {
   console.error(`\n✗ vocabulary drift detected (${problems.length}):\n`);
   for (const problem of problems) console.error(`  ${problem}`);
-  console.error(
-    "\nRegenerate the grammar (node scripts/gen-engine-grammar.mjs) against the MotelyJAML\n" +
-      "build motely-wasm was published from.\n",
-  );
+  console.error("\nvocab.json and the wasm binary ship in the same motely-wasm package: reinstall it, or report the mismatch to the engine.\n");
   process.exit(1);
 }
 
 console.log(
-  `\n✓ vocabulary in sync — ${keysChecked} grammar keys mapped, joker tiers partition, ` +
+  `\n✓ vocabulary in sync — ${keysChecked} vocab.json keys mapped, ${enumsSame} enums match, joker tiers partition, ` +
     `${roundTripped} decode enum(s) round-trip\n`,
 );
 process.exit(0);

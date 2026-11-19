@@ -2,17 +2,15 @@
 
 import React, { useMemo } from "react";
 import { JimboSprite } from "../ui/sprites.js";
-import { JimboColorOption } from "../ui/tokens.js";
 import { JimboBox } from "../ui/JimboBox.js";
+import { JimboZoneRail } from "../ui/JimboZoneRail.js";
+import { JimboClausePill } from "../ui/JimboClausePill.js";
 import type { SpriteSheetType } from "../sprites/spriteMapper.js";
 import {
   extractVisualJamlItems,
-  type JamlPreviewItem,
   type JamlPreviewSection,
   type JamlPreviewVisualType,
 } from "../utils/jamlMapPreview.js";
-
-const C = JimboColorOption;
 
 export interface JamlMapPreviewProps {
   /** The raw JAML string to parse and visualize. */
@@ -25,12 +23,6 @@ export interface JamlMapPreviewProps {
   compact?: boolean;
 }
 
-const ZONES: Record<JamlPreviewSection, { label: string; color: string; glow: string }> = {
-  must: { label: "Must", color: C.BLUE, glow: C.BLUE },
-  should: { label: "Should", color: C.RED, glow: C.GOLD },
-  mustNot: { label: "Must Not", color: C.ORANGE, glow: C.ORANGE },
-};
-
 const SECTION_ORDER: JamlPreviewSection[] = ["must", "should", "mustNot"];
 
 const SHEET_FOR_VISUAL: Record<JamlPreviewVisualType, SpriteSheetType> = {
@@ -40,106 +32,6 @@ const SHEET_FOR_VISUAL: Record<JamlPreviewVisualType, SpriteSheetType> = {
   tag: "tags",
   boss: "BlindChips",
 };
-
-export function ClausePill({ 
-  item, 
-  glow, 
-  matchCount 
-}: { 
-  item: JamlPreviewItem; 
-  glow: string; 
-  matchCount: number;
-}) {
-  const isHit = matchCount > 0;
-  const hasData = matchCount !== undefined && matchCount >= 0;
-
-  return (
-    <JimboBox
-      className={isHit ? "j-map-preview-pill j-map-preview-pill--hit" : "j-map-preview-pill"}
-      style={{
-        "--j-map-pill-bg": isHit ? `${glow}33` : "var(--j-darkest)",
-        "--j-map-pill-border": isHit ? glow : "var(--j-panel-edge)",
-        "--j-map-pill-opacity": isHit ? 1 : 0.6,
-        "--j-map-pill-anim": isHit ? "j-glow-pulse 1.6s ease-in-out infinite" : "none",
-      } as React.CSSProperties}
-      title={`${item.clauseKey}: ${item.value}${hasData ? ` (Found: ${matchCount})` : ""}`}
-    >
-      <JimboSprite 
-        name={item.value} 
-        sheet={SHEET_FOR_VISUAL[item.visualType]} 
-        width={26} 
-      />
-      <JimboBox className="j-map-preview-pill-text">
-        {item.value}
-      </JimboBox>
-      {isHit && (
-        <JimboBox className="j-map-preview-hit-count">
-          {matchCount > 1 ? `x${matchCount}` : "1"}
-        </JimboBox>
-      )}
-    </JimboBox>
-  );
-}
-
-
-export function ZoneRail({ 
-  zone, 
-  items, 
-  matchMap,
-  compact = false
-}: { 
-  zone: JamlPreviewSection; 
-  items: JamlPreviewItem[];
-  matchMap: Record<string, number>;
-  compact?: boolean;
-}) {
-  const meta = ZONES[zone];
-  return (
-    <JimboBox
-      className={`j-map-preview-rail ${compact ? "j-map-preview-rail--compact" : "j-map-preview-rail--normal"}`}
-      style={{
-        "--j-map-rail-color": `${meta.color}55`,
-      } as React.CSSProperties}
-    >
-      <JimboBox className="j-map-preview-rail-header">
-        <JimboBox
-          className={`j-map-preview-rail-label ${compact ? "j-map-preview-rail-label--compact" : "j-map-preview-rail-label--normal"}`}
-          style={{ "--j-map-rail-bg": meta.color } as React.CSSProperties}
-        >
-          {meta.label}
-        </JimboBox>
-        <JimboBox 
-          className="j-map-preview-rail-line"
-          style={{ "--j-map-rail-line-bg": `${meta.color}44` } as React.CSSProperties} 
-        />
-        <JimboBox className="j-map-preview-rail-count">{items.length}</JimboBox>
-      </JimboBox>
-      <JimboBox className="j-map-preview-items">
-        {items.length === 0 ? (
-          <JimboBox className="j-map-preview-empty">
-            drop clauses here
-          </JimboBox>
-        ) : (
-          items.map((item) => {
-            // Match logic: the engine labels usually look like "must: joker: Blueprint"
-            // or "must: rareJoker: Blueprint". We try to match the item value and section.
-            const labelKey = `${item.section}: ${item.clauseKey}: ${item.value}`;
-            const count = matchMap[labelKey] ?? -1;
-
-            return (
-              <ClausePill 
-                key={item.id} 
-                item={item} 
-                glow={meta.glow}
-                matchCount={count}
-              />
-            );
-          })
-        )}
-      </JimboBox>
-    </JimboBox>
-  );
-}
 
 export function JamlMapPreview({
   jaml,
@@ -165,7 +57,13 @@ export function JamlMapPreview({
   if (totalItems === 0) {
     return (
       <JimboBox
-        className={`${className} j-map-preview-root-empty ${compact ? "j-map-preview-root-empty--compact" : "j-map-preview-root-empty--normal"}`.trim()}
+        className={[
+          "j-map-preview__empty",
+          compact ? "j-map-preview__empty--compact" : "",
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         {emptyMessage}
       </JimboBox>
@@ -174,17 +72,50 @@ export function JamlMapPreview({
 
   return (
     <JimboBox
-      className={`${className} j-map-preview-root ${compact ? "j-map-preview-root--compact" : "j-map-preview-root--normal"}`.trim()}
+      className={[
+        "j-map-preview",
+        compact ? "j-map-preview--compact" : "",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
-      {SECTION_ORDER.map((section) => (
-        <ZoneRail 
-          key={section} 
-          zone={section} 
-          items={groups[section]} 
-          matchMap={matchMap}
-          compact={compact}
-        />
-      ))}
+      {SECTION_ORDER.map((section) => {
+        const items = groups[section];
+        return (
+          <JimboZoneRail
+            key={section}
+            zone={section}
+            variant="preview"
+            compact={compact}
+            count={items.length}
+            emptyText="drop clauses here"
+          >
+            {items.map((item) => {
+              const labelKey = `${item.section}: ${item.clauseKey}: ${item.value}`;
+              const count = matchMap[labelKey] ?? -1;
+              const hasData = count >= 0;
+
+              return (
+                <JimboClausePill
+                  key={item.id}
+                  zone={section}
+                  label={item.value}
+                  matchCount={count}
+                  title={`${item.clauseKey}: ${item.value}${hasData ? ` (Found: ${count})` : ""}`}
+                  sprite={
+                    <JimboSprite
+                      name={item.value}
+                      sheet={SHEET_FOR_VISUAL[item.visualType]}
+                      width={26}
+                    />
+                  }
+                />
+              );
+            })}
+          </JimboZoneRail>
+        );
+      })}
     </JimboBox>
   );
 }
